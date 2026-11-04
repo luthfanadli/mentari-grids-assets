@@ -5,8 +5,25 @@ import unittest
 from unittest.mock import patch
 
 from prepare_data import (ROOT, TARGET_V, normalize_voltage, parse_voltages, osm_status,
-                          polygon_bucket, line_bucket, feature, validate_publication, prepare)
+                          polygon_bucket, line_bucket, feature, validate_publication, prepare, write_json)
 from shapely.geometry import LineString
+
+
+class SerializationTests(unittest.TestCase):
+    def test_json_bytes_preserve_publication_crlf_on_every_platform(self):
+        value = {"label": "Mentari ©", "note": "first\nsecond"}
+        expected = {
+            True: '{"label":"Mentari ©","note":"first\\nsecond"}\r\n',
+            False: '{\r\n  "label": "Mentari ©",\r\n  "note": "first\\nsecond"\r\n}\r\n',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "nested" / "export.json"
+            for compact, text in expected.items():
+                with self.subTest(compact=compact):
+                    write_json(path, value, compact=compact)
+                    self.assertEqual(path.read_bytes(), text.encode("utf-8"))
+                    self.assertEqual(json.loads(path.read_bytes()), value)
+                    self.assertFalse(path.with_suffix(".json.tmp").exists())
 
 
 class ClassificationTests(unittest.TestCase):

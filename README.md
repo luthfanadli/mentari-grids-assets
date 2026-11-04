@@ -22,7 +22,7 @@ Open http://localhost:5174. The preprocessed publication files are included unde
 - Layers icon: select **OpenStreetMap**, **Google Satellite** or **Plain background**. A configured custom style is retained as another choice. Switching preserves camera, asset filters, selection and counts.
 - The dashboard shows four actual inventory/review metrics. Planned RUPTL/RUKN data gaps and official region/system limitations remain in **About the data**, alongside source scope and provenance.
 
-Google Satellite uses the exact `mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}` endpoint supplied for this local implementation. The basemap receives separate Google Maps attribution; inventory attribution remains OSM/OpenInfraMap. This direct endpoint is not the documented Google Map Tiles API key/session integration. No Google account entitlement or provider-specific copyright metadata was verified. Before a public Google imagery release, use a service permitted by the applicable Google agreement and implement its provider attribution requirements; see [official satellite API documentation](https://developers.google.com/maps/documentation/tile/satellite) and [attribution policies](https://developers.google.com/maps/documentation/tile/policies). No offline tile download, proxy or prefetch was added. See [dashboard UI changes and verification](docs/DASHBOARD_UX_UPDATE.md).
+Google Satellite uses the exact `mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}` endpoint supplied for this local implementation. The basemap receives separate Google Maps attribution; inventory attribution remains OSM/OpenInfraMap. This is a direct raster integration, without the key/session workflow or provider-specific metadata of the [documented Google Map Tiles API](https://developers.google.com/maps/documentation/tile/satellite). No offline tile download, proxy or prefetch was added. See [dashboard UI changes, verification and integration limits](docs/DASHBOARD_UX_UPDATE.md).
 
 ## Reproduce spatial preprocessing
 
@@ -82,7 +82,9 @@ pnpm build
 pnpm preview
 ```
 
-`pnpm build` checks the eight data files, dataset checksums, version/count consistency, IDs, scope, representative-parent linkage and nonpublic-file exclusions before type checking and Vite compilation. It needs no raw data. Ten Node tests use the real generated datasets. Fifteen Python tests cover real-source counts/geometry, matching rules, deterministic exports and matching reports, unchanged baseline exports, exact point coordinates, representative containment, source-point promotion rejection and source-version mismatches. Source-dependent tests skip explicitly when the private raw file is absent.
+`pnpm build` checks the eight data files, dataset checksums, version/count consistency, IDs, scope, representative-parent linkage and nonpublic-file exclusions before type checking and Vite compilation. It needs no raw data. Eleven Node tests use the real generated datasets, including a Git staging/checkout regression for byte integrity. Sixteen Python tests cover real-source counts/geometry, matching rules, deterministic exports and matching reports, unchanged baseline exports, exact point coordinates, representative containment, source-point promotion rejection, source-version mismatches and platform-independent JSON serialization. Source-dependent tests skip explicitly when the private raw file is absent.
+
+Generated JSON/GeoJSON uses canonical UTF-8/CRLF bytes to retain the original catalog checksums. `.gitattributes` disables Git text conversion for `public/data/`. Keep the rule and all eight outputs in the same commit; when upgrading an existing checkout, refresh tracked data with `git add --renormalize public/data/`. The strict size/hash checks remain enabled. See [the Windows-to-Vercel build fix](docs/BUILD_FIX_GIT_LINE_ENDINGS.md) and [deployment notes](docs/DEPLOYMENT.md).
 
 Browser tests use Playwright and real MapLibre WebGL rendering:
 

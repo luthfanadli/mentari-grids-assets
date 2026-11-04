@@ -7,6 +7,9 @@ The repository has a Vercel Vite configuration. No hosted deployment was created
 1. Run preprocessing locally on the supplied private GeoPackage, then verify `pnpm check:data`, `pnpm test` and `pnpm build`.
 2. Include all eight generated files under `public/data/` together: four inventory/review GeoJSONs, one representative-symbol GeoJSON and three metadata files. Python and the raw data must not be fetched during a Vercel build. Full point-matching evidence/CSV stays under ignored root `data/qa/`.
 3. Keep `data/raw/`, `data/qa/`, virtual environments, `.env*`, restricted references and secrets excluded. `.gitignore` protects local source/QA; `.vercelignore` also excludes root `/data/` for CLI uploads. The leading slash is intentional: **`public/data/` remains included**. Do not upload the original ToR or license PDF.
+4. Include `.gitattributes` **and all eight `public/data/` files in the same commit**. These generated files use canonical UTF-8/CRLF bytes to retain the original catalog hashes. The `-text` rule prevents Git from normalizing those bytes. When adding this rule to an older checkout, use `git add .gitattributes` and `git add --renormalize public/data/` to refresh already-tracked files; adding the rule alone does not restore bytes already normalized in an earlier commit. The Python writer explicitly emits the same bytes on Windows and Linux.
+
+If the data guard reports `6151921` actual versus `6151922` expected bytes for `transmission-lines.geojson`, the older commit contains LF-normalized data but Windows-generated catalog hashes. All five GeoJSONs lose one byte this way. Restore the original generated files and commit them with the attributes rule; keep the strict byte/checksum checks enabled. The Git round-trip regression in `pnpm test` verifies staged bytes and clean checkouts with both `core.autocrlf=false` and `true`. See [the build-fix report](BUILD_FIX_GIT_LINE_ENDINGS.md).
 
 ## Import the existing repository
 

@@ -1,0 +1,3 @@
+# Generated publication files are checksummed as bytes. Preserve their canonical
+# CRLF serialization on every platform, regardless of core.autocrlf.
+/public/data/** -text whitespace=cr-at-eol

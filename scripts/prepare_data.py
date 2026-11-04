@@ -150,9 +150,12 @@ def sha256(path):
 def write_json(path, value, *, compact=False):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False,
-                                    separators=(",", ":") if compact else None,
-                                    indent=None if compact else 2) + "\n", encoding="utf-8")
+    text = json.dumps(value, ensure_ascii=False, allow_nan=False,
+                      separators=(",", ":") if compact else None,
+                      indent=None if compact else 2) + "\n"
+    # Retain the original Windows publication bytes/checksums on every OS.
+    # Binary writes avoid platform-dependent text-mode newline translation.
+    temporary.write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
     temporary.replace(path)
 
 
