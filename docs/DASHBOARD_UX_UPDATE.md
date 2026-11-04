@@ -1,6 +1,6 @@
 # Dashboard UI update — 4 November 2026
 
-The existing dashboard now has a collapsible legend, compact map controls and a Google Satellite basemap choice. The changes address the five supplied screenshots/requests. No preprocessing, data export, matching policy, package/lockfile, hosting configuration or deployment was changed in this update. Existing header and introduction edits were preserved.
+The existing dashboard now has a collapsible legend, compact map controls and a Google Satellite basemap choice. The changes address the five supplied screenshots/requests. No preprocessing, data export, matching policy, package/lockfile, hosting configuration or deployment was changed in this update. Existing header and introduction edits were preserved. The later logo and single-extent refinement is recorded at the end of this report and supersedes the original two-control arrangement.
 
 ## Presentation decisions
 
@@ -99,3 +99,32 @@ The final local `dist/` totals **9,637,945 bytes**. Main JavaScript is 115,166 b
 ## Remaining data gaps
 
 Authoritative planned RUPTL/RUKN assets, official regional/power-system membership, verified operation, source vintage, COD, capacity/MVA, circuit-km, AIS/GIS and unresolved physical station identity remain unavailable or unverified. This presentation update supplies no replacement values or infrastructure. See [the substation report](SUBSTATION_ENHANCEMENT_REPORT.md) for the source QA and preservation evidence.
+
+## Follow-up: MENTARI logo and one extent action
+
+Replaced the hand-drawn header icon with the existing `public/images/Mentari Logo_Tagline Revamp_Color.png` (96,120 bytes), preserving its full-color artwork and tagline. A white background maintains contrast with the green header; responsive dimensions and a narrow-screen spacing adjustment keep the logo, application title and navigation within 320 px. The source image was not edited or regenerated.
+
+Removed **Zoom to Indonesia** and its unused handler. **Fit filtered records** is now the only extent action; it fits the current filters and fits the full selected inventory again after clearing them. The initial map still opens over Indonesia. The icon, tooltip, accessible name, smooth/reduced-motion behavior and empty-selection disabling remain. Basemap and zoom-in/out controls remain available.
+
+Changed files for this follow-up: `src/components/AppHeader.vue`, `src/components/MapCanvas.vue`, `tests/e2e/inventory.spec.ts`, `README.md`, `docs/ARCHITECTURE.md` and this report. Concurrent user edits in `src/App.vue` were preserved. No dependency, data, preprocessing or deployment change was made.
+
+Verification:
+
+- `pnpm.cmd build`: **PASS**, including the unchanged publication guard and Vue/TypeScript checks.
+- Production-preview Edge checks: **2 passed** using `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175` and `pnpm.cmd exec playwright test --grep 'MENTARI logo|mobile filters'`. They verify the actual image loads, one extent action, fitting a searched polygon and the full filtered inventory, legend controls and existing mobile flows.
+- Header screenshots inspected at **1440, 390 and 320 px**; no document overflow. Internal screenshots: `data/qa/mentari-header-{1440,390,320}.png` and `mentari-single-extent.png`.
+- `git diff --check`: **PASS**.
+
+All eight publication files remain **7,800,419 bytes** with the same features, original geometries and checksums. The follow-up production bundle totals **9,733,642 bytes**: main JS 114,301 bytes, CSS 93,586 bytes, unchanged MapLibre vendor JS 1,104,231 bytes and worker 518,989 bytes. The existing nonfatal vendor-size warning remains. ToR/source gaps above remain unresolved; no values or infrastructure were fabricated. No deployment occurred.
+
+## Follow-up: remove dashboard notice and download section
+
+Removed the yellow **Source tags, unverified operation** banner from `src/App.vue`. Removed the entire **Download the published derivative database** section from `DataProvenanceDialog.vue`, including all five dataset links, three metadata links, processing note and version footer shown in the supplied screenshot. Removed the unused banner/download/version CSS. Source qualification remains in About, filters and feature details; source and ODbL attribution remain in the footer, map and publication metadata.
+
+There are no download controls or `/data/` links in the application UI. This is a UI removal, not access control: the static WebGIS still fetches publicly accessible `/data/` URLs to render its map. No endpoint, original feature, attribute, geometry, metadata or checksum was changed. No backend or download-blocking claim was introduced.
+
+Changed for this follow-up: `src/App.vue`, `src/components/DataProvenanceDialog.vue`, `src/style.css`, `tests/e2e/inventory.spec.ts`, `README.md`, `docs/ARCHITECTURE.md`, `docs/DEPLOYMENT.md` and this report. Earlier header, extent and concurrent user edits were preserved.
+
+Verification: `pnpm.cmd build` **passed**, including publication checks and Vue/TypeScript. The production-preview Edge command `pnpm.cmd exec playwright test --grep 'real map, flags|mobile filters'` with the previously documented environment variables returned **2 passed** (18.2 s). The existing inventory/search/details/candidate/mobile flow checks now also assert the banner, download heading and every dataset/download link are absent, while footer attribution remains. Desktop and 390 px About screenshots were inspected; no mobile document overflow was observed. Screenshots remain internal under `data/qa/dashboard-without-banner.png`, `about-without-downloads-desktop.png` and `about-without-downloads-mobile.png`. `git diff --check` passed.
+
+The eight publication files remain **7,800,419 bytes**, with the same 4,374 lines, 622 primary polygons, 448 review polygons, 32 optional points and 1,070 uncounted symbols. Current `dist/` totals **9,730,988 bytes**: main JS 112,464 bytes, CSS 92,769 bytes and unchanged MapLibre/worker assets. The nonfatal vendor-size warning and remaining ToR/data gaps are unchanged. No deployment occurred.

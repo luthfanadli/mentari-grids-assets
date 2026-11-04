@@ -90,7 +90,6 @@ function fitFeatures(features: AssetFeature[]) {
 function cameraTransition() {
   return { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700, linear: true, easing: (t: number) => t * t * (3 - 2 * t) }
 }
-function home() { map?.fitBounds([[94.5, -11.4], [141.7, 6.7]], { padding: 25, ...cameraTransition() }) }
 function watchBasemapAvailability() {
   clearTimeout(basemapTimeout)
   if (basemap.value !== 'plain') basemapTimeout = setTimeout(() => { if (map && !map.areTilesLoaded()) basemapError.value = true }, 12000)
@@ -154,7 +153,6 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(basemapTimeout); resize?.d
 <template>
   <section class="map-card" aria-label="Spatial asset inventory">
     <div class="map-toolbar"><div></div><div class="map-actions">
-      <button class="map-tool-button" :disabled="!ready" aria-label="Zoom to Indonesia" title="Zoom to Indonesia" @click="home"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c5 5 5 12 0 17-5-5-5-12 0-17Z"/></svg></button>
       <button class="map-tool-button" :disabled="!ready || !features.length" aria-label="Fit filtered records" title="Fit filtered records" @click="fitFeatures(features)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
       <span class="map-tools-divider" aria-hidden="true"></span>
       <MapBasemapPicker :selected="basemap" :custom-available="!!customStyleUrl" :disabled="!mapAvailable" @change="changeBasemap"/>

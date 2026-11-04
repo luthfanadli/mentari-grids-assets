@@ -2,7 +2,7 @@
 
 Deliverable 2 WebGIS, implemented in the existing Vue 3 + Vite + TypeScript repository with MapLibre GL JS. It presents **preliminary OpenStreetMap-based mapped features**, not a verified operational asset registry.
 
-The working dashboard includes voltage, layer and OSM-status filters; name/ref/operator/source-ID search; map and table selection; source details; selected-record and rendered-viewport counts; optional unvalidated review polygons and point-only candidates; data downloads, attribution, loading/retry and empty states; and mobile layouts. At overview zooms, representative symbols locate polygon records; from zoom 10, their original footprints are displayed. Symbols never add inventory records.
+The working dashboard includes voltage, layer and OSM-status filters; name/ref/operator/source-ID search; map and table selection; source details; selected-record and rendered-viewport counts; optional unvalidated review polygons and point-only candidates; attribution, loading/retry and empty states; and mobile layouts. At overview zooms, representative symbols locate polygon records; from zoom 10, their original footprints are displayed. Symbols never add inventory records.
 
 ## Run the application
 
@@ -18,7 +18,8 @@ Open http://localhost:5174. The preprocessed publication files are included unde
 ## Dashboard map controls
 
 - The legend starts collapsed. **Legend** opens/closes a compact symbol key without a permanent overlay obscuring the map.
-- Globe icon: **Zoom to Indonesia**. Extent icon: **Fit filtered records**. Both have tooltips, keyboard labels and smooth camera transitions that respect reduced-motion settings.
+- Extent icon: **Fit filtered records**, the single extent action. It fits the active selection and provides a tooltip, keyboard label and smooth camera transition that respects reduced-motion settings. Clear filters to fit the full selected inventory again.
+- The header uses the supplied full-color MENTARI logo from `public/images`, with a white background for legibility and responsive sizing.
 - Layers icon: select **OpenStreetMap**, **Google Satellite** or **Plain background**. A configured custom style is retained as another choice. Switching preserves camera, asset filters, selection and counts.
 - The dashboard shows four actual inventory/review metrics. Planned RUPTL/RUKN data gaps and official region/system limitations remain in **About the data**, alongside source scope and provenance.
 
@@ -114,6 +115,6 @@ Planned RUPTL/RUKN infrastructure, official region/system assignments, COD, capa
 
 ## Attribution and database license
 
-Contains information from **© [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)**, exported through [OpenInfraMap](https://openinframap.org/), available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The processed derivative database is distributed under ODbL 1.0 with attribution and license notices embedded in each GeoJSON and the catalog. The About panel links all four inventory/review subsets and the separate presentation symbols for free download, along with metadata and transformation methodology. Retain these notices when redistributing.
+Contains information from **© [OpenStreetMap contributors](https://www.openstreetmap.org/copyright)**, exported through [OpenInfraMap](https://openinframap.org/), available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The processed derivative database is distributed under ODbL 1.0 with attribution and license notices embedded in each GeoJSON and the catalog. The dashboard has no download section or dataset links. Its static `/data/` URLs remain publicly accessible because the map fetches them in the browser; removing UI links does not provide access control. Source/status caveats remain in filters, feature details and About rather than a dashboard banner. Retain attribution and license notices when redistributing.
 
 Default basemap: OpenStreetMap tiles, subject to the [OSMF tile usage policy](https://operations.osmfoundation.org/policies/tiles/). There is no bulk tile download or offline tile cache. A custom provider requires its own applicable terms and attribution; MapLibre retains style-source attribution alongside the inventory attribution.

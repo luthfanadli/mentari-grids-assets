@@ -34,7 +34,7 @@ No client-side router is used. The app is served at `/`; no catch-all rewrite is
 ## Verify a preview deployment before production promotion
 
 - `/` loads with 4,345 line segments, 621 primary polygons and zero review candidates under the defaults.
-- All eight `/data/...` paths return JSON/GeoJSON, matching the catalog checksums. Download the four original inventory/review datasets and separate representative symbols through About. Derived symbols are not inventory records.
+- All eight `/data/...` paths return JSON/GeoJSON, matching the catalog checksums. The map fetches these public assets directly; the About download section and dataset links have been removed. Removing those controls does not restrict access to the static data URLs. Derived symbols are not inventory records.
 - `/assets/` includes the bundled MapLibre worker; the map actually renders features, rather than only initializing a canvas. Construction/disused flags and review candidates have separate styles and controls.
 - Search `-18678451` to find the source's `GITET Pedan` polygon; details retain the negative ID and original multi-voltage tag. Test list selection and clicking the zoomed footprint.
 - Enable construction/disused and verify the resulting 4,374 lines and 622 primary polygons. Enable review and verify 448 separate candidates; their source distribution/unknown tags remain visible in details.
