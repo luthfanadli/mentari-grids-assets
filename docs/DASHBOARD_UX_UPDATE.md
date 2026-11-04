@@ -151,3 +151,25 @@ Changed files: `src/components/MapCanvas.vue`, `src/style.css`, `tests/e2e/inven
 Verification: `pnpm.cmd build` **passed**, including publication integrity and Vue/TypeScript checks. With Edge and `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, `pnpm.cmd test:e2e` returned **7 passed** (52.6 s). This retains real feature clicks, zoom/presentation transitions, candidate retry/visibility, filters/search/details, basemap state/count preservation and mobile coverage. `git diff --check` passed. No dependency, package/lockfile, preprocessing, data, attribution or deployment configuration changed.
 
 The eight data files remain **7,800,419 bytes** with all prior counts and checksums. Current `dist/` totals **9,730,859 bytes**: main JS 112,434 bytes, CSS 92,670 bytes, unchanged MapLibre vendor JS 1,104,231 bytes and worker 518,989 bytes. The existing nonfatal vendor-size warning and remaining ToR/data gaps are unchanged. No deployment occurred.
+
+## Follow-up: MENTARI colors and typography
+
+Replaced the green interface palette with blue `#0d4c8f` and red `#d02030` sampled from the supplied MENTARI logo. The header uses a blue gradient with a red active-navigation accent. Page surfaces use a subtle blue-gray background, white cards, softer borders and shadows. Filters, tables, dialogs, map buttons, legend and basemap picker share color tokens. The plain map background is now a cool neutral `#edf2f8`; voltage colors, primary/review/point symbols and source-status geometry styles are unchanged.
+
+Added local **Plus Jakarta Sans** variable typography, including a font preload, `font-display: swap` and system fallbacks. The font is an application choice that complements the logo, not a claim about an official MENTARI brand typeface. The original logo remains unedited. The WOFF2 is 27,348 bytes; its included OFL notice is 4,402 bytes. Exact source URLs and font checksum are in [FONT_SOURCES.md](FONT_SOURCES.md). No npm dependency or external runtime font request was added.
+
+Hover/focus colors and shadows transition over 180 ms. Basemap, About and feature panels have short 160–180 ms entrance animations. Reduced-motion preference disables animations and makes transitions effectively immediate. The header keeps a white keyboard-focus outline against its blue background. Narrow-screen logo/text sizing was adjusted for the new font without changing navigation behavior or the larger map layout.
+
+Changed files: `src/style.css`, `src/components/AppHeader.vue`, `MapLegend.vue`, `MapBasemapPicker.vue`, `src/utils/basemaps.ts`, `index.html`, the two assets under `public/fonts/`, `README.md`, `docs/ARCHITECTURE.md`, `docs/FONT_SOURCES.md` and this report.
+
+Verification:
+
+- `pnpm.cmd build`: **PASS**, including the unchanged data guard and Vue/TypeScript checks.
+- Production-preview Edge suite, `PLAYWRIGHT_CHANNEL=msedge`, `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, `pnpm.cmd test:e2e`: **7 passed** (50.4 s).
+- Font request: **HTTP 200**, `font/woff2`, same-origin `/fonts/PlusJakartaSans-Latin-Variable.woff2`. Both regular and bold font checks passed. Only the local font was requested.
+- Desktop/tablet/mobile checks at **1440, 1024, 390 and 320 px**: no document overflow; header, navigation and controls remain usable. Screenshots were inspected. Internal files are `data/qa/mentari-theme-*.png` and `mentari-theme-verification.json`.
+- Reduced-motion check: panel animation is `none`; button transition is `0.00001s`.
+- Sample text contrast ratios: body **11.52:1**, card notes **5.16:1**, metric labels **6.38:1**, white header text **8.58:1**, About text **5.66:1** and About caveat text **5.26:1**. These are sampled color pairs, not a complete accessibility audit.
+- Publication hashes and byte counts remain unchanged. `git diff --check` passed.
+
+The eight publication files remain **7,800,419 bytes**, with 4,374 line segments, 622 primary polygons, 448 review polygons, 32 optional source points and 1,070 uncounted symbols. The final local `dist/` totals **9,765,135 bytes**: main JS 112,434 bytes, CSS 95,028 bytes, unchanged MapLibre vendor JS 1,104,231 bytes and worker 518,989 bytes, plus the local font and notice. The existing nonfatal MapLibre size warning remains. No preprocessing, feature geometry, filtering, matching policy, source attribution, hosting configuration or deployment changed. Remaining ToR/data gaps are unchanged.

@@ -16,7 +16,7 @@ export function basemapStyle(id: BasemapId, customStyleUrl?: string): StyleSpeci
   const style: StyleSpecification = {
     version: 8,
     sources: {},
-    layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#eaf0ed' } }],
+    layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#edf2f8' } }],
   }
   if (id === 'google_satellite') {
     style.sources['google-satellite'] = {

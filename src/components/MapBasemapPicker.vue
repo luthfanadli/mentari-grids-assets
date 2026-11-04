@@ -45,14 +45,14 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside))
 
 <style scoped>
 .basemap-picker { position: relative }
-.basemap-popover { position: absolute; right: 0; top: calc(100% + 9px); width: 232px; z-index: 5; padding: 8px; background: #fff; border: 1px solid #d7e1d2; border-radius: 7px; box-shadow: 0 5px 22px #173c2d24; color: #294338 }
+.basemap-popover { position: absolute; right: 0; top: calc(100% + 9px); width: 232px; z-index: 5; padding: 8px; background: #fff; border: 1px solid var(--border); border-radius: 7px; box-shadow: 0 5px 22px #123b6824; color: var(--ink); transform-origin: top right; animation: surface-in 160ms var(--ease) }
 fieldset { padding: 0; margin: 0; border: 0 }
 legend { float: none; padding: 6px 8px 10px; margin: 0; font-size: 11px; font-weight: 650 }
 .basemap-choice { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; min-height: 43px }
-.basemap-choice:hover { background: #f0f5eb }
-.basemap-choice:has(input:checked) { background: #eaf2e5; color: #1a654d }
-input { margin: 0; accent-color: #125d50; width: 14px; height: 14px; flex: none }
-.basemap-preview { width: 29px; height: 27px; border: 1px solid #cedbca; border-radius: 3px; flex: none; background-color: #eaf0ed }
+.basemap-choice:hover { background: var(--surface-soft) }
+.basemap-choice:has(input:checked) { background: var(--surface-blue); color: var(--brand-blue) }
+input { margin: 0; accent-color: var(--brand-blue); width: 14px; height: 14px; flex: none }
+.basemap-preview { width: 29px; height: 27px; border: 1px solid var(--border-strong); border-radius: 3px; flex: none; background-color: var(--map-background) }
 .osm { background: linear-gradient(35deg, transparent 42%, #fff 43%, #fff 51%, transparent 52%), linear-gradient(100deg, #dce7cc 40%, #c1d9e1 42%, #c1d9e1 52%, #e6edda 54%) }
 .google_satellite { background: linear-gradient(30deg, transparent 37%, #a1ae83 38%, #a1ae83 42%, transparent 43%), linear-gradient(115deg, #324e2a 25%, #658446 26%, #304b32 68%, #344756 69%) }
 .custom { background: linear-gradient(45deg, #dbe3ed 50%, #dce9d5 50%) }

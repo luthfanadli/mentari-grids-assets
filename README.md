@@ -26,6 +26,12 @@ Open http://localhost:5174. The preprocessed publication files are included unde
 
 Google Satellite uses the exact `mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}` endpoint supplied for this local implementation. The basemap receives separate Google Maps attribution; inventory attribution remains OSM/OpenInfraMap. This is a direct raster integration, without the key/session workflow or provider-specific metadata of the [documented Google Map Tiles API](https://developers.google.com/maps/documentation/tile/satellite). No offline tile download, proxy or prefetch was added. See [dashboard UI changes, verification and integration limits](docs/DASHBOARD_UX_UPDATE.md).
 
+## Theme and typography
+
+The interface uses the supplied MENTARI logo's blue (`#0d4c8f`) and red (`#d02030`), a soft blue-gray page background, white cards and matching map controls. Voltage colors and primary/review/point symbols retain their data meanings.
+
+Plus Jakarta Sans is served locally as one 27,348-byte variable WOFF2 file, with a preload, `font-display: swap` and system fallbacks. There are no runtime Google Fonts requests. Hover/focus transitions and panel entrances are short; reduced-motion preferences disable animations. The logo artwork is unchanged. See [font sources and included license](docs/FONT_SOURCES.md) and the latest verification in [the dashboard report](docs/DASHBOARD_UX_UPDATE.md).
+
 ## Reproduce spatial preprocessing
 
 Place the supplied `IDN.gpkg` at `data/raw/IDN.gpkg`. The original source, Python environments and internal QA are gitignored. No replacement data is downloaded or generated when the file is missing.

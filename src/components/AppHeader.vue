@@ -9,7 +9,7 @@ defineEmits<{ about: [] }>()
 </template>
 
 <style scoped>
-.brand-logo { display: block; width: 92px; height: 54px; padding: 3px 6px; object-fit: contain; flex: none; background: #fff; border-radius: 3px }
+.brand-logo { display: block; width: 92px; height: 54px; padding: 3px 6px; object-fit: contain; flex: none; background: #fff; border-radius: 6px }
 @media(max-width:720px) { .brand-logo { width: 62px; height: 38px } }
-@media(max-width:380px) { .app-header { padding-inline: 14px; gap: 8px } .brand { gap: 8px } .brand strong { font-size: 18px } .brand small { font-size: 6px; letter-spacing: .9px } }
+@media(max-width:380px) { .app-header { padding-inline: 14px; gap: 8px } .brand { gap: 8px } .brand-logo { width: 56px; height: 36px } .brand strong { font-size: 17px } .brand small { font-size: 5.5px; letter-spacing: .8px } }
 </style>
