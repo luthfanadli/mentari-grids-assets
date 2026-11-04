@@ -25,7 +25,7 @@ from shapely.geometry import mapping, shape
 ROOT = Path(__file__).resolve().parents[1]
 TARGET_V = frozenset({500_000, 275_000, 150_000, 70_000})
 STATUSES = ("not_flagged_in_osm", "tagged_construction", "tagged_disused", "conflicting_tags")
-PIPELINE_VERSION = "1.1.0"
+PIPELINE_VERSION = "1.2.0"
 GEOD = Geod(ellps="WGS84")
 LICENSE_URL = "https://opendatacommons.org/licenses/odbl/1-0/"
 ATTRIBUTION = "© OpenStreetMap contributors; export via OpenInfraMap. ODbL 1.0."
@@ -34,6 +34,7 @@ LIMITATIONS = [
     "Not flagged in OSM does not establish existing or operational status.",
     "Source data vintage is unknown; file modification time is not an OSM snapshot date.",
     "Features are mapped segments/polygons, not unique circuits, corridors or verified stations.",
+    "Power plants are OSM footprints, not generators or verified unique stations. Source output has no supplied unit; start_date is not verified COD. Plants have no voltage/disused field.",
     "Review candidates are unvalidated, separate from primary inventory and off by default.",
     "Source points are matched against all polygons; only eligible distinct point-only candidates are published separately, off by default. Voltage/function/identity remain unverified.",
     "No authoritative planned RUPTL/RUKN projects, region or power-system crosswalk was supplied.",
@@ -41,10 +42,19 @@ LIMITATIONS = [
     "Cross-layer duplicates, electrical topology and registry completeness have not been validated.",
 ]
 FIELD_MEANINGS = {
+    "plant_source": "Original power_plant.source energy-source tag; not a new dataset attribution.",
+    "plant_method": "Original generation method tag, unverified.",
+    "plant_output_raw": "Original numeric output; unit unspecified in this export. Not assumed MW or verified capacity.",
+    "plant_output_unit": "Null: no output unit supplied by the source export.",
+    "plant_start_date_raw": "Original start_date string, including approximate/partial dates; not verified COD.",
+    "plant_name_en": "Original English-name tag or null.",
+    "plant_description": "Original description or null.",
+    "plant_wikidata": "Original Wikidata identifier or null; not an authoritative station ID.",
+    "plant_representative_point": "Derived point_on_surface coordinates inside the original footprint; display only, never another inventory record.",
     "feature_id": "Unique original inventory/review record <source_layer>:<original id>; negative IDs preserved. A derived display symbol reuses its parent ID and is not another record.",
     "source_layer": "Original GeoPackage layer.",
     "source_id": "Original id as a string, never GeoPackage fid. OSM element kind is not verified.",
-    "asset_type": "transmission_line, substation_polygon, or separately reviewed substation_point.",
+    "asset_type": "transmission_line, substation_polygon, separately reviewed substation_point, or source power_plant.",
     "display_name": "Original nonblank name, otherwise interface fallback, not an official name.",
     "display_name_is_fallback": "True when display_name is a synthetic interface label.",
     "name": "Original name or null.", "ref": "Original ref or null.", "operator": "Original operator or null.",
@@ -61,7 +71,7 @@ FIELD_MEANINGS = {
     "location": "Original line location; null for substations. Does not establish HVDC.",
     "circuits": "Original line circuit count when known; no assumption of one circuit.",
     "mapped_geometry_length_km": "WGS84 geodesic line geometry length, not official circuit-km.",
-    "geometry_role": "original_point for point-only candidates; derived_polygon_representative_point for display symbols, which do not count as inventory.",
+    "geometry_role": "original_power_plant_footprint for plant polygons, original_point for point-only candidates; derived_polygon_representative_point for display symbols, which do not count as inventory.",
     "matching_classification": "Point-only publication requires distinct_point_only_candidate under the versioned QA policy; not verified physical-station identity.",
     "matching_reason": "Explanation of the source matching decision; no voltage or function is inherited from polygons.",
     "matching_version": "Version of reproducible point/polygon matching policy.",
@@ -179,15 +189,16 @@ def output_geometry(geometry):
 def feature(record, layer, reason=None):
     is_line = layer == "power_line"
     is_point = layer == "power_substation_point"
+    is_plant = layer == "power_plant"
     source_id = str(int(record["id"]))
     original_name = scalar(record.get("name"))
     fallback = not original_name or not original_name.strip()
-    display_name = (f"Unnamed {'line' if is_line else 'substation'} · OSM ID {source_id}"
+    display_name = (f"Unnamed {'line' if is_line else 'power plant' if is_plant else 'substation'} · OSM ID {source_id}"
                     if fallback else original_name)
     voltage = scalar(record.get("max_voltage"))
     properties = {
         "feature_id": f"{layer}:{source_id}", "source_layer": layer, "source_id": source_id,
-        "asset_type": "transmission_line" if is_line else "substation_point" if is_point else "substation_polygon",
+        "asset_type": "transmission_line" if is_line else "power_plant" if is_plant else "substation_point" if is_point else "substation_polygon",
         "display_name": display_name, "display_name_is_fallback": fallback,
         **{key: scalar(record.get(key)) for key in ("name", "ref", "operator")},
         "max_voltage_v": voltage, "max_voltage_kv": normalize_voltage(voltage),
@@ -200,7 +211,16 @@ def feature(record, layer, reason=None):
         "circuits": scalar(record.get("circuits")) if is_line else None,
         "mapped_geometry_length_km": GEOD.geometry_length(record["geometry"]) / 1000 if is_line else None,
     }
-    geometry = output_geometry(record["geometry"])
+    geometry = mapping(shapely.orient_polygons(record["geometry"])) if is_plant else output_geometry(record["geometry"])
+    if is_plant:
+        properties.update({f"plant_{key}": scalar(record.get(source)) for key, source in (
+            ("source", "source"), ("method", "method"), ("output_raw", "output"),
+            ("start_date_raw", "start_date"), ("name_en", "name_en"), ("description", "description"), ("wikidata", "wikidata"))})
+        output = properties["plant_output_raw"]
+        if output is not None and (not isinstance(output, Real) or isinstance(output, bool) or not math.isfinite(output) or output < 0):
+            raise ValueError(f"Invalid power-plant source output: {source_id}")
+        properties.update(plant_output_unit=None, geometry_role="original_power_plant_footprint",
+                          plant_representative_point=list(shape(geometry).representative_point().coords[0]))
     return {"type": "Feature", "id": properties["feature_id"], "properties": properties,
             "bbox": list(shape(geometry).bounds), "geometry": geometry}
 
@@ -223,7 +243,7 @@ def layer_qa(frame, allowed):
         source_id = scalar(record["id"])
         if source_id is not None and (not isinstance(source_id, Real) or int(source_id) != source_id):
             raise ValueError(f"Nonintegral source id: {source_id!r}")
-        voltage = scalar(record["max_voltage"])
+        voltage = scalar(record.get("max_voltage"))
         if voltage is not None and normalize_voltage(voltage) is None:
             raise ValueError(f"Invalid numeric max_voltage for {source_id}: {voltage!r}")
         osm_status(record)  # Reject malformed booleans, including truthy strings.
@@ -291,12 +311,20 @@ def validate_publication(datasets):
             if key == "point_candidates" and (geom.geom_type != "Point" or props.get("matching_classification") != "distinct_point_only_candidate"
                                                or props.get("review_reason") != "point_only_unvalidated"):
                 raise ValueError("Only eligible distinct point-only candidates may enter the separate point layer")
+            if key == "power_plants":
+                if geom.geom_type not in ("Polygon", "MultiPolygon") or props["asset_type"] != "power_plant":
+                    raise ValueError("Power plants require original source footprints")
+                if props["max_voltage_v"] is not None or props.get("plant_output_unit") is not None:
+                    raise ValueError("Power-plant voltage/output unit must not be inferred")
+                from shapely.geometry import Point
+                if not geom.covers(Point(props["plant_representative_point"])):
+                    raise ValueError("Power-plant representative must be inside its original footprint")
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate global feature_id / overlapping publication subsets")
     return {"features_validated": len(ids), "duplicate_feature_ids": 0,
             "geometry_errors": 0, "voltage_scope_errors": 0, "subset_overlaps": 0,
             "coordinate_precision_decimals": 7, "simplified": False,
-            "coordinate_precision_scope": "Existing line/polygon exports only; source point candidates preserve original coordinates and representative symbols preserve generated interior coordinates.",
+            "coordinate_precision_scope": "Existing line/substation polygon exports only; source point candidates and power-plant footprints preserve original coordinate precision. Representatives are derived interior locations.",
             "coordinate_order": "longitude, latitude", "crs": "EPSG:4326"}
 
 
@@ -319,12 +347,17 @@ def prepare(input_path, output, qa_output, allow_source_mismatch=False):
     frames, raw_qa = {}, {}
     for layer, allowed in (("power_line", {"LineString", "MultiLineString"}),
                            ("power_substation_polygon", {"Polygon", "MultiPolygon"}),
-                           ("power_substation_point", {"Point", "MultiPoint"})):
+                           ("power_substation_point", {"Point", "MultiPoint"}),
+                           ("power_plant", {"Polygon", "MultiPolygon"})):
         if layer not in {entry["name"] for entry in layers}:
             raise ValueError(f"Required source layer missing: {layer}")
         frame = gpd.read_file(input_path, layer=layer, engine="pyogrio")
-        required = {"id", "name", "ref", "operator", "max_voltage", "voltages", "construction"}
-        required |= {"disused", "location", "circuits"} if layer == "power_line" else {"substation_type"}
+        required = {"id", "name", "ref", "operator", "construction"}
+        if layer == "power_plant":
+            required |= {"source", "method", "output", "start_date", "name_en", "description", "wikidata"}
+        else:
+            required |= {"max_voltage", "voltages"}
+            required |= {"disused", "location", "circuits"} if layer == "power_line" else {"substation_type"}
         if required - set(frame.columns):
             raise ValueError(f"{layer} missing fields: {sorted(required - set(frame.columns))}")
         if frame.crs is None or frame.crs.to_epsg() != 4326:
@@ -372,7 +405,18 @@ def prepare(input_path, output, qa_output, allow_source_mismatch=False):
                                   nearest_polygon_distance_m=match["nearest_polygon_distance_m"])
         datasets["point_candidates"].append(item)
     display_points = representative_features(datasets)
+    datasets["power_plants"] = [feature(record, "power_plant") for record in frames["power_plant"].to_dict("records")]
     summaries = {key: dataset_summary(value) for key, value in datasets.items()}
+    plant_frame = frames["power_plant"]
+    plant_audit = {"raw_count": len(plant_frame), "published_count": len(datasets["power_plants"]),
+                   "not_flagged": summaries["power_plants"]["statuses"]["not_flagged_in_osm"],
+                   "construction": summaries["power_plants"]["statuses"]["tagged_construction"],
+                   "polygons": int((plant_frame.geom_type == "Polygon").sum()),
+                   "multipolygons": int((plant_frame.geom_type == "MultiPolygon").sum()),
+                   **{f"missing_{key}": int(plant_frame[key].isna().sum()) for key in ("name", "operator", "source", "method", "output", "start_date")},
+                   "voltage_field_available": "max_voltage" in plant_frame.columns,
+                   "disused_field_available": "disused" in plant_frame.columns,
+                   "output_unit": None}
     actual = {
         "source_bytes": before_size, "source_sha256": before_hash, "layer_count": len(layers),
         "raw_lines": len(line_frame), "raw_polygons": len(polygon_frame), "raw_points": len(point_frame),
@@ -394,6 +438,8 @@ def prepare(input_path, output, qa_output, allow_source_mismatch=False):
     }
     expected = json.loads((Path(__file__).parent / "expected-audit.json").read_text(encoding="utf-8"))
     differences = [{"metric": k, "expected": v, "actual": actual.get(k)} for k, v in expected.items() if actual.get(k) != v]
+    plant_expected = json.loads((Path(__file__).parent / "expected-power-plant-audit.json").read_text(encoding="utf-8"))
+    differences += [{"metric": f"power_plants.{k}", "expected": v, "actual": plant_audit.get(k)} for k, v in plant_expected.items() if plant_audit.get(k) != v]
     validation = validate_publication(datasets)
     after_hash = sha256(input_path)
     if after_hash != before_hash:
@@ -406,6 +452,7 @@ def prepare(input_path, output, qa_output, allow_source_mismatch=False):
           "excluded_layer_counts": {e["name"]: e["count"] for e in layers if e["name"] not in frames},
           "quarantined_conflicts": len(quarantined), "qa_only_points": len(point_frame) - len(datasets["point_candidates"]),
           "substation_point_matching": matching_summary,
+          "power_plant_audit": plant_audit,
           "representative_symbols": {"count": len(display_points), "outside_parent_footprint": 0, "counts_as_inventory": False},
           "publication_validation": validation,
           "validation_summary": "PASS" if not differences else "SOURCE_VERSION_MISMATCH",
@@ -426,7 +473,7 @@ def prepare(input_path, output, qa_output, allow_source_mismatch=False):
     if differences and not allow_source_mismatch:
         raise ValueError("Source-version mismatch; no publication files written. Exact differences: " + json.dumps(differences))
     filenames = {"lines": "transmission-lines.geojson", "primary": "substations-primary.geojson", "review": "substations-review.geojson",
-                 "point_candidates": "substations-point-candidates.geojson"}
+                 "point_candidates": "substations-point-candidates.geojson", "power_plants": "power-plants.geojson"}
     output_sizes = {}
     for key, filename in filenames.items():
         write_json(output / filename, collection(datasets[key]), compact=True)
@@ -434,26 +481,32 @@ def prepare(input_path, output, qa_output, allow_source_mismatch=False):
     display_filename = "substation-display-points.geojson"
     write_json(output / display_filename, collection(display_points), compact=True)
     output_sizes[display_filename] = (output / display_filename).stat().st_size
-    summary = {"schema_version": 2, "data_version": data_version, "source_data_vintage": "unknown",
+    summary = {"schema_version": 3, "data_version": data_version, "source_data_vintage": "unknown",
                "source_sha256": before_hash, "raw_counts": {e["name"]: e["count"] for e in layers},
                "datasets": summaries,
                "review_reasons": dict(Counter(f["properties"]["review_reason"] for f in datasets["review"])),
                "default_selection": {"lines": summaries["lines"]["statuses"]["not_flagged_in_osm"],
-                                     "primary": summaries["primary"]["statuses"]["not_flagged_in_osm"], "review": 0, "points": 0},
+                                     "primary": summaries["primary"]["statuses"]["not_flagged_in_osm"], "review": 0, "points": 0,
+                                     "plants": summaries["power_plants"]["statuses"]["not_flagged_in_osm"]},
                "substation_point_matching": {key: matching_summary[key] for key in ("matching_version", "classifications", "eligible_point_candidates", "held_distinct_candidates", "pair_comparisons")},
                "substation_presentation": {"representative_symbol_count": len(display_points), "footprint_min_zoom": 10, "counts_as_inventory": False},
+               "power_plant_presentation": {"representative_symbol_count": len(datasets["power_plants"]), "footprint_min_zoom": 10,
+                                            "counts_as_inventory": False, "coordinates_field": "plant_representative_point"},
                "output_bytes": output_sizes, "planned_assets": {"state": "data_not_provided", "count": None},
                "official_region_and_power_system": "data_not_provided"}
-    catalog = {"schema_version": 2, "data_version": data_version, "source": "OpenInfraMap / OpenStreetMap",
+    catalog = {"schema_version": 3, "data_version": data_version, "source": "OpenInfraMap / OpenStreetMap",
                "source_url": "https://openinframap.org/", "osm_url": "https://www.openstreetmap.org/copyright",
                "license": "ODbL-1.0", "license_url": LICENSE_URL, "attribution": ATTRIBUTION,
                "source_file": "IDN.gpkg", "source_bytes": before_size, "source_sha256": before_hash,
                "source_data_vintage": "unknown", "original_crs": "EPSG:4326", "output_crs": "EPSG:4326",
                "pipeline_version": PIPELINE_VERSION,
-               "processing_method": "Unchanged exact numeric max_voltage line filter in 70000/150000/275000/500000 V; unchanged transmission-tagged primary polygons and three review predicates. Conflicting flags quarantined. Existing line/polygon exports retain seven coordinate decimals and RFC7946 winding, without simplification/dissolve. WGS84 geodesic line lengths. All raw substation points matched against all polygons under the versioned policy; eligible distinct candidates retain original point coordinates and unknown voltage. Polygon point_on_surface symbols preserve parent IDs and do not count as inventory.",
+               "processing_method": "Unchanged exact numeric max_voltage line filter in 70000/150000/275000/500000 V; unchanged transmission-tagged primary polygons and three review predicates. Conflicting flags quarantined. Existing line/polygon exports retain seven coordinate decimals and RFC7946 winding, without simplification/dissolve. WGS84 geodesic line lengths. All raw substation points matched against all polygons under the versioned policy; eligible distinct candidates retain original point coordinates and unknown voltage. Polygon point_on_surface symbols preserve parent IDs and do not count as inventory. Power-plant footprints retain original precision, source attributes and derived interior coordinates; no voltage, output unit, official capacity or COD is inferred.",
                "substation_matching_policy": matching["policy"],
+               "power_plant_policy": {"source_layer": "power_plant", "default_visible": True, "grid_voltage_filter_applies": False,
+                                      "full_precision_footprints": True, "overview_marker": "derived point_on_surface; not another record",
+                                      "output_unit": None, "source_start_date_is_verified_cod": False, "generator_layers_published": False},
                "database_license_notice": "The processed derivative database and presentation symbols are available under ODbL 1.0. Retain attribution and license notices on redistribution.",
-               "datasets": [{"key": k, "url": f"/data/{v}", "source_layer": "power_line" if k == "lines" else "power_substation_point" if k == "point_candidates" else "power_substation_polygon",
+               "datasets": [{"key": k, "url": f"/data/{v}", "source_layer": "power_line" if k == "lines" else "power_plant" if k == "power_plants" else "power_substation_point" if k == "point_candidates" else "power_substation_polygon",
                              "role": "inventory", "count": len(datasets[k]), "bytes": output_sizes[v], "sha256": sha256(output / v)} for k, v in filenames.items()] + [
                                  {"key": "display_points", "url": f"/data/{display_filename}", "source_layer": "power_substation_polygon", "role": "presentation",
                                   "count": len(display_points), "bytes": output_sizes[display_filename], "sha256": sha256(output / display_filename), "counts_as_inventory": False}],

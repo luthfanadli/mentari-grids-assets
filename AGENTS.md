@@ -9,7 +9,7 @@ Build **MENTARI Grids — Transmission Asset Inventory** for **Deliverable 2 onl
 1. Data provenance first. NEVER invent grid features, verified operational status, RUPTL/RUKN planned projects, COD, official circuit-km, capacity, power-system membership or official province attribution.
 2. Stage the work: **inspect raw data -> implement & test preprocessing -> run it -> verify counts/QA -> implement UI -> build/test -> document Vercel deployment**.
 3. Preserve original GeoPackage unchanged and gitignore `data/raw/`, Python virtual environments, temporary files and secrets.
-4. Filter at preprocessing time. Publish only the intended lines and substation datasets to `public/data/`; do not load or deploy all 26 GeoPackage layers.
+4. Filter at preprocessing time. Publish only the intended lines, substation datasets and user-authorized power-plant context dataset to `public/data/`; do not load or deploy all 26 GeoPackage layers.
 5. The default WebGIS represents a **preliminary OSM-based inventory**. `construction=false` and `disused=false` mean **not flagged**, not independently verified existing/operational.
 6. Only `500, 275, 150, 70 kV` are in the default transmission-voltage scope; numeric source `max_voltage` is in **volts**. Use `max_voltage / 1000` strictly for display.
 7. Distinguish substations selected by explicit transmission tags from substations needing manual validation. Review candidates are OFF by default.
@@ -28,5 +28,6 @@ Build **MENTARI Grids — Transmission Asset Inventory** for **Deliverable 2 onl
 
 ## Current UI and maintenance
 - Follow the current [filters and legend behavior](README.md#filters-and-legend): no static sidebar totals; the cards/list count selected original records; legend categories come from those same records.
+- Power plants are user-authorized context: publish source footprints, preserve output units as unknown, and keep them independent of grid voltage filters. Do not import generator layers or infer MW/COD/connections. See [the plant report](docs/POWER_PLANTS_REPORT.md).
 - Keep line-voltage colors separate from source-status patterns. Candidate layers stay optional/default-off, and missing voltage never becomes an inferred value.
 - Retain data/source QA and historical evidence during cleanup. Remove confirmed unused demo assets/styles/types; do not recreate starter components or speculative planned records. See [the cleanup report](docs/SIMPLIFICATION_REPORT.md).

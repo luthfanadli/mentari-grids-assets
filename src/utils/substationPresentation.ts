@@ -6,7 +6,7 @@ export const FOOTPRINT_MIN_ZOOM = 10
 export function selectedMapLegend(features: AssetFeature[]) {
   const voltages = new Set<number>()
   const key = { lineVoltages: [] as number[], baselineLines: false, constructionLines: false, disusedLines: false,
-    primary: false, constructionPrimary: false, review: false, points: false }
+    primary: false, constructionPrimary: false, review: false, points: false, plants: false, constructionPlants: false }
   for (const { properties: p } of features) {
     if (p.counts_as_inventory === false) continue
     if (p.asset_type === 'transmission_line') {
@@ -14,6 +14,9 @@ export function selectedMapLegend(features: AssetFeature[]) {
       if (p.osm_tag_status === 'tagged_construction') key.constructionLines = true
       else if (p.osm_tag_status === 'tagged_disused') key.disusedLines = true
       else if (p.osm_tag_status === 'not_flagged_in_osm') key.baselineLines = true
+    } else if (p.asset_type === 'power_plant') {
+      if (p.osm_tag_status === 'tagged_construction') key.constructionPlants = true
+      else key.plants = true
     } else if (p.asset_type === 'substation_point') key.points = true
     else if (p.review_reason) key.review = true
     else if (p.osm_tag_status === 'tagged_construction') key.constructionPrimary = true

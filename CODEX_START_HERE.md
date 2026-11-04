@@ -1,6 +1,8 @@
 # Codex Development Guide (v2) — MENTARI Grids Transmission Asset Inventory
 
-Current implementation: the existing project publishes five GeoJSONs and three metadata files, including 32 optional point-only candidates and 1,070 uncounted polygon representatives after source QA. The original three-file MVP examples below describe the starting stage; use [the current data dictionary](docs/DATA_DICTIONARY.md) and [matching policy](docs/SUBSTATION_MATCHING.md) for the complete contract. The current UI keeps counts in the cards/list, omits static sidebar totals, and derives its legend from the filtered selection. Planned-data gaps remain in About; no speculative unused planned-asset interface is required. Follow [README](README.md#filters-and-legend) and [the simplification report](docs/SIMPLIFICATION_REPORT.md) for current UI/cleanup verification. The original source-selection predicates and data-integrity invariants remain unchanged. Do not deploy without user authorization.
+Latest authorized scope: add the source `power_plant` layer as generation context, not individual generators or planned projects. There are 643 source footprints (633 not construction-tagged, ten construction-tagged), with no voltage/disused field or output unit. Preserve raw attributes and geometry; do not infer MW/COD/connections. Current publication is nine files, schema v3/pipeline v1.2.0. The original grid predicates and five prior GeoJSONs remain unchanged. See [the plant report](docs/POWER_PLANTS_REPORT.md).
+
+Current implementation: the existing project publishes six GeoJSONs and three metadata files, including 32 optional point-only candidates and 1,070 uncounted polygon representatives after source QA. The original three-file MVP examples below describe the starting stage; use [the current data dictionary](docs/DATA_DICTIONARY.md) and [matching policy](docs/SUBSTATION_MATCHING.md) for the complete contract. The current UI keeps counts in the cards/list, omits static sidebar totals, and derives its legend from the filtered selection. Planned-data gaps remain in About; no speculative unused planned-asset interface is required. Follow [README](README.md#filters-and-legend) and [the simplification report](docs/SIMPLIFICATION_REPORT.md) for current UI/cleanup verification. The original source-selection predicates and data-integrity invariants remain unchanged. Do not deploy without user authorization.
 
 **Project state:** Vue 3 + Vite + TypeScript is **already installed** in the repository. This guide supersedes the earlier prompt that assumed a new repo and Cloudflare Pages hosting.
 
@@ -29,7 +31,7 @@ The provided OSM/OpenInfraMap GeoPackage is **not** a complete approved grid reg
 - an explicitly labeled optional layer of substation candidates awaiting validation;
 - filters, map, searchable feature details, honest asset counts/QA and attribution.
 
-**Current MVP excludes:** towers, power generators/plants, individual transformers, telecom, water, pipeline/petroleum layers, all non-target lines, point substations unless later validated; it does **not** invent planned spatial features.
+**Current MVP excludes:** towers, individual power generators, individual transformers, telecom, water, pipeline/petroleum layers, all non-target lines, point substations unless later validated; it does **not** invent planned spatial features.
 
 ## 2. Execution plan — implement in this order
 

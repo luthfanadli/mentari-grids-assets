@@ -2,28 +2,31 @@ import type { AssetFeature, AssetFilters } from '../types/assets'
 
 export const VOLTAGES = [500, 275, 150, 70] as const
 export function defaultFilters(): AssetFilters {
-  return { query: '', voltages: [...VOLTAGES], statuses: ['not_flagged_in_osm'], lines: true, primary: true, review: false, pointCandidates: false, unknownVoltage: true }
+  return { query: '', voltages: [...VOLTAGES], statuses: ['not_flagged_in_osm'], lines: true, primary: true, powerPlants: true, review: false, pointCandidates: false, unknownVoltage: true }
 }
 export function matchesFeature(feature: AssetFeature, filters: AssetFilters): boolean {
   const p = feature.properties
   if (p.osm_tag_status === 'conflicting_tags' || !filters.statuses.includes(p.osm_tag_status)) return false
-  if (p.asset_type === 'substation_point') {
+  if (p.asset_type === 'power_plant') {
+    if (!filters.powerPlants) return false
+  } else if (p.asset_type === 'substation_point') {
     if (!filters.pointCandidates || p.matching_classification !== 'distinct_point_only_candidate') return false
   } else if (p.review_reason ? !filters.review : p.asset_type === 'transmission_line' ? !filters.lines : !filters.primary) return false
-  if (p.max_voltage_kv === null ? !filters.unknownVoltage : !filters.voltages.includes(p.max_voltage_kv)) return false
+  if (p.asset_type !== 'power_plant' && (p.max_voltage_kv === null ? !filters.unknownVoltage : !filters.voltages.includes(p.max_voltage_kv))) return false
   const query = filters.query.trim().toLowerCase()
-  return !query || [p.name, p.ref, p.operator, p.source_id, p.feature_id, p.display_name].some(value => value?.toLowerCase().includes(query))
+  return !query || [p.name, p.ref, p.operator, p.source_id, p.feature_id, p.display_name, p.plant_name_en, p.plant_source, p.plant_method].some(value => value?.toLowerCase().includes(query))
 }
 export const filterAssets = (features: AssetFeature[], filters: AssetFilters) => features.filter(feature => matchesFeature(feature, filters))
 export function selectionCounts(features: AssetFeature[]) {
-  let lines = 0, primary = 0, review = 0, points = 0
+  let lines = 0, primary = 0, review = 0, points = 0, plants = 0
   for (const feature of uniqueInventoryFeatures(features)) {
-    if (feature.properties.asset_type === 'substation_point') points++
+    if (feature.properties.asset_type === 'power_plant') plants++
+    else if (feature.properties.asset_type === 'substation_point') points++
     else if (feature.properties.review_reason) review++
     else if (feature.properties.asset_type === 'transmission_line') lines++
     else primary++
   }
-  return { lines, primary, review, points, total: lines + primary + review + points }
+  return { lines, primary, review, points, plants, total: lines + primary + review + points + plants }
 }
 export function uniqueInventoryFeatures(features: AssetFeature[]): AssetFeature[] {
   return [...new Map(features.filter(feature => feature.properties.counts_as_inventory !== false).map(feature => [feature.properties.feature_id, feature])).values()]

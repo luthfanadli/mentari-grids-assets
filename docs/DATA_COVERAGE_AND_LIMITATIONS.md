@@ -4,7 +4,7 @@ This is the supplied OpenInfraMap/OpenStreetMap export's preliminary inventory. 
 
 ## Verified scope
 
-The 30,412,800-byte GeoPackage has 26 layers. Only 5,396 line records, 2,753 substation polygons and 68 point substations are read as spatial records. All have EPSG:4326, valid nonempty geometry and unique IDs within their layer. Three polygon IDs are negative and remain unchanged.
+The 30,412,800-byte GeoPackage has 26 layers. Only 5,396 line records, 2,753 substation polygons, 68 point substations and 643 power-plant footprints are read as spatial records. All have EPSG:4326, valid nonempty geometry and unique IDs within their layer. Three polygon IDs are negative and remain unchanged.
 
 | Published subset | Total | Not flagged | Tagged construction | Tagged disused |
 | --- | ---: | ---: | ---: | ---: |
@@ -12,8 +12,9 @@ The 30,412,800-byte GeoPackage has 26 layers. Only 5,396 line records, 2,753 sub
 | Primary transmission-tagged polygons | 622 | 621 | 1 | 0 |
 | Separate review polygons | 448 | 448 | 0 | 0 |
 | Separate eligible point-only candidates | 32 | 32 | 0 | 0 |
+| Power-plant context footprints | 643 | 633 | 10 | 0 |
 
-Substation layers have no `disused` field. The zero disused category is a computed source-category count, not proof that no substation is disused. Both candidate layers are off by default. Primary polygons are explicitly tagged transmission and at target numeric voltage; this does not certify GI/GITET identity or operation. Point-only candidates retain unknown voltage and unverified function and are never included in the primary count.
+Substation and power-plant layers have no `disused` field. The zero disused category is a computed source-category count, not proof that no substation is disused. Both candidate layers are off by default. Primary polygons are explicitly tagged transmission and at target numeric voltage; this does not certify GI/GITET identity or operation. Point-only candidates retain unknown voltage and unverified function and are never included in the primary count.
 
 | Maximum line voltage | Segments across all flags |
 | --- | ---: |
@@ -40,9 +41,13 @@ These reconcile exactly: 5,396 = 4,374 + 1,022 lines; 2,753 = 622 + 448 + 19 + 3
 
 The versioned matching enhancement compares all 68 points against all 2,753 raw polygons: 187,204 pair evaluations. It records two supported matches, 25 uncertain and 41 distinct candidates under conservative thresholds. Supported source associations do not certify duplication. Of the 41 distinct candidates, 32 pass optional-layer eligibility; nine remain held for source-role or office-name review. Matched/uncertain points are withheld regardless of polygon-layer visibility. Original point coordinates and null voltage are retained. See [matching policy](SUBSTATION_MATCHING.md) and internal `data/qa/substation-matching-report.json`/CSV.
 
-The 448 candidates comprise 37 transmission-tagged/missing-voltage polygons, 239 target-voltage/missing-type polygons and 172 target-voltage/distribution-tagged polygons. Original tags remain unchanged. Towers (121,396), transformers (950), plants (643), generators and all telecom/water/pipeline/petroleum layers are excluded. The aggregate QA report lists every excluded layer's actual count.
+The 448 candidates comprise 37 transmission-tagged/missing-voltage polygons, 239 target-voltage/missing-type polygons and 172 target-voltage/distribution-tagged polygons. Original tags remain unchanged. Towers (121,396), transformers (950), individual generators and all telecom/water/pipeline/petroleum layers are excluded. The aggregate QA report lists every excluded layer's actual count.
 
 Additional source QA found one unparseable voltage string: polygon ID `943539373`, name `GITET Aur Duri Baru`, raw `voltages='500000/275000/150000'`, with null numeric maximum voltage and null type. It remains excluded by the exact predicates, even though its name is a review clue. Its voltage is not guessed or silently repaired. This illustrates why an OSM-tag subset is incomplete.
+
+## Power-plant source coverage
+
+The context layer publishes all 643 footprints, including 11 MultiPolygons; this is not a verified unique-plant registry. Name is missing on 113, operator on 428, energy source on 85, method on 283, output on 223 and start date on 613. No voltage, disused field or output unit is supplied. The 420 known output values retain unspecified units and are not summed or converted to MW. Start dates include partial/approximate strings and are not verified COD. Repeated names/Wikidata tags and multiple footprints are not automatically merged. Generator layers remain excluded. See [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).
 
 ## Attribute completeness
 
@@ -75,8 +80,8 @@ The map displays derived interior symbols for the same selected polygon records 
 
 ## Data reuse
 
-The processed derivative database is distributed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/) with [OpenStreetMap attribution](https://www.openstreetmap.org/copyright) and OpenInfraMap credit. Each GeoJSON embeds the license URI and attribution. The About download section is removed; all eight static `/data/` files remain accessible for browser rendering. Source/reference documents and internal QA stay outside static publication. Basemap reuse follows the configured provider's terms.
+The processed derivative database is distributed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/) with [OpenStreetMap attribution](https://www.openstreetmap.org/copyright) and OpenInfraMap credit. Each GeoJSON embeds the license URI and attribution. The About download section is removed; all nine static `/data/` files remain accessible for browser rendering. Source/reference documents and internal QA stay outside static publication. Basemap reuse follows the configured provider's terms.
 
 ## Reading the filters and legend
 
-Sidebar layer/voltage checkboxes do not display source totals. The cards and list count original records matching all active filters; map viewport counts remain separate. The legend describes this same filtered selection, not national completeness or exact contents of the viewport. It hides categories without matches and separates line voltage colors from source-status patterns. Review/point candidates remain unvalidated, and unknown voltage is not guessed. See [current UI and cleanup verification](SIMPLIFICATION_REPORT.md).
+Sidebar layer/voltage checkboxes do not display source totals. The cards and list count original records matching all active filters; map viewport counts remain separate. Power plants have their own count/key and do not use grid voltage controls. The legend describes this same filtered selection, not national completeness or exact contents of the viewport. It hides categories without matches and separates line voltage colors from source-status patterns. Review/point candidates remain unvalidated, and unknown voltage is not guessed. See [current UI and cleanup verification](SIMPLIFICATION_REPORT.md).

@@ -13,7 +13,7 @@ Audited against the uploaded 30,412,800-byte GeoPackage (30.41 MB) during prepar
 | `power_substation_point` | 68 | QA only until validated |
 | `power_transformer` | 950 | Exclude |
 | `power_tower` | 121,396 | Exclude |
-| `power_plant` | 643 | Exclude |
+| `power_plant` | 643 | User-authorized generation context |
 
 ## Transmission line filtered results
 
@@ -43,3 +43,7 @@ Audited against the uploaded 30,412,800-byte GeoPackage (30.41 MB) during prepar
 ## Recheck in the working repository
 
 The code assistant must **inspect the actual mounted `IDN.gpkg`** and recompute these figures. These verified numbers are reproducibility targets for this specific upload, not constants to blindly insert in source code.
+
+## Power-plant audit extension
+
+The same unchanged GeoPackage contains 643 valid, nonempty plant footprints in EPSG:4326: 632 Polygon and 11 MultiPolygon. Construction is false on 633 and true on ten. The layer supplies no voltage, disused field or output unit. Missing values: name 113, operator 428, source 85, method 283, output 223, start date 613. These findings are captured separately from the historic grid audit in `scripts/expected-power-plant-audit.json`; no historic source count was replaced. See [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).

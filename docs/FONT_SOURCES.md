@@ -22,3 +22,5 @@ The included SIL Open Font License 1.1 notice retains the project authors' copyr
 The primary theme colors, blue `#0d4c8f` and red `#d02030`, were sampled from solid-color areas of `public/images/Mentari Logo_Tagline Revamp_Color.png`. These colors style the interface; the existing voltage classes and map asset/status symbols retain their original colors.
 
 The sidebar/legend cleanup retains both font assets and the original logo. Status-line samples now use neutral strokes to explain patterns separately from kV colors; this does not recolor source features. No typeface or license asset was removed as unused. See [current cleanup verification](SIMPLIFICATION_REPORT.md).
+
+Power-plant overview diamonds are drawn locally in canvas and added as MapLibre images; construction uses a hollow diamond. No additional font, downloaded icon or external asset request was added. The original MENTARI logo and both font/license assets are unchanged. Current verification: [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).

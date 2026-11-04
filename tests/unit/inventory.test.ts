@@ -12,28 +12,29 @@ const lines = read('transmission-lines.geojson') as AssetCollection
 const primary = read('substations-primary.geojson') as AssetCollection
 const review = read('substations-review.geojson') as AssetCollection
 const points = read('substations-point-candidates.geojson') as AssetCollection
+const plants = read('power-plants.geojson') as AssetCollection
 const symbols = read('substation-display-points.geojson') as DisplayPointCollection
 const summary = read('summary.json') as InventorySummary
-const all = [...lines.features, ...primary.features, ...review.features, ...points.features]
+const all = [...lines.features, ...primary.features, ...review.features, ...points.features, ...plants.features]
 
 test('actual export counts and default selection match the generated summary', () => {
   assert.equal(lines.features.length, summary.datasets.lines.count)
   assert.equal(primary.features.length, summary.datasets.primary.count)
   assert.equal(review.features.length, summary.datasets.review.count)
-  assert.deepEqual(selectionCounts(filterAssets(all, defaultFilters())), { ...summary.default_selection, total: 4966 })
+  assert.deepEqual(selectionCounts(filterAssets(all, defaultFilters())), { ...summary.default_selection, total: 5599 })
 })
 test('optional source flags add exactly 25 construction lines, one polygon and four disused lines', () => {
   const filters = defaultFilters()
   filters.statuses = ['tagged_construction']
-  assert.deepEqual(selectionCounts(filterAssets(all, filters)), { lines: 25, primary: 1, review: 0, points: 0, total: 26 })
+  assert.deepEqual(selectionCounts(filterAssets(all, filters)), { lines: 25, primary: 1, review: 0, points: 0, plants: 10, total: 36 })
   filters.statuses = ['tagged_disused']
-  assert.deepEqual(selectionCounts(filterAssets(all, filters)), { lines: 4, primary: 0, review: 0, points: 0, total: 4 })
+  assert.deepEqual(selectionCounts(filterAssets(all, filters)), { lines: 4, primary: 0, review: 0, points: 0, plants: 0, total: 4 })
   filters.statuses = ['not_flagged_in_osm', 'tagged_construction', 'tagged_disused']
-  assert.equal(filterAssets(all, filters).length, lines.features.length + primary.features.length)
+  assert.equal(filterAssets(all, filters).length, lines.features.length + primary.features.length + plants.features.length)
 })
 test('review is independent from primary, unknown voltages remain explicit and all reasons are disjoint', () => {
   const filters = defaultFilters()
-  filters.review = true; filters.lines = false; filters.primary = false
+  filters.review = true; filters.lines = false; filters.primary = false; filters.powerPlants = false
   assert.equal(filterAssets(all, filters).length, 448)
   filters.unknownVoltage = false
   assert.equal(filterAssets(all, filters).length, 411)
@@ -43,7 +44,7 @@ test('review is independent from primary, unknown voltages remain explicit and a
   assert.equal(new Set(all.map(f => f.properties.feature_id)).size, all.length)
 })
 test('voltage filtering uses maximum value only, once per feature', () => {
-  const filters = defaultFilters(); filters.voltages = [500]
+  const filters = defaultFilters(); filters.powerPlants = false; filters.voltages = [500]
   const result = filterAssets(all, filters)
   assert.ok(result.length > 0)
   assert.ok(result.every(f => f.properties.max_voltage_v === 500000 && f.properties.max_voltage_kv === 500))
@@ -81,7 +82,7 @@ test('repository fetches base once and does not request review until explicitly 
   }) as typeof fetch
   const repo = createAssetRepository(fetcher, '/')
   await repo.loadBase(); await repo.loadBase()
-  assert.equal(calls.length, 4); assert.ok(!calls.some(c => c.includes('review') || c.includes('point-candidates')))
+  assert.equal(calls.length, 5); assert.ok(!calls.some(c => c.includes('review') || c.includes('point-candidates')))
   await repo.loadReview(); await repo.loadReview()
   assert.equal(calls.filter(c => c.includes('review')).length, 1)
   await repo.loadPointCandidates(); await repo.loadPointCandidates()
@@ -91,8 +92,8 @@ test('repository fetches base once and does not request review until explicitly 
 test('point-only candidates stay separate from both polygon groups and retain unknown voltage', () => {
   const filters = defaultFilters()
   filters.pointCandidates = true
-  assert.deepEqual(selectionCounts(filterAssets(all, filters)), { lines: 4345, primary: 621, review: 0, points: 32, total: 4998 })
-  filters.lines = false; filters.primary = false
+  assert.deepEqual(selectionCounts(filterAssets(all, filters)), { lines: 4345, primary: 621, review: 0, points: 32, plants: 633, total: 5631 })
+  filters.lines = false; filters.primary = false; filters.powerPlants = false
   assert.equal(filterAssets(all, filters).length, summary.datasets.point_candidates.count)
   assert.ok(filterAssets(all, filters).every(feature => feature.properties.max_voltage_v === null && feature.properties.max_voltage_kv === null))
   filters.unknownVoltage = false
@@ -109,7 +110,7 @@ test('representative symbols follow parent filters and never inflate inventory o
   const original = primary.features[0]!
   const symbol = symbols.features.find(f => f.id === original.id)!
   const display = { ...symbol, properties: { ...original.properties, counts_as_inventory: false as const } } as AssetFeature
-  assert.deepEqual(selectionCounts([original, original, display]), { lines: 0, primary: 1, review: 0, points: 0, total: 1 })
+  assert.deepEqual(selectionCounts([original, original, display]), { lines: 0, primary: 1, review: 0, points: 0, plants: 0, total: 1 })
   assert.equal(selectionCounts([display]).total, 0)
   assert.equal(renderedRecordCount([original, symbol, symbol]), 1)
   assert.equal(renderedRecordCount([original, symbol, points.features[0]!]), 2)
@@ -128,9 +129,9 @@ test('legend includes only selected original features and keeps unknown-voltage 
   const filters = defaultFilters()
   assert.deepEqual(selectedMapLegend(filterAssets(all, filters)), {
     lineVoltages: [500, 275, 150, 70], baselineLines: true, constructionLines: false, disusedLines: false,
-    primary: true, constructionPrimary: false, review: false, points: false,
+    primary: true, constructionPrimary: false, review: false, points: false, plants: true, constructionPlants: false,
   })
-  filters.lines = false; filters.primary = false; filters.review = true; filters.pointCandidates = true; filters.voltages = []
+  filters.lines = false; filters.primary = false; filters.powerPlants = false; filters.review = true; filters.pointCandidates = true; filters.voltages = []
   const selected = filterAssets(all, filters)
   assert.equal(selected.length, 69) // 37 unknown-voltage review polygons + 32 source points.
   const key = selectedMapLegend(selected)
@@ -162,4 +163,34 @@ test('legend excludes derived representatives and clears every key for an empty 
   const filters = defaultFilters(); filters.query = 'no matching source asset xyz'
   assert.deepEqual(selectedMapLegend([representative]), selectedMapLegend(filterAssets(all, filters)))
   assert.deepEqual(selectedMapLegend([representative]), selectedMapLegend([]))
+})
+
+test('power plants use source flags and search while remaining independent of grid voltage', () => {
+  const filters = defaultFilters(); filters.lines = false; filters.primary = false
+  filters.voltages = []; filters.unknownVoltage = false
+  assert.equal(filterAssets(all, filters).length, 633)
+  assert.ok(filterAssets(all, filters).every(f => f.properties.asset_type === 'power_plant'))
+  filters.statuses = ['tagged_construction']
+  assert.equal(filterAssets(all, filters).length, 10)
+  assert.equal(selectedMapLegend(filterAssets(all, filters)).constructionPlants, true)
+  filters.statuses = ['not_flagged_in_osm']; filters.query = 'Tolo Wind Farm'
+  assert.ok(filterAssets(all, filters).some(f => f.properties.plant_name_en === 'Tolo Wind Farm'))
+  filters.query = 'geothermal'
+  assert.ok(filterAssets(all, filters).every(f => f.properties.plant_source === 'geothermal' || f.properties.display_name.toLowerCase().includes('geothermal') || f.properties.operator?.toLowerCase().includes('geothermal') || f.properties.plant_name_en?.toLowerCase().includes('geothermal')))
+  filters.powerPlants = false
+  assert.equal(filterAssets(all, filters).length, 0)
+})
+
+test('power-plant footprints and their display representatives count as one original record', () => {
+  const plant = plants.features.find(f => f.properties.osm_tag_status === 'not_flagged_in_osm')!
+  const representative = { ...plant, properties: { ...plant.properties, represented_feature_id: plant.id, counts_as_inventory: false as const } }
+  const counts = selectionCounts([plant, plant, representative])
+  assert.equal(counts.plants, 1); assert.equal(counts.primary, 0); assert.equal(counts.total, 1)
+  assert.equal(renderedRecordCount([plant, representative, representative]), 1)
+  assert.equal(selectedMapLegend([plant]).plants, true)
+  assert.equal(selectedMapLegend([representative]).plants, false)
+  for (const feature of plants.features) {
+    assert.equal(feature.properties.max_voltage_kv, null)
+    assert.equal(feature.properties.plant_output_unit, null)
+  }
 })

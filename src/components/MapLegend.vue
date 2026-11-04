@@ -29,6 +29,11 @@ const key = computed(() => selectedMapLegend(props.features))
         <span v-if="key.review" class="legend-row"><i class="review-sample" :class="{ round: overview }"></i>Review polygons</span>
         <span v-if="key.points" class="legend-row"><i class="point-sample"></i>Point-only candidates</span>
       </template>
+      <template v-if="key.plants || key.constructionPlants">
+        <strong class="legend-section">Power plants</strong>
+        <span v-if="key.plants" class="legend-row"><i class="plant-sample" :class="{ diamond: overview }"></i>Power plants</span>
+        <span v-if="key.constructionPlants" class="legend-row"><i class="plant-sample plant-construction" :class="{ diamond: overview }"></i>Plant · construction</span>
+      </template>
       <template v-if="key.constructionLines || key.disusedLines">
         <strong class="legend-section">Line pattern</strong>
         <span v-if="key.baselineLines" class="legend-row"><i class="baseline-sample"></i>Not flagged in OSM</span>
@@ -62,6 +67,9 @@ const key = computed(() => selectedMapLegend(props.features))
 .round, .point-sample { border-radius: 50% }
 .review-sample.round { border-style: solid }
 .point-sample { border: 2px solid #b8406a; background: white }
+.legend-row .plant-sample { width: 9px; height: 9px; margin: 0 4px; background: #d0203033; border: 1px solid #b72236 }
+.plant-sample.diamond { transform: rotate(45deg); background: #b72236; border-color: #fff }
+.legend-row .plant-construction { border-color: #b72236; border-style: dashed; background: #fff9f0 }
 .baseline-sample { border-top: 2px solid var(--muted) }
 .construction-sample { border-top: 2px dashed var(--muted) }
 .disused-sample { border-top: 2px dotted var(--muted) }

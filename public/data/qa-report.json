@@ -1,5 +1,5 @@
 {
-  "data_version": "6ea22caaae9ef62a-pipeline-1.1.0",
+  "data_version": "6ea22caaae9ef62a-pipeline-1.2.0",
   "source_sha256": "6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba",
   "source_unchanged": true,
   "raw_layers": [
@@ -253,6 +253,48 @@
         "start_date": 68
       },
       "negative_source_ids": 0
+    },
+    "power_plant": {
+      "count": 643,
+      "crs": "EPSG:4326",
+      "bounds": [
+        95.07524503357155,
+        -10.884326107067766,
+        140.7920410960544,
+        5.875549295010516
+      ],
+      "geometry_types": {
+        "Polygon": 632,
+        "MultiPolygon": 11
+      },
+      "errors": {
+        "null_geometry": 0,
+        "empty_geometry": 0,
+        "invalid_geometry": 0,
+        "unexpected_geometry_type": 0,
+        "duplicate_source_ids": 0,
+        "null_source_ids": 0
+      },
+      "voltage_tag_qa": {},
+      "missing_values": {
+        "id": 0,
+        "name": 113,
+        "name_en": 622,
+        "description": 641,
+        "ref": 639,
+        "ref_us_eia": 643,
+        "ref_gb_repd": 643,
+        "ref_eu_eic": 643,
+        "wikidata": 590,
+        "operator": 428,
+        "wd_operator": 579,
+        "construction": 0,
+        "source": 85,
+        "method": 283,
+        "output": 223,
+        "start_date": 613
+      },
+      "negative_source_ids": 23
     }
   },
   "audit_actual": {
@@ -266,6 +308,7 @@
     "primary": 622,
     "review": 448,
     "point_candidates": 32,
+    "power_plants": 643,
     "lines_not_flagged_in_osm": 4345,
     "lines_tagged_construction": 25,
     "lines_tagged_disused": 4,
@@ -317,7 +360,6 @@
     "power_compensator": 1,
     "power_generator_point": 4677,
     "power_generator_polygon": 8585,
-    "power_plant": 643,
     "power_switch": 8,
     "power_tower": 121396,
     "power_transformer": 950,
@@ -366,20 +408,37 @@
     "missing_point_numeric_voltage": 68,
     "confirmed_unique_station_count": null
   },
+  "power_plant_audit": {
+    "raw_count": 643,
+    "published_count": 643,
+    "not_flagged": 633,
+    "construction": 10,
+    "polygons": 632,
+    "multipolygons": 11,
+    "missing_name": 113,
+    "missing_operator": 428,
+    "missing_source": 85,
+    "missing_method": 283,
+    "missing_output": 223,
+    "missing_start_date": 613,
+    "voltage_field_available": false,
+    "disused_field_available": false,
+    "output_unit": null
+  },
   "representative_symbols": {
     "count": 1070,
     "outside_parent_footprint": 0,
     "counts_as_inventory": false
   },
   "publication_validation": {
-    "features_validated": 5476,
+    "features_validated": 6119,
     "duplicate_feature_ids": 0,
     "geometry_errors": 0,
     "voltage_scope_errors": 0,
     "subset_overlaps": 0,
     "coordinate_precision_decimals": 7,
     "simplified": false,
-    "coordinate_precision_scope": "Existing line/polygon exports only; source point candidates preserve original coordinates and representative symbols preserve generated interior coordinates.",
+    "coordinate_precision_scope": "Existing line/substation polygon exports only; source point candidates and power-plant footprints preserve original coordinate precision. Representatives are derived interior locations.",
     "coordinate_order": "longitude, latitude",
     "crs": "EPSG:4326"
   },

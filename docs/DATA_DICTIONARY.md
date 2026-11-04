@@ -1,13 +1,13 @@
 # Data dictionary
 
-The four inventory/review GeoJSONs are RFC 7946 FeatureCollections in EPSG:4326 longitude/latitude. The original three line/polygon exports remain unchanged, without simplification or dissolve, at seven coordinate decimals and normalized ring winding. Point-only candidates retain exact original point coordinates. Each original inventory/review feature has a string `id`, identical to `properties.feature_id`, and geometry-derived `[west,south,east,north]` `bbox`. A fifth GeoJSON contains derived polygon display points, separately identified and excluded from inventory counts. Each collection embeds attribution and the ODbL URI.
+The five original-record inventory/review GeoJSONs are RFC 7946 FeatureCollections in EPSG:4326 longitude/latitude. The original three line/polygon exports remain unchanged, without simplification or dissolve, at seven coordinate decimals and normalized ring winding. Point-only candidates retain exact original point coordinates. Each original inventory/review feature has a string `id`, identical to `properties.feature_id`, and geometry-derived `[west,south,east,north]` `bbox`. A sixth GeoJSON contains derived substation display points, separately identified and excluded from inventory counts. Each collection embeds attribution and the ODbL URI.
 
 | Property | Type | Meaning |
 | --- | --- | --- |
 | `feature_id` | string | `<source_layer>:<source_id>`, unique across original inventory/review exports. Derived display symbols intentionally reuse their parent's ID. |
-| `source_layer` | string | Original `power_line` or `power_substation_polygon`. |
+| `source_layer` | string | Original `power_line`, `power_substation_polygon`, `power_substation_point` or `power_plant`. |
 | `source_id` | string | Original `id`, never GeoPackage `fid`. Negative IDs preserved. OSM element kind is not verified. |
-| `asset_type` | string | `transmission_line`, `substation_polygon` or `substation_point`. Candidate status does not establish physical asset identity. |
+| `asset_type` | string | `transmission_line`, `substation_polygon`, `substation_point` or `power_plant`. Candidate status does not establish physical asset identity. |
 | `display_name` | string | Original nonblank name, otherwise `Unnamed line/substation · OSM ID …`. |
 | `display_name_is_fallback` | boolean | Synthetic interface label flag; a fallback is not an official name. |
 | `name`, `ref`, `operator` | string or null | Original source values, without ownership verification or label-based inference. |
@@ -16,7 +16,7 @@ The four inventory/review GeoJSONs are RFC 7946 FeatureCollections in EPSG:4326 
 | `voltages_raw` | string or null | Original `voltages`, including empty/multi-value strings. |
 | `all_voltages_kv` | number[] | Distinct finite positive numeric semicolon tokens / 1000, in source order. Invalid tokens are not coerced; raw value is retained. Never widens the numeric maximum-voltage filter. |
 | `construction` | boolean or null | Original flag. All supplied core-layer records have a nonnull value. |
-| `disused` | boolean or null | Original line flag. Null for polygons, whose source layer has no such field. |
+| `disused` | boolean or null | Original line flag. Null for substations and plants, whose source layers have no such field. |
 | `osm_tag_status` | string | Source flag category below; not official project or operational status. |
 | `source_status_verified` | false | Always false for these datasets. |
 | `substation_type` | string or null | Original polygon type; null for lines. `distribution` remains unchanged in review records. |
@@ -61,13 +61,19 @@ The two candidate toggles are independent of primary-substation visibility. With
 
 `substation-display-points.geojson` contains 1,070 derived Point features, one per published polygon. Its smaller presentation-only properties are `feature_id`, `source_id`, `represented_feature_id`, `inventory_group` (`primary`/`review`), `geometry_role=derived_polygon_representative_point`, `counts_as_inventory=false` and `method`. Both feature `id` and `represented_feature_id` equal the parent polygon's ID; repeated IDs across a parent and its symbol are intentional, not additional inventory records. Symbols are generated inside the published footprint with Shapely point_on_surface, without changing the footprint. They use the parent's filtered attributes at render time and do not inherit a separate source point's identity.
 
+## Power-plant properties
+
+`power-plants.geojson` has `asset_type=power_plant`, original Polygon/MultiPolygon geometry at full source precision, `geometry_role=original_power_plant_footprint`, original signed IDs and null voltage/disused fields. `plant_source`, `plant_method`, `plant_output_raw`, `plant_start_date_raw`, `plant_name_en`, `plant_description` and `plant_wikidata` preserve source attributes. `plant_output_unit=null` records missing units; raw output is not verified capacity or assumed MW. Raw start date is not verified COD. `plant_representative_point` contains derived interior longitude/latitude for display, not another source record. Runtime symbols reuse the parent ID and set `counts_as_inventory=false`.
+
+`datasets.power_plants` and `default_selection.plants` are separate from primary/review counts. `power_plant_presentation` describes embedded representatives; `power_plant_policy` in the catalog documents voltage independence and source limitations. See [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).
+
 ## Metadata
 
 Metadata totals describe complete published subsets across source flags. They are not filter results. The sidebar no longer repeats these totals; cards and the list count matching original records, and the legend is derived from those records. `Unknown voltage` covers 37 review polygons and all 32 optional source points when those layers are enabled. No data property or serialized output changed for the sidebar/legend simplification; see [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
 
-Schema-v2 `summary.json` contains raw counts for all layers, actual per-subset counts, statuses, maximum-voltage distributions, missing-value metrics, fallback-label counts, review reasons, default selection and GeoJSON byte sizes. `datasets.point_candidates` is separate from `datasets.review`; `substation_point_matching` contains 2/25/41 classification counts and eligibility totals. `substation_presentation` holds symbol count, zoom threshold and its non-inventory role. `planned_assets.count` is null, not zero: no authoritative dataset was provided.
+Schema-v3 `summary.json` contains raw counts for all layers, actual per-subset counts, statuses, maximum-voltage distributions, missing-value metrics, fallback-label counts, review reasons, default selection and GeoJSON byte sizes. `datasets.point_candidates` is separate from `datasets.review`; `substation_point_matching` contains 2/25/41 classification counts and eligibility totals. `substation_presentation` holds symbol count, zoom threshold and its non-inventory role. `planned_assets.count` is null, not zero: no authoritative dataset was provided.
 
-`data-catalog.json` provides source/licensing, unknown source vintage, input SHA-256, original/output CRS, transformation description, matching policy, field meanings, limitations and each GeoJSON's role/count/bytes/SHA-256. Presentation datasets are not added to inventory counts. `data_version` combines source hash prefix and pipeline version (`1.1.0`); no current timestamp is inserted, so identical processing is byte deterministic.
+`data-catalog.json` provides source/licensing, unknown source vintage, input SHA-256, original/output CRS, transformation description, matching policy, field meanings, limitations and each GeoJSON's role/count/bytes/SHA-256. Presentation datasets are not added to inventory counts. `data_version` combines source hash prefix and pipeline version (`1.2.0`); no current timestamp is inserted, so identical processing is byte deterministic.
 
 `qa-report.json` contains all-layer metadata/counts; core-layer fields/nulls, validity, bounds, geometry types and duplicate/negative IDs; voltage-tag inconsistencies; exclusion counts; conflict/point counts; actual audit metrics; exact expected/actual differences; publication validation and unchanged-source checks. QA PASS covers structural and selection checks, not official asset validation. Frontend/backend test execution results live in the implementation report, not a fabricated test stamp in generated data.
 

@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "data_version": "6ea22caaae9ef62a-pipeline-1.1.0",
+  "schema_version": 3,
+  "data_version": "6ea22caaae9ef62a-pipeline-1.2.0",
   "source_data_vintage": "unknown",
   "source_sha256": "6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba",
   "raw_counts": {
@@ -125,6 +125,27 @@
         "location": 32
       },
       "fallback_names": 10
+    },
+    "power_plants": {
+      "count": 643,
+      "statuses": {
+        "not_flagged_in_osm": 633,
+        "tagged_construction": 10,
+        "tagged_disused": 0,
+        "conflicting_tags": 0
+      },
+      "voltage_kv": {
+        "unknown": 643
+      },
+      "missing_values": {
+        "name": 113,
+        "ref": 639,
+        "operator": 428,
+        "max_voltage_kv": 643,
+        "circuits": 643,
+        "location": 643
+      },
+      "fallback_names": 113
     }
   },
   "review_reasons": {
@@ -136,7 +157,8 @@
     "lines": 4345,
     "primary": 621,
     "review": 0,
-    "points": 0
+    "points": 0,
+    "plants": 633
   },
   "substation_point_matching": {
     "matching_version": "1.0.0",
@@ -154,11 +176,18 @@
     "footprint_min_zoom": 10,
     "counts_as_inventory": false
   },
+  "power_plant_presentation": {
+    "representative_symbol_count": 643,
+    "footprint_min_zoom": 10,
+    "counts_as_inventory": false,
+    "coordinates_field": "plant_representative_point"
+  },
   "output_bytes": {
     "transmission-lines.geojson": 6151922,
     "substations-primary.geojson": 646266,
     "substations-review.geojson": 450635,
     "substations-point-candidates.geojson": 36376,
+    "power-plants.geojson": 1111875,
     "substation-display-points.geojson": 490830
   },
   "planned_assets": {

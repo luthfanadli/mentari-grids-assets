@@ -8,9 +8,9 @@ const root = fileURLToPath(new URL('../', import.meta.url))
 const directory = resolve(root, 'public/data')
 const read = name => JSON.parse(readFileSync(join(directory, name), 'utf8'))
 const summary = read('summary.json'), catalog = read('data-catalog.json'), qa = read('qa-report.json')
-const files = ['transmission-lines.geojson', 'substations-primary.geojson', 'substations-review.geojson', 'substations-point-candidates.geojson', 'substation-display-points.geojson', 'summary.json', 'data-catalog.json', 'qa-report.json']
-assert.deepEqual(readdirSync(directory).sort(), [...files].sort(), 'Only the eight intended data exports may be published')
-assert.equal(summary.schema_version, 2)
+const files = ['transmission-lines.geojson', 'substations-primary.geojson', 'substations-review.geojson', 'substations-point-candidates.geojson', 'substation-display-points.geojson', 'power-plants.geojson', 'summary.json', 'data-catalog.json', 'qa-report.json']
+assert.deepEqual(readdirSync(directory).sort(), [...files].sort(), 'Only the nine intended data exports may be published')
+assert.equal(summary.schema_version, 3)
 assert.equal(summary.data_version, catalog.data_version, 'Metadata versions differ')
 assert.equal(summary.data_version, qa.data_version, 'QA version differs')
 assert.equal(summary.source_sha256, catalog.source_sha256)
@@ -55,6 +55,18 @@ for (const entry of catalog.datasets) {
     if (entry.key === 'lines' || entry.key === 'primary') assert.ok(target.has(p.max_voltage_v))
     if (entry.key === 'primary' || entry.key === 'review') polygonIds.add(feature.id)
     if (entry.key === 'primary') assert.equal(p.substation_type, 'transmission')
+    if (entry.key === 'power_plants') {
+      assert.equal(p.asset_type, 'power_plant')
+      assert.equal(p.source_layer, 'power_plant')
+      assert.ok(['Polygon', 'MultiPolygon'].includes(feature.geometry.type))
+      assert.equal(p.geometry_role, 'original_power_plant_footprint')
+      assert.equal(p.max_voltage_v, null)
+      assert.equal(p.plant_output_unit, null)
+      assert.equal(p.disused, null)
+      assert.ok(Array.isArray(p.plant_representative_point) && p.plant_representative_point.length === 2)
+      assert.ok(p.plant_representative_point.every(Number.isFinite))
+      assert.ok(p.plant_output_raw === null || Number.isFinite(p.plant_output_raw) && p.plant_output_raw >= 0)
+    }
     if (entry.key === 'point_candidates') {
       assert.equal(p.asset_type, 'substation_point')
       assert.equal(p.geometry_role, 'original_point')
@@ -69,6 +81,9 @@ assert.deepEqual([...symbolIds].sort(), [...polygonIds].sort(), 'Representative 
 assert.equal(ids.size, qa.publication_validation.features_validated)
 assert.equal(symbolIds.size, summary.substation_presentation.representative_symbol_count)
 assert.equal(summary.datasets.point_candidates.count, qa.substation_point_matching.eligible_point_candidates)
+assert.equal(summary.datasets.power_plants.count, qa.power_plant_audit.published_count)
+assert.equal(summary.power_plant_presentation.representative_symbol_count, summary.datasets.power_plants.count)
+assert.equal(summary.power_plant_presentation.counts_as_inventory, false)
 assert.equal(Object.values(qa.substation_point_matching.classifications).reduce((sum, n) => sum + n, 0), qa.substation_point_matching.point_count)
 function checkAssets(path) {
   for (const entry of readdirSync(path, { withFileTypes: true })) {
@@ -78,5 +93,5 @@ function checkAssets(path) {
   }
 }
 checkAssets(resolve(root, 'public'))
-console.log(`Publication checks passed: ${ids.size.toLocaleString('en-GB')} inventory/review records; ${symbolIds.size} uncounted display symbols; eight files; matching versions, checksums and counts.`)
+console.log(`Publication checks passed: ${ids.size.toLocaleString('en-GB')} inventory/review records; ${symbolIds.size} uncounted substation symbols; ${summary.datasets.power_plants.count} embedded plant display locations; nine files; matching versions, checksums and counts.`)
 console.log(`Published GeoJSON bytes: ${catalog.datasets.reduce((n, entry) => n + statSync(join(directory, entry.url.split('/').pop())).size, 0).toLocaleString('en-GB')}`)

@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "data_version": "6ea22caaae9ef62a-pipeline-1.1.0",
+  "schema_version": 3,
+  "data_version": "6ea22caaae9ef62a-pipeline-1.2.0",
   "source": "OpenInfraMap / OpenStreetMap",
   "source_url": "https://openinframap.org/",
   "osm_url": "https://www.openstreetmap.org/copyright",
@@ -13,8 +13,8 @@
   "source_data_vintage": "unknown",
   "original_crs": "EPSG:4326",
   "output_crs": "EPSG:4326",
-  "pipeline_version": "1.1.0",
-  "processing_method": "Unchanged exact numeric max_voltage line filter in 70000/150000/275000/500000 V; unchanged transmission-tagged primary polygons and three review predicates. Conflicting flags quarantined. Existing line/polygon exports retain seven coordinate decimals and RFC7946 winding, without simplification/dissolve. WGS84 geodesic line lengths. All raw substation points matched against all polygons under the versioned policy; eligible distinct candidates retain original point coordinates and unknown voltage. Polygon point_on_surface symbols preserve parent IDs and do not count as inventory.",
+  "pipeline_version": "1.2.0",
+  "processing_method": "Unchanged exact numeric max_voltage line filter in 70000/150000/275000/500000 V; unchanged transmission-tagged primary polygons and three review predicates. Conflicting flags quarantined. Existing line/polygon exports retain seven coordinate decimals and RFC7946 winding, without simplification/dissolve. WGS84 geodesic line lengths. All raw substation points matched against all polygons under the versioned policy; eligible distinct candidates retain original point coordinates and unknown voltage. Polygon point_on_surface symbols preserve parent IDs and do not count as inventory. Power-plant footprints retain original precision, source attributes and derived interior coordinates; no voltage, output unit, official capacity or COD is inferred.",
   "substation_matching_policy": {
     "version": "1.0.0",
     "proximity_review_m": 500,
@@ -29,6 +29,16 @@
     "name_policy": "Case/accent/punctuation normalization; strip generic utility/station words and explicit kV text; retain site-code numbers (PK 276 differs from PK 277). Distinctive token-set equality only; no fuzzy substring or arbitrary place-name inference.",
     "eligibility_policy": "Only distinct candidates; missing voltage stays null. Hold known distribution/minor_distribution/generation/other non-transmission roles, non-target known numeric voltage, conflicting status flags, and office/park function clues outside the map layer for manual review. These holds do not delete source records.",
     "distance_method": "Per-point WGS84 azimuthal equidistant projection against every raw polygon; projected stored-edge chord approximation in meters. Intersection uses original EPSG:4326 geometry. Thresholds are QA rules, not surveyed boundaries or network connectivity."
+  },
+  "power_plant_policy": {
+    "source_layer": "power_plant",
+    "default_visible": true,
+    "grid_voltage_filter_applies": false,
+    "full_precision_footprints": true,
+    "overview_marker": "derived point_on_surface; not another record",
+    "output_unit": null,
+    "source_start_date_is_verified_cod": false,
+    "generator_layers_published": false
   },
   "database_license_notice": "The processed derivative database and presentation symbols are available under ODbL 1.0. Retain attribution and license notices on redistribution.",
   "datasets": [
@@ -69,6 +79,15 @@
       "sha256": "6d4589cfb3f54fe768dff45e26db59157fbf5a34524c4df7ff02c198b5c4f8ea"
     },
     {
+      "key": "power_plants",
+      "url": "/data/power-plants.geojson",
+      "source_layer": "power_plant",
+      "role": "inventory",
+      "count": 643,
+      "bytes": 1111875,
+      "sha256": "61587c1f8248b6fda71f7c4eeaa1b60aa74c4a4654ea31f0136a4f84063fc1c3"
+    },
+    {
       "key": "display_points",
       "url": "/data/substation-display-points.geojson",
       "source_layer": "power_substation_polygon",
@@ -80,10 +99,19 @@
     }
   ],
   "fields": {
+    "plant_source": "Original power_plant.source energy-source tag; not a new dataset attribution.",
+    "plant_method": "Original generation method tag, unverified.",
+    "plant_output_raw": "Original numeric output; unit unspecified in this export. Not assumed MW or verified capacity.",
+    "plant_output_unit": "Null: no output unit supplied by the source export.",
+    "plant_start_date_raw": "Original start_date string, including approximate/partial dates; not verified COD.",
+    "plant_name_en": "Original English-name tag or null.",
+    "plant_description": "Original description or null.",
+    "plant_wikidata": "Original Wikidata identifier or null; not an authoritative station ID.",
+    "plant_representative_point": "Derived point_on_surface coordinates inside the original footprint; display only, never another inventory record.",
     "feature_id": "Unique original inventory/review record <source_layer>:<original id>; negative IDs preserved. A derived display symbol reuses its parent ID and is not another record.",
     "source_layer": "Original GeoPackage layer.",
     "source_id": "Original id as a string, never GeoPackage fid. OSM element kind is not verified.",
-    "asset_type": "transmission_line, substation_polygon, or separately reviewed substation_point.",
+    "asset_type": "transmission_line, substation_polygon, separately reviewed substation_point, or source power_plant.",
     "display_name": "Original nonblank name, otherwise interface fallback, not an official name.",
     "display_name_is_fallback": "True when display_name is a synthetic interface label.",
     "name": "Original name or null.",
@@ -102,7 +130,7 @@
     "location": "Original line location; null for substations. Does not establish HVDC.",
     "circuits": "Original line circuit count when known; no assumption of one circuit.",
     "mapped_geometry_length_km": "WGS84 geodesic line geometry length, not official circuit-km.",
-    "geometry_role": "original_point for point-only candidates; derived_polygon_representative_point for display symbols, which do not count as inventory.",
+    "geometry_role": "original_power_plant_footprint for plant polygons, original_point for point-only candidates; derived_polygon_representative_point for display symbols, which do not count as inventory.",
     "matching_classification": "Point-only publication requires distinct_point_only_candidate under the versioned QA policy; not verified physical-station identity.",
     "matching_reason": "Explanation of the source matching decision; no voltage or function is inherited from polygons.",
     "matching_version": "Version of reproducible point/polygon matching policy.",
@@ -116,6 +144,7 @@
     "Not flagged in OSM does not establish existing or operational status.",
     "Source data vintage is unknown; file modification time is not an OSM snapshot date.",
     "Features are mapped segments/polygons, not unique circuits, corridors or verified stations.",
+    "Power plants are OSM footprints, not generators or verified unique stations. Source output has no supplied unit; start_date is not verified COD. Plants have no voltage/disused field.",
     "Review candidates are unvalidated, separate from primary inventory and off by default.",
     "Source points are matched against all polygons; only eligible distinct point-only candidates are published separately, off by default. Voltage/function/identity remain unverified.",
     "No authoritative planned RUPTL/RUKN projects, region or power-system crosswalk was supplied.",

@@ -1,6 +1,6 @@
 # Spatial Data Filter Specification — MENTARI Grids D2
 
-Current publication note: exact line/primary/review predicates and historic source counts below are unchanged. The later matching supplement adds the optional 32-point dataset and 1,070 non-inventory symbols, for five GeoJSONs plus three metadata files; see [DATA_DICTIONARY.md](DATA_DICTIONARY.md) and [SUBSTATION_MATCHING.md](SUBSTATION_MATCHING.md). Three-file examples retain the starting MVP contract. The simplified sidebar has no source totals; matching-record cards/list and selection-driven legend use the existing filter result without changing preprocessing. See [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
+Current publication note: exact line/primary/review predicates and historic source counts below are unchanged. The matching supplement adds the optional 32-point dataset and 1,070 non-inventory symbols; the plant supplement adds 643 original power-plant footprints. Current publication is six GeoJSONs plus three metadata files; see [DATA_DICTIONARY.md](DATA_DICTIONARY.md), [SUBSTATION_MATCHING.md](SUBSTATION_MATCHING.md) and [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md). Three-file examples retain the starting MVP contract. The simplified sidebar has no source totals; cards/list and the selection-driven legend use the same filtered original records. See [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md) for the earlier UI cleanup.
 
 **Status:** approved starting logic for the MVP; source-tag categories are preliminary, **not** confirmation by PLN/DJK ESDM. **Input:** `data/raw/IDN.gpkg`. **Reference:** ToR Deliverable 2 and verified audit in `VERIFIED_DATA_AUDIT.md`.
 
@@ -13,7 +13,8 @@ Only source layers below may contribute to the production map:
 | `power_line` | 5,396 | Filter to 500/275/150/70 kV |
 | `power_substation_polygon` | 2,753 | Filter to primary transmission-tagged polygons; candidate polygons separate |
 | `power_substation_point` | 68 | Review/QA only; zero default map features |
-| `power_tower`, `power_transformer`, `power_plant`, generators, all non-power layers | Varies | Exclude from MVP |
+| `power_plant` | 643 | User-authorized generation context: source footprints, separate count and symbols |
+| `power_tower`, `power_transformer`, individual generators, all non-power layers | Varies | Exclude from MVP |
 
 Retain raw GPKG at `data/raw/` locally; do not publish or git-track that directory. Avoid a `SELECT *` export of all layers.
 
@@ -134,3 +135,11 @@ The ToR also requires RUPTL 2025–2034/RUKN 2025–2060 planned lines/substatio
 ## H. User-authorized substation enhancement
 
 The subsequent enhancement request authorizes an optional, default-off point-only candidate layer after full point–polygon matching QA and derived overview symbols for polygons. It preserves all existing line predicates, 622 primary polygons and 448 review polygons, including their original export bytes. No missing-voltage point enters primary inventory. The versioned policy, all 68 source-point classifications, eligibility rules, eight-file publication schema and counting/representation behavior are documented in [SUBSTATION_MATCHING.md](SUBSTATION_MATCHING.md). This supplement does not authorize deployment or change the historic source audit.
+
+## Power-plant context supplement (user authorized)
+
+Read only `power_plant` in addition to the three existing spatial layers. Publish all 643 structurally valid source footprints (632 Polygon, 11 MultiPolygon), retain signed IDs and full original coordinate precision, and exclude individual generator layers. Preserve 633 not-construction-tagged and ten construction-tagged records; construction is optional under the existing status filter. Power plants are on by default and have a separate count. Grid voltage filters do not apply because no plant voltage field exists.
+
+Keep energy-source, method, numeric raw output, raw start-date string, English-name, description and Wikidata tags with explicit provenance. Output units are not supplied: leave the unit null and do not convert to MW or aggregate verified capacity. Raw start date is not verified COD. No disused field or electrical connections are inferred. Derived `plant_representative_point` coordinates must be inside the original footprint and must never add inventory records.
+
+Publish `power-plants.geojson` with the five unchanged earlier GeoJSONs and three updated metadata files (nine files; summary/catalog schema v3, pipeline v1.2.0). Keep `expected-audit.json` unchanged; the plant audit is recorded separately in `expected-power-plant-audit.json`. [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md) records source fields, exact counts, preservation proof and tests.

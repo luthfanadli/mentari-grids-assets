@@ -13,6 +13,7 @@ const statuses: OsmStatus[] = ['not_flagged_in_osm', 'tagged_construction', 'tag
     <fieldset><legend>Layers</legend>
       <label class="check-row"><input v-model="filters.lines" type="checkbox"/><span>Transmission lines</span></label>
       <label class="check-row"><input v-model="filters.primary" type="checkbox"/><span>Primary substations</span></label>
+      <label class="check-row"><input v-model="filters.powerPlants" type="checkbox"/><span>Power plants</span></label>
       <div class="candidate-options">
         <p class="candidate-heading">Optional candidates</p>
         <label class="check-row"><input v-model="filters.review" type="checkbox"/><i class="candidate-key review-key" aria-hidden="true"></i><span>Review polygons</span></label>
@@ -25,7 +26,7 @@ const statuses: OsmStatus[] = ['not_flagged_in_osm', 'tagged_construction', 'tag
     <fieldset><legend>Voltage <span>kV</span></legend>
       <label v-for="voltage in VOLTAGES" :key="voltage" class="check-row"><input v-model="filters.voltages" type="checkbox" :value="voltage" :aria-label="`${voltage} kV`"/><span class="voltage-swatch" :style="{ background: VOLTAGE_COLORS[voltage] }"></span><span>{{ voltage }} kV</span></label>
       <label v-if="filters.review || filters.pointCandidates" class="check-row"><input v-model="filters.unknownVoltage" type="checkbox"/><span>Unknown voltage</span></label>
-      <p class="filter-note">Applies to lines and substations.</p>
+      <p class="filter-note">Lines and substations only.</p>
     </fieldset>
     <fieldset><legend>OSM status</legend><label v-for="status in statuses" :key="status" class="check-row"><input v-model="filters.statuses" type="checkbox" :value="status"/><span>{{ STATUS_LABELS[status] }}</span></label><p class="filter-note">Tags do not verify operation.</p></fieldset>
   </aside>

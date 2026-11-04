@@ -18,7 +18,7 @@ export function useAssetFilters() {
     loading.value = true; error.value = ''
     try {
       const data = await repository.loadBase()
-      baseFeatures.value = [...data.lines.features, ...data.primary.features]; summary.value = data.summary
+      baseFeatures.value = [...data.lines.features, ...data.primary.features, ...data.powerPlants.features]; summary.value = data.summary
       displayPoints.value = data.displayPoints
     } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Inventory could not be loaded.' }
     finally { loading.value = false }

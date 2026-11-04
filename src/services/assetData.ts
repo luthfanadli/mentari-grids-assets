@@ -27,9 +27,15 @@ export function createAssetRepository(fetcher: typeof fetch = fetch, base = impo
   }
   return {
     loadBase: async () => {
-      const [lines, primary, summary, displayPoints] = await Promise.all([
+      const [lines, primary, powerPlants, summary, displayPoints] = await Promise.all([
         load<AssetCollection>('transmission-lines.geojson', validCollection), load<AssetCollection>('substations-primary.geojson', validCollection),
-        load<InventorySummary>('summary.json', v => (v as InventorySummary)?.schema_version === 2 && !!(v as InventorySummary).datasets),
+        load<AssetCollection>('power-plants.geojson', v => validCollection(v) && (v as AssetCollection).features.every(feature => {
+          const p = feature.properties
+          return p.asset_type === 'power_plant' && p.source_layer === 'power_plant' && p.geometry_role === 'original_power_plant_footprint' &&
+            ['Polygon', 'MultiPolygon'].includes(feature.geometry.type) && p.max_voltage_kv === null && p.plant_output_unit === null &&
+            Array.isArray(p.plant_representative_point) && p.plant_representative_point.length === 2 && p.plant_representative_point.every(Number.isFinite)
+        })),
+        load<InventorySummary>('summary.json', v => (v as InventorySummary)?.schema_version === 3 && !!(v as InventorySummary).datasets),
         load<DisplayPointCollection>('substation-display-points.geojson', v => {
           const data = v as DisplayPointCollection
           return data?.type === 'FeatureCollection' && Array.isArray(data.features) && data.features.every(feature =>
@@ -37,8 +43,8 @@ export function createAssetRepository(fetcher: typeof fetch = fetch, base = impo
             feature.properties.geometry_role === 'derived_polygon_representative_point' && feature.id === feature.properties.represented_feature_id)
         }),
       ])
-      if (lines.features.length !== summary.datasets.lines.count || primary.features.length !== summary.datasets.primary.count || displayPoints.features.length !== summary.substation_presentation.representative_symbol_count) throw new Error('Dataset counts differ from summary.json. Use all eight files from the same preprocessing run.')
-      return { lines, primary, summary, displayPoints }
+      if (lines.features.length !== summary.datasets.lines.count || primary.features.length !== summary.datasets.primary.count || powerPlants.features.length !== summary.datasets.power_plants.count || displayPoints.features.length !== summary.substation_presentation.representative_symbol_count) throw new Error('Dataset counts differ from summary.json. Use all nine files from the same preprocessing run.')
+      return { lines, primary, powerPlants, summary, displayPoints }
     },
     loadReview: () => load<AssetCollection>('substations-review.geojson', validCollection),
     loadPointCandidates: () => load<AssetCollection>('substations-point-candidates.geojson', v => validCollection(v) && (v as AssetCollection).features.every(feature =>

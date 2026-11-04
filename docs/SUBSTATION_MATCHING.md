@@ -89,3 +89,7 @@ The UI uses MapLibre [minzoom/maxzoom layer rules](https://maplibre.org/maplibre
 Tests cover generic/intersection-only uncertainty; distinctive supported matches; conflicting operators/construction and ambiguous polygons; signed IDs with unknown element type; distance thresholds; meaningful code numbers; candidate holds; full 68×2753 coverage; exact original point coordinates; representative containment including concave footprints; unchanged line/polygon file hashes; deterministic publication and full matching reports; independent toggles, unknown voltage, retries, symbol clicks and zoom transitions; viewport/statistic deduplication and mobile layout.
 
 Operational status, authoritative GI/GITET identifiers, complete transmission scope, point-point physical deduplication, official station counts, COD/MVA/circuit-km/AIS–GIS, planned RUPTL/RUKN assets and system/region assignment remain unverified or unavailable. No hosting action is part of this enhancement.
+
+## Power-plant context
+
+The later plant layer does not change this matching policy, its input polygons, the 2/25/41 classifications or candidate eligibility. A station point inside a plant footprint is not automatically a duplicate plant or connected station. Plant symbols use their own parent IDs/count and do not enter primary or review inventories. See [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).

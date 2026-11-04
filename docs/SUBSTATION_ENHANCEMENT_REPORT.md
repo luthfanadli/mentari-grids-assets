@@ -1,5 +1,7 @@
 # Substation enhancement report — 4 November 2026
 
+Later user-authorized extension: [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md) documents 643 plant footprints, nine-file/schema-v3 publication and current tests. The stage-specific counts, hashes and UI descriptions below are preserved as history; the five earlier GeoJSONs and raw source remain unchanged.
+
 Current UI/cleanup: source matching, export bytes and preservation proof below are unchanged. Sidebar totals and the static all-category legend have since been replaced by simpler controls and a selection-driven key. Current checks and removed unused files are in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
 
 Subsequent dashboard-only layout, legend, extent-control and basemap updates are recorded in [DASHBOARD_UX_UPDATE.md](DASHBOARD_UX_UPDATE.md). The matching outputs, source counts and preservation proof in this report remain unchanged.

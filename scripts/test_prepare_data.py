@@ -90,7 +90,7 @@ class RealSourceTests(unittest.TestCase):
             first = prepare(ROOT / "data/raw/IDN.gpkg", base / "a", base / "qa-a")
             second = prepare(ROOT / "data/raw/IDN.gpkg", base / "b", base / "qa-b")
             self.assertEqual(first["audit_differences"], [])
-            self.assertEqual(first["counts"], {"lines": 4374, "primary": 622, "review": 448, "point_candidates": 32})
+            self.assertEqual(first["counts"], {"lines": 4374, "primary": 622, "review": 448, "point_candidates": 32, "power_plants": 643})
             self.assertEqual(first, second)
             for path in (base / "a").iterdir():
                 self.assertEqual(path.read_bytes(), (base / "b" / path.name).read_bytes(), path.name)

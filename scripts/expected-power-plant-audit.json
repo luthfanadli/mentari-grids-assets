@@ -1,0 +1,17 @@
+{
+  "raw_count": 643,
+  "published_count": 643,
+  "not_flagged": 633,
+  "construction": 10,
+  "polygons": 632,
+  "multipolygons": 11,
+  "missing_name": 113,
+  "missing_operator": 428,
+  "missing_source": 85,
+  "missing_method": 283,
+  "missing_output": 223,
+  "missing_start_date": 613,
+  "voltage_field_available": false,
+  "disused_field_available": false,
+  "output_unit": null
+}

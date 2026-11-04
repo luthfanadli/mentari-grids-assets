@@ -7,7 +7,7 @@ export interface AssetProperties {
   feature_id: string
   source_layer: string
   source_id: string
-  asset_type: 'transmission_line' | 'substation_polygon' | 'substation_point'
+  asset_type: 'transmission_line' | 'substation_polygon' | 'substation_point' | 'power_plant'
   display_name: string
   display_name_is_fallback: boolean
   name: string | null
@@ -26,7 +26,16 @@ export interface AssetProperties {
   location: string | null
   circuits: number | null
   mapped_geometry_length_km: number | null
-  geometry_role?: 'original_point'
+  geometry_role?: 'original_point' | 'original_power_plant_footprint'
+  plant_source?: string | null
+  plant_method?: string | null
+  plant_output_raw?: number | null
+  plant_output_unit?: null
+  plant_start_date_raw?: string | null
+  plant_name_en?: string | null
+  plant_description?: string | null
+  plant_wikidata?: string | null
+  plant_representative_point?: [number, number]
   matching_classification?: 'distinct_point_only_candidate'
   matching_reason?: string
   matching_version?: string
@@ -52,6 +61,7 @@ export interface AssetFilters {
   statuses: OsmStatus[]
   lines: boolean
   primary: boolean
+  powerPlants: boolean
   review: boolean
   pointCandidates: boolean
   unknownVoltage: boolean
@@ -69,9 +79,9 @@ export interface InventorySummary {
   source_data_vintage: string
   source_sha256: string
   raw_counts: Record<string, number>
-  datasets: Record<'lines' | 'primary' | 'review' | 'point_candidates', DatasetSummary>
+  datasets: Record<'lines' | 'primary' | 'review' | 'point_candidates' | 'power_plants', DatasetSummary>
   review_reasons: Record<ReviewReason, number>
-  default_selection: Record<'lines' | 'primary' | 'review' | 'points', number>
+  default_selection: Record<'lines' | 'primary' | 'review' | 'points' | 'plants', number>
   output_bytes: Record<string, number>
   substation_point_matching: {
     matching_version: string
@@ -81,4 +91,5 @@ export interface InventorySummary {
     pair_comparisons: number
   }
   substation_presentation: { representative_symbol_count: number; footprint_min_zoom: number; counts_as_inventory: false }
+  power_plant_presentation: { representative_symbol_count: number; footprint_min_zoom: number; counts_as_inventory: false; coordinates_field: string }
 }

@@ -1,5 +1,7 @@
 # Implementation report — 4 November 2026 (Asia/Jakarta)
 
+Later user-authorized extension: [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md) documents 643 plant footprints, nine-file/schema-v3 publication and current tests. The stage-specific counts, hashes and UI descriptions below are preserved as history; the five earlier GeoJSONs and raw source remain unchanged.
+
 Current UI/cleanup: this initial-MVP report is historical. Its original checks and six-file sizes are preserved; the current eight-file publication, simpler filters/legend and removed demo files are recorded in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
 
 Historical initial-MVP report. Current substation matching, eight-file publication, zoom-dependent symbols and point-only candidates are documented in [the enhancement report](SUBSTATION_ENHANCEMENT_REPORT.md). Initial counts/results below record that earlier implementation stage.

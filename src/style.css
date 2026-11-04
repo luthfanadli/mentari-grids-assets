@@ -51,7 +51,7 @@ h1 { font-size: clamp(26px, 2.5vw, 38px); font-weight: 700; letter-spacing: -.04
 
 .outline-button { border: 1px solid var(--border); background: var(--surface); border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; padding: 10px 14px; min-height: 38px; font-size: 12px; font-weight: 550; white-space: nowrap }
 .outline-button:hover, .small-button:hover:not(:disabled) { background: var(--surface-blue); border-color: var(--border-strong) }
-.summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 29px }
+.summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 29px }
 .metric-card { padding: 19px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 9px }
 .metric-label { font-size: 12px; color: #4b617a; display: flex; align-items: center; gap: 8px }
 .metric-icon { height: 20px; width: 20px; background: var(--surface-blue); color: var(--brand-blue); border-radius: 4px; display: inline-grid; place-items: center; font-size: 16px }
@@ -114,3 +114,6 @@ td { padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 11px
 @media(max-width:720px) { .map-tool-button { width: 36px; height: 36px; min-width: 36px } }
 @keyframes surface-in { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: translateY(0) } }
 @media(prefers-reduced-motion:reduce) { *, *:before, *:after { animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important } }
+
+.plant-metric .metric-icon, .plant-symbol { color: #b72236; background: #fff0f2; border-color: #efd2d8 }
+@media(max-width:1050px) { .plant-metric { grid-column: 1 / -1 } }
