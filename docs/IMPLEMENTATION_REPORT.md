@@ -1,5 +1,7 @@
 # Implementation report — 4 November 2026 (Asia/Jakarta)
 
+Current UI/cleanup: this initial-MVP report is historical. Its original checks and six-file sizes are preserved; the current eight-file publication, simpler filters/legend and removed demo files are recorded in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
+
 Historical initial-MVP report. Current substation matching, eight-file publication, zoom-dependent symbols and point-only candidates are documented in [the enhancement report](SUBSTATION_ENHANCEMENT_REPORT.md). Initial counts/results below record that earlier implementation stage.
 
 The existing Vue 3 + Vite + TypeScript project now implements the Deliverable 2 MVP using the actual supplied GeoPackage. Data inspection, preprocessing tests, preprocessing, count/geometry QA, UI implementation and browser/production checks were completed in that order. The original scaffold configuration and pnpm lockfile were reused; no new app was scaffolded.

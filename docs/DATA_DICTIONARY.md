@@ -63,6 +63,8 @@ The two candidate toggles are independent of primary-substation visibility. With
 
 ## Metadata
 
+Metadata totals describe complete published subsets across source flags. They are not filter results. The sidebar no longer repeats these totals; cards and the list count matching original records, and the legend is derived from those records. `Unknown voltage` covers 37 review polygons and all 32 optional source points when those layers are enabled. No data property or serialized output changed for the sidebar/legend simplification; see [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
+
 Schema-v2 `summary.json` contains raw counts for all layers, actual per-subset counts, statuses, maximum-voltage distributions, missing-value metrics, fallback-label counts, review reasons, default selection and GeoJSON byte sizes. `datasets.point_candidates` is separate from `datasets.review`; `substation_point_matching` contains 2/25/41 classification counts and eligibility totals. `substation_presentation` holds symbol count, zoom threshold and its non-inventory role. `planned_assets.count` is null, not zero: no authoritative dataset was provided.
 
 `data-catalog.json` provides source/licensing, unknown source vintage, input SHA-256, original/output CRS, transformation description, matching policy, field meanings, limitations and each GeoJSON's role/count/bytes/SHA-256. Presentation datasets are not added to inventory counts. `data_version` combines source hash prefix and pipeline version (`1.1.0`); no current timestamp is inserted, so identical processing is byte deterministic.

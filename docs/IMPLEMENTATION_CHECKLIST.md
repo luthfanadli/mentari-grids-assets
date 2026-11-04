@@ -1,23 +1,25 @@
 # Deliverable 2 implementation checklist
 
-- [x] Read repository development guide, filter specification and verified audit.
-- [x] Inspect existing Vue 3 / Vite / TypeScript scaffold and pnpm lockfile.
-- [x] Inspect the actual GeoPackage layers, CRS, fields, nulls, flags and geometry validity.
-- [x] Read `data/raw/License.pdf`; no original ToR was supplied in the repository.
-- [x] Implement deterministic Python selection, source hash checks and aggregate/internal QA.
-- [x] Test preprocessing and compare every audit metric before frontend work.
-- [x] Generate and validate the six publication files; record exact sizes/counts.
-- [x] Implement MapLibre, filters, searchable list, details and lazy review candidates.
-- [x] Test loading, filters, selection, review toggles, missing data and responsive behavior.
-- [x] Run type checking and production build.
-- [x] Document data fields, limitations, architecture and Vercel deployment.
+- [x] Preserve the existing Vue 3 / Vite / TypeScript project and pnpm lockfile.
+- [x] Inspect the supplied GeoPackage and license; preserve the private original unchanged.
+- [x] Validate exact transmission-line and primary/review polygon predicates against the source audit.
+- [x] Audit all 68 points against 2,753 polygons; retain complete QA and publish 32 optional unvalidated points.
+- [x] Publish five GeoJSONs plus three metadata files, with original geometries and stable IDs.
+- [x] Keep 1,070 derived polygon symbols outside inventory totals; retain overview/footprint transitions.
+- [x] Keep optional candidate layers independently lazy, retryable and off by default.
+- [x] Simplify Layers, Voltage and OSM status controls; remove static sidebar totals.
+- [x] Derive legend items from matching original records; separate line colors from status patterns.
+- [x] Handle unknown voltage, empty searches, optional layers and construction-tagged substations in the key.
+- [x] Remove confirmed unused demo component/assets, speculative interface and obsolete CSS.
+- [x] Update every project Markdown document and validate local documentation links.
+- [x] Run 14 Node tests, Vue/TypeScript checks, production build and eight production-browser scenarios.
+- [x] Preserve attribution, font license, audit evidence, dataset hashes and existing deployment configuration.
 
-Raw inspection: 26 layers; 30,412,800 bytes; all three core layers EPSG:4326,
-nonempty and valid. Raw layer counts: 5,396 lines, 2,753 polygons, 68 points.
-Original polygon IDs include three negatives. Source SHA-256:
+The 30,412,800-byte source retains SHA-256:
 `6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba`.
+Raw source counts remain 5,396 lines, 2,753 polygons and 68 points across 26 layers.
+Published totals remain 4,374 lines, 622 primary polygons, 448 review polygons and 32 optional points.
+The 1,070 representative symbols are not additional inventory records.
 
-Final validation: seven Python tests, eight Node tests, three browser scenarios
-against development and production, publication guard, type checking and production
-build passed. No audit differences. Vercel is configured/documented; no hosted
-deployment was requested or created. Details: `IMPLEMENTATION_REPORT.md`.
+The last full source-dependent Python run passed 16 tests in the [build-fix stage](BUILD_FIX_GIT_LINE_ENDINGS.md). This frontend cleanup changes no Python or preprocessing logic, so that suite was not rerun.
+Current commands, sizes, checks, removed files and remaining gaps: [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md). No deployment or push occurred.

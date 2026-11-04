@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { defaultFilters, filterAssets, selectionCounts, featureBounds } from '../../src/utils/filterAssets.ts'
 import { formatValue, formatVoltage } from '../../src/utils/formatAssets.ts'
 import { createAssetRepository } from '../../src/services/assetData.ts'
-import { selectedDisplayPoints, renderedRecordCount } from '../../src/utils/substationPresentation.ts'
+import { selectedDisplayPoints, renderedRecordCount, selectedMapLegend } from '../../src/utils/substationPresentation.ts'
 import type { AssetCollection, InventorySummary, DisplayPointCollection, AssetFeature } from '../../src/types/assets.ts'
 
 const read = (filename: string) => JSON.parse(readFileSync(new URL(`../../public/data/${filename}`, import.meta.url), 'utf8'))
@@ -122,4 +122,44 @@ test('missing files produce a useful error and failed requests can be retried', 
   await assert.rejects(repo.loadReview(), /substations-review.geojson.*HTTP 404/)
   fail = false
   assert.equal((await repo.loadReview()).features.length, 448)
+})
+
+test('legend includes only selected original features and keeps unknown-voltage candidates separate', () => {
+  const filters = defaultFilters()
+  assert.deepEqual(selectedMapLegend(filterAssets(all, filters)), {
+    lineVoltages: [500, 275, 150, 70], baselineLines: true, constructionLines: false, disusedLines: false,
+    primary: true, constructionPrimary: false, review: false, points: false,
+  })
+  filters.lines = false; filters.primary = false; filters.review = true; filters.pointCandidates = true; filters.voltages = []
+  const selected = filterAssets(all, filters)
+  assert.equal(selected.length, 69) // 37 unknown-voltage review polygons + 32 source points.
+  const key = selectedMapLegend(selected)
+  assert.deepEqual(key.lineVoltages, [])
+  assert.equal(key.review, true); assert.equal(key.points, true); assert.equal(key.primary, false)
+  filters.unknownVoltage = false
+  assert.ok(Object.values(selectedMapLegend(filterAssets(all, filters))).every(value => Array.isArray(value) ? value.length === 0 : value === false))
+})
+
+test('legend distinguishes construction lines from construction-tagged polygon substations', () => {
+  const filters = defaultFilters(); filters.statuses = ['tagged_construction']
+  const construction = selectedMapLegend(filterAssets(all, filters))
+  assert.deepEqual(construction.lineVoltages, [500, 275, 150])
+  assert.equal(construction.constructionLines, true); assert.equal(construction.constructionPrimary, true)
+  assert.equal(construction.primary, false); assert.equal(construction.baselineLines, false)
+  filters.lines = false
+  const polygonOnly = selectedMapLegend(filterAssets(all, filters))
+  assert.deepEqual(polygonOnly.lineVoltages, [])
+  assert.equal(polygonOnly.constructionLines, false); assert.equal(polygonOnly.constructionPrimary, true)
+  filters.lines = true; filters.statuses = ['tagged_disused']
+  const disused = selectedMapLegend(filterAssets(all, filters))
+  assert.deepEqual(disused.lineVoltages, [500, 70])
+  assert.equal(disused.disusedLines, true); assert.equal(disused.primary, false)
+})
+
+test('legend excludes derived representatives and clears every key for an empty search', () => {
+  const original = primary.features[0]!
+  const representative = { ...original, properties: { ...original.properties, counts_as_inventory: false as const } }
+  const filters = defaultFilters(); filters.query = 'no matching source asset xyz'
+  assert.deepEqual(selectedMapLegend([representative]), selectedMapLegend(filterAssets(all, filters)))
+  assert.deepEqual(selectedMapLegend([representative]), selectedMapLegend([]))
 })

@@ -1,5 +1,7 @@
 # Substation point versus polygon — source analysis
 
+Current presentation: retain this source analysis and its reproducible script as QA evidence. The optional point layer remains unvalidated/default-off; its key now appears only when records match active filters. See [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md) for current UI/cleanup results.
+
 Historical read-only analysis. The subsequent user-authorized [matching and visualization enhancement](SUBSTATION_MATCHING.md) implements a conservative matching policy and a separate optional 32-record point-only layer. Source findings below remain valid; statements about application behavior describe the earlier analysis stage. Current implementation/results are in `SUBSTATION_ENHANCEMENT_REPORT.md`.
 
 Analysis date: 4 November 2026 (Asia/Jakarta). This is a read-only analysis of the supplied export, not a change to publication filters or an authoritative asset validation. The application, expected audit and six `public/data/` files remain unchanged.

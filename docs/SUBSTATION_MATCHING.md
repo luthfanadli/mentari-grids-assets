@@ -4,6 +4,8 @@ This user-authorized enhancement preserves the 622 primary polygons, 448 review 
 
 ## Reproduce
 
+Current UI: optional layers are named **Review polygons** and **Point-only candidates**; both remain off by default. The sidebar contains no dataset totals. Matching counts are shown in cards/list, and the legend is derived from that same filtered original-record selection. Unknown-voltage points produce no transmission-voltage legend item; derived representatives add no legend categories or inventory records. Matching thresholds, 2/25/41 classifications, eligibility and geometries are unchanged. See [the cleanup report](SIMPLIFICATION_REPORT.md).
+
 Use the GIS environment described in `README.md`:
 
 ```powershell

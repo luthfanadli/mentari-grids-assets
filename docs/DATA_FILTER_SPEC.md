@@ -1,5 +1,7 @@
 # Spatial Data Filter Specification — MENTARI Grids D2
 
+Current publication note: exact line/primary/review predicates and historic source counts below are unchanged. The later matching supplement adds the optional 32-point dataset and 1,070 non-inventory symbols, for five GeoJSONs plus three metadata files; see [DATA_DICTIONARY.md](DATA_DICTIONARY.md) and [SUBSTATION_MATCHING.md](SUBSTATION_MATCHING.md). Three-file examples retain the starting MVP contract. The simplified sidebar has no source totals; matching-record cards/list and selection-driven legend use the existing filter result without changing preprocessing. See [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
+
 **Status:** approved starting logic for the MVP; source-tag categories are preliminary, **not** confirmation by PLN/DJK ESDM. **Input:** `data/raw/IDN.gpkg`. **Reference:** ToR Deliverable 2 and verified audit in `VERIFIED_DATA_AUDIT.md`.
 
 ## A. Single source of truth

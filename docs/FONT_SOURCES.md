@@ -20,3 +20,5 @@ The included SIL Open Font License 1.1 notice retains the project authors' copyr
 `index.html` preloads the local file. `src/style.css` declares the 200–800 weight range and `font-display: swap`, with Segoe UI/system fallbacks for unavailable glyphs or a failed font request. No font npm package, CDN stylesheet or runtime Google Fonts request is required. Source names and other data text are unchanged.
 
 The primary theme colors, blue `#0d4c8f` and red `#d02030`, were sampled from solid-color areas of `public/images/Mentari Logo_Tagline Revamp_Color.png`. These colors style the interface; the existing voltage classes and map asset/status symbols retain their original colors.
+
+The sidebar/legend cleanup retains both font assets and the original logo. Status-line samples now use neutral strokes to explain patterns separately from kV colors; this does not recolor source features. No typeface or license asset was removed as unused. See [current cleanup verification](SIMPLIFICATION_REPORT.md).

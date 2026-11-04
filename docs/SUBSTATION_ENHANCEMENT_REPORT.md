@@ -1,5 +1,7 @@
 # Substation enhancement report — 4 November 2026
 
+Current UI/cleanup: source matching, export bytes and preservation proof below are unchanged. Sidebar totals and the static all-category legend have since been replaced by simpler controls and a selection-driven key. Current checks and removed unused files are in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
+
 Subsequent dashboard-only layout, legend, extent-control and basemap updates are recorded in [DASHBOARD_UX_UPDATE.md](DASHBOARD_UX_UPDATE.md). The matching outputs, source counts and preservation proof in this report remain unchanged.
 
 The existing WebGIS now audits source point/polygon associations reproducibly, exposes a separate optional point-only candidate layer, and switches polygon substations between overview symbols and original footprints. Transmission-line filtering and the original primary/review polygon inventories are preserved. No deployment, hosting configuration change, package/lockfile update or new dependency was made for this enhancement. Existing header/intro presentation edits were retained.

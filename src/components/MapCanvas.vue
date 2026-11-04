@@ -160,7 +160,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(basemapTimeout); resize?.d
       </div>
       <div v-if="mapError" class="map-failure" role="alert">{{ mapError }}</div><div v-else-if="!ready" class="map-loading" role="status">Loading map…</div>
       <div v-if="basemapError" class="basemap-error" role="status">{{ BASEMAP_LABELS[basemap] }} is unavailable or taking too long. <button @click="usePlainBackground">Use plain background</button><span>Inventory overlays and records remain available.</span></div>
-      <MapLegend :overview="zoom < FOOTPRINT_MIN_ZOOM"/>
+      <MapLegend :overview="zoom < FOOTPRINT_MIN_ZOOM" :features="features"/>
       <span v-if="ready" class="zoom-label">ZOOM {{ zoom.toFixed(1) }}</span>
     </div>
   </section>

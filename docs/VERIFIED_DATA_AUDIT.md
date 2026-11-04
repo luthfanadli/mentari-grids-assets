@@ -1,5 +1,7 @@
 # Verified Source Audit — `IDN.gpkg`
 
+Source-audit preservation note: all recorded source counts and qualifications below remain unchanged. The initial audit did not exhaustively match point/polygon records; the later [matching policy and QA](SUBSTATION_MATCHING.md) now account for all 68 × 2,753 pairs and publish 32 optional unvalidated points. The [current sidebar/legend simplification](SIMPLIFICATION_REPORT.md) changes presentation only and preserves all source/publication fingerprints. Source totals in this document must not be interpreted as filtered UI counts.
+
 Audited against the uploaded 30,412,800-byte GeoPackage (30.41 MB) during preparation of these instructions. Numbers are **feature counts in the provided file**, not verified unique PLN assets. The input is EPSG:4326, and contains 26 layers, many outside electricity transmission. The three core layers are valid/nonnull geometric features in the checks performed, but cross-layer duplicates, network topology, true commissioning status and asset registry completeness have **not** been validated.
 
 ## Important source layer counts

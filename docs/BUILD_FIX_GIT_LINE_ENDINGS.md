@@ -1,5 +1,7 @@
 # Build fix: publication bytes changed by Git — 4 November 2026
 
+Current status: the byte-preserving Git/serialization fix below remains active. The later sidebar/legend and unused-file cleanup leaves all eight data files and checksums unchanged; its current test counts are in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md). Historical build-fix results below describe that earlier stage.
+
 The Vercel build failure in commit `5d1c0a2` is reproducible directly from its Git blobs. `scripts/check_public_data.mjs:24` rejects a line GeoJSON of **6,151,921 bytes**, while the catalog expects **6,151,922 bytes**. This occurs before Vue/TypeScript/Vite compilation.
 
 ## Confirmed cause

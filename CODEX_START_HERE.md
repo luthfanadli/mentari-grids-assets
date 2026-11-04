@@ -1,5 +1,7 @@
 # Codex Development Guide (v2) — MENTARI Grids Transmission Asset Inventory
 
+Current implementation: the existing project publishes five GeoJSONs and three metadata files, including 32 optional point-only candidates and 1,070 uncounted polygon representatives after source QA. The original three-file MVP examples below describe the starting stage; use [the current data dictionary](docs/DATA_DICTIONARY.md) and [matching policy](docs/SUBSTATION_MATCHING.md) for the complete contract. The current UI keeps counts in the cards/list, omits static sidebar totals, and derives its legend from the filtered selection. Planned-data gaps remain in About; no speculative unused planned-asset interface is required. Follow [README](README.md#filters-and-legend) and [the simplification report](docs/SIMPLIFICATION_REPORT.md) for current UI/cleanup verification. The original source-selection predicates and data-integrity invariants remain unchanged. Do not deploy without user authorization.
+
 **Project state:** Vue 3 + Vite + TypeScript is **already installed** in the repository. This guide supersedes the earlier prompt that assumed a new repo and Cloudflare Pages hosting.
 
 **Target:** a functioning, static-first WebGIS deployed to **Vercel**, using the selected electricity-transmission spatial assets from `IDN.gpkg`. Do **not** start by scaffolding another Vue project. Do **not** implement Deliverable 1 or Deliverable 3.

@@ -15,6 +15,15 @@ pnpm dev
 
 Open http://localhost:5174. The preprocessed publication files are included under `public/data/`; Python and the raw GeoPackage are **not needed** to run or deploy the frontend. The default attributed OpenStreetMap basemap needs internet access. Copy `.env.example` to `.env.local` to supply a different public `VITE_BASEMAP_STYLE_URL`. Never put a secret in a `VITE_` variable.
 
+## Filters and legend
+
+- **Layers:** choose transmission lines and primary substations. Optional **Review polygons** and **Point-only candidates** are unvalidated and off by default. Point voltages remain unknown.
+- **Voltage:** applies to all selected layers. **Unknown voltage** appears when either candidate layer is enabled.
+- **OSM status:** choose source tags; they do not verify operational status. Search applies to the same selection.
+- Sidebar controls have no dataset totals. The four cards and record list show matching original records; **rendered in viewport** is a separate map count.
+- The legend follows the current filtered selection, including searches. It hides absent categories and shows an empty message for no matches. It describes the selection, not only the current viewport.
+- **Transmission lines · kV** explains line colors. **Line pattern** explains construction/disused tags when present; patterns do not replace voltage colors. **Substations** distinguishes primary, review, point-only and construction-tagged primary symbols. At overview zoom, polygon symbols become circles; at local zoom, the key represents their footprints.
+
 ## Dashboard map controls
 
 - The legend starts collapsed. **Legend** opens/closes a compact symbol key without a permanent overlay obscuring the map.
@@ -90,7 +99,7 @@ pnpm build
 pnpm preview
 ```
 
-`pnpm build` checks the eight data files, dataset checksums, version/count consistency, IDs, scope, representative-parent linkage and nonpublic-file exclusions before type checking and Vite compilation. It needs no raw data. Eleven Node tests use the real generated datasets, including a Git staging/checkout regression for byte integrity. Sixteen Python tests cover real-source counts/geometry, matching rules, deterministic exports and matching reports, unchanged baseline exports, exact point coordinates, representative containment, source-point promotion rejection, source-version mismatches and platform-independent JSON serialization. Source-dependent tests skip explicitly when the private raw file is absent.
+`pnpm build` checks the eight data files, dataset checksums, version/count consistency, IDs, scope, representative-parent linkage and nonpublic-file exclusions before type checking and Vite compilation. It needs no raw data. Fourteen Node tests use the real generated datasets, including selection-driven legend cases and a Git staging/checkout regression for byte integrity. Sixteen Python tests cover real-source counts/geometry, matching rules, deterministic exports and matching reports, unchanged baseline exports, exact point coordinates, representative containment, source-point promotion rejection, source-version mismatches and platform-independent JSON serialization. Source-dependent tests skip explicitly when the private raw file is absent.
 
 Generated JSON/GeoJSON uses canonical UTF-8/CRLF bytes to retain the original catalog checksums. `.gitattributes` disables Git text conversion for `public/data/`. Keep the rule and all eight outputs in the same commit; when upgrading an existing checkout, refresh tracked data with `git add --renormalize public/data/`. The strict size/hash checks remain enabled. See [the Windows-to-Vercel build fix](docs/BUILD_FIX_GIT_LINE_ENDINGS.md) and [deployment notes](docs/DEPLOYMENT.md).
 
@@ -108,7 +117,7 @@ $env:PLAYWRIGHT_CHANNEL='msedge'
 pnpm.cmd test:e2e
 ```
 
-For a production build, start `pnpm preview --host 127.0.0.1 --port 5175`, set `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, and run the seven browser scenarios, including dashboard controls and basemap switching. See the [dashboard UI report](docs/DASHBOARD_UX_UPDATE.md) and [substation data report](docs/SUBSTATION_ENHANCEMENT_REPORT.md). No deployment or hosting configuration change is part of these enhancements.
+For a production build, start `pnpm preview --host 127.0.0.1 --port 5175`, set `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, and run the eight browser scenarios, including selection-driven legend keys, unknown voltage, candidate loading, dashboard controls and basemap switching. See the [simplification and cleanup report](docs/SIMPLIFICATION_REPORT.md), [dashboard UI history](docs/DASHBOARD_UX_UPDATE.md) and [substation data report](docs/SUBSTATION_ENHANCEMENT_REPORT.md). No deployment or hosting configuration change is part of these enhancements.
 
 ## Data scope and documentation
 
@@ -118,7 +127,11 @@ For a production build, start `pnpm preview --host 127.0.0.1 --port 5175`, set `
 - [Substation matching policy and representation](docs/SUBSTATION_MATCHING.md)
 - [Vercel deployment](docs/DEPLOYMENT.md)
 
-Planned RUPTL/RUKN infrastructure, official region/system assignments, COD, capacity, AIS/GIS and verified HVDC are not supplied. The UI displays this gap and the TypeScript extension contract has no fabricated records. The original ToR was not present; traceability follows the supplied development guide.
+Planned RUPTL/RUKN infrastructure, official region/system assignments, COD, capacity, AIS/GIS and verified HVDC are not supplied. About documents these gaps. An unused speculative planned-asset type was removed; any future integration needs sourced records and a reviewed schema. The original ToR was not present; traceability follows the supplied development guide.
+
+## Repository maintenance
+
+Unused Vue/Vite demo component, demo images/SVGs, sprite sheet, speculative type and obsolete CSS have been removed. The source GeoPackage, source license, expected audit, published datasets, reproducible analysis/preprocessing scripts, font license and historical audit reports are retained. Historical reports preserve their stage-specific findings and link to the [current simplification report](docs/SIMPLIFICATION_REPORT.md).
 
 ## Attribution and database license
 

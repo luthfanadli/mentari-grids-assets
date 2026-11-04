@@ -82,13 +82,3 @@ export interface InventorySummary {
   }
   substation_presentation: { representative_symbol_count: number; footprint_min_zoom: number; counts_as_inventory: false }
 }
-// Extension contract only: no planned records or official assignments are supplied.
-export interface FutureAuthoritativeAsset {
-  asset_type: 'planned_line' | 'planned_substation'
-  project_id: string
-  source_document: string
-  region: string | null
-  power_system: string | null
-  commissioning_year: number | null
-  geometry: AssetGeometry | null
-}

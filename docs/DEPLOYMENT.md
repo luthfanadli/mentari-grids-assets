@@ -51,7 +51,7 @@ $env:PLAYWRIGHT_CHANNEL='msedge'
 pnpm.cmd test:e2e
 ```
 
-Local production verification uses `pnpm preview --host 127.0.0.1 --port 5175` and the same five-scenario suite with that local base URL. Current results are in `SUBSTATION_ENHANCEMENT_REPORT.md`; the initial MVP also verified actual OSM tiles. Local verification does not verify a future Vercel account, domain, protection setting or CDN response.
+Local production verification uses `pnpm preview --host 127.0.0.1 --port 5175` and the eight-scenario suite with that local base URL. Check that the legend follows the current filters, optional candidates are absent from it until they match, and construction/disused line patterns are separate from kV colors. Sidebar controls have no totals; matching counts are shown in the cards/list. Current results are in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md); source QA remains in `SUBSTATION_ENHANCEMENT_REPORT.md`. Local verification does not verify a future Vercel account, domain, protection setting or CDN response.
 
 ## Updating the source later
 

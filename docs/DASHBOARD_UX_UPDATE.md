@@ -1,5 +1,7 @@
 # Dashboard UI update — 4 November 2026
 
+Current state: this document preserves the sequence of earlier dashboard updates and their measured results. The latest simple sidebar, selection-driven legend, confirmed unused-file cleanup and current checks are documented in [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md); those UI descriptions supersede earlier static-key/sidebar examples below.
+
 The existing dashboard now has a collapsible legend, compact map controls and a Google Satellite basemap choice. The changes address the five supplied screenshots/requests. No preprocessing, data export, matching policy, package/lockfile, hosting configuration or deployment was changed in this update. Existing header and introduction edits were preserved. The later logo and single-extent refinement is recorded at the end of this report and supersedes the original two-control arrangement.
 
 ## Presentation decisions

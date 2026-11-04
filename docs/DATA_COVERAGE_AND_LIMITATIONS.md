@@ -61,11 +61,11 @@ The source includes one populated raw polygon `start_date`; it is not used as a 
 | Existing 70/150/275/500 kV lines | Preliminary OSM subset, status unverified | Authoritative route/asset registry, validation and crosswalk |
 | GI/GITET substations | Tagged primary polygons plus separate review queue | Official station identifiers, scope and deduplication |
 | By power system and region | No fabricated grouping or filter | Authoritative electrical-system crosswalk and agreed regional/province boundaries/attribution |
-| RUPTL 2025–2034 / RUKN 2025–2060 planned lines/substations | Explicit “Data not yet provided”; empty extension contract | Approved project inventory and available spatial layers |
+| RUPTL 2025–2034 / RUKN 2025–2060 planned lines/substations | Missing data documented in About; no records or speculative runtime type | Approved project inventory and available spatial layers |
 | HVDC, converter stations and interconnections | No verified classification/projects | Authoritative technology/project records |
 | Overhead/submarine/underground | Original `location` shown where supplied | Validation of asset technology and route sections |
 | COD, capacity/MVA, thermal ratings, official circuit-km, AIS/GIS, costs | Not available | Authoritative values, units, dates and source references |
-| Source log and dictionary | Catalog, audit, hashes, method, download links and dictionary implemented | Source vintage remains unknown |
+| Source log and dictionary | Published catalog, QA, hashes, method and dictionary; download UI removed | Source vintage remains unknown |
 
 The original ToR document was not present in the repository, so its text could not be independently inspected. Traceability follows `CODEX_START_HERE.md`. The supplied `data/raw/License.pdf` was read. No restricted BNEF material was supplied or published.
 
@@ -75,4 +75,8 @@ The map displays derived interior symbols for the same selected polygon records 
 
 ## Data reuse
 
-The processed derivative database is distributed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/) with [OpenStreetMap attribution](https://www.openstreetmap.org/copyright) and OpenInfraMap credit. Each GeoJSON embeds the license URI and attribution. All three complete subsets are linked in the About panel without a login, together with metadata and transformation methodology. Source/reference documents and internal QA stay outside static publication. Basemap reuse and service capacity follow the [OSMF tile usage policy](https://operations.osmfoundation.org/policies/tiles/) or the configured provider's terms.
+The processed derivative database is distributed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/) with [OpenStreetMap attribution](https://www.openstreetmap.org/copyright) and OpenInfraMap credit. Each GeoJSON embeds the license URI and attribution. The About download section is removed; all eight static `/data/` files remain accessible for browser rendering. Source/reference documents and internal QA stay outside static publication. Basemap reuse follows the configured provider's terms.
+
+## Reading the filters and legend
+
+Sidebar layer/voltage checkboxes do not display source totals. The cards and list count original records matching all active filters; map viewport counts remain separate. The legend describes this same filtered selection, not national completeness or exact contents of the viewport. It hides categories without matches and separates line voltage colors from source-status patterns. Review/point candidates remain unvalidated, and unknown voltage is not guessed. See [current UI and cleanup verification](SIMPLIFICATION_REPORT.md).
