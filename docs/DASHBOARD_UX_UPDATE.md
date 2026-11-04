@@ -128,3 +128,26 @@ Changed for this follow-up: `src/App.vue`, `src/components/DataProvenanceDialog.
 Verification: `pnpm.cmd build` **passed**, including publication checks and Vue/TypeScript. The production-preview Edge command `pnpm.cmd exec playwright test --grep 'real map, flags|mobile filters'` with the previously documented environment variables returned **2 passed** (18.2 s). The existing inventory/search/details/candidate/mobile flow checks now also assert the banner, download heading and every dataset/download link are absent, while footer attribution remains. Desktop and 390 px About screenshots were inspected; no mobile document overflow was observed. Screenshots remain internal under `data/qa/dashboard-without-banner.png`, `about-without-downloads-desktop.png` and `about-without-downloads-mobile.png`. `git diff --check` passed.
 
 The eight publication files remain **7,800,419 bytes**, with the same 4,374 lines, 622 primary polygons, 448 review polygons, 32 optional points and 1,070 uncounted symbols. Current `dist/` totals **9,730,988 bytes**: main JS 112,464 bytes, CSS 92,769 bytes and unchanged MapLibre/worker assets. The nonfatal vendor-size warning and remaining ToR/data gaps are unchanged. No deployment occurred.
+
+## Follow-up: map controls inside a larger canvas
+
+Moved the extent and basemap buttons into the upper-right corner of the map as a compact overlay. Removed the entire external toolbar, including its empty placeholder. The map body creates an isolated stacking context: the canvas is at z-index 0, the tool group at 4, and the basemap popover remains above other map overlays. Native zoom buttons sit below the group with a visible gap. Keyboard labels, tooltips, Escape dismissal and focus restoration remain functional.
+
+Expanded the page to use its available width and reduced horizontal padding to 24 px on desktop, 16 px on tablet and 12 px on mobile. The sidebar retains its usable width. Increased map height to `clamp(600px, 72vh, 900px)` on desktop, `clamp(560px, 70vh, 800px)` on tablet and `clamp(520px, 72svh, 760px)` on mobile. The existing ResizeObserver updates the MapLibre canvas after layout changes.
+
+Measured canvas sizes in local production preview:
+
+| Browser viewport | Map width × height |
+| --- | ---: |
+| 1440 × 1100 | 1110 × 792 px |
+| 1024 × 1100 | 737 × 770 px |
+| 390 × 844 | 364 × approximately 608 px |
+| 320 × 844 | 294 × approximately 608 px |
+
+All four layouts had no document overflow. The basemap popover remains inside the map on narrow screens and above its zoom controls. Desktop/mobile screenshots were inspected using the plain-background option to keep verification independent of external imagery availability. Internal captures and measurements are under `data/qa/map-overlay-*.png`, `map-overlay-picker-*.png` and `map-overlay-verification.json`.
+
+Changed files: `src/components/MapCanvas.vue`, `src/style.css`, `tests/e2e/inventory.spec.ts`, `README.md`, `docs/ARCHITECTURE.md` and this report. Browser assertions now check that the external toolbar is absent, map tools are inside the map, zoom controls do not overlap them, and the mobile picker stays within map bounds.
+
+Verification: `pnpm.cmd build` **passed**, including publication integrity and Vue/TypeScript checks. With Edge and `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, `pnpm.cmd test:e2e` returned **7 passed** (52.6 s). This retains real feature clicks, zoom/presentation transitions, candidate retry/visibility, filters/search/details, basemap state/count preservation and mobile coverage. `git diff --check` passed. No dependency, package/lockfile, preprocessing, data, attribution or deployment configuration changed.
+
+The eight data files remain **7,800,419 bytes** with all prior counts and checksums. Current `dist/` totals **9,730,859 bytes**: main JS 112,434 bytes, CSS 92,670 bytes, unchanged MapLibre vendor JS 1,104,231 bytes and worker 518,989 bytes. The existing nonfatal vendor-size warning and remaining ToR/data gaps are unchanged. No deployment occurred.

@@ -162,8 +162,11 @@ test('mobile filters, details and attribution fit the viewport', async ({ page }
   const picker = page.getByRole('dialog', { name: 'Basemap options' })
   await expect(picker).toBeVisible()
   const pickerBox = (await picker.boundingBox())!
-  expect(pickerBox.x).toBeGreaterThanOrEqual(0)
-  expect(pickerBox.x + pickerBox.width).toBeLessThanOrEqual(390)
+  const mapBox = (await page.getByTestId('map').boundingBox())!
+  expect(pickerBox.x).toBeGreaterThanOrEqual(mapBox.x)
+  expect(pickerBox.x + pickerBox.width).toBeLessThanOrEqual(mapBox.x + mapBox.width)
+  expect(pickerBox.y).toBeGreaterThanOrEqual(mapBox.y)
+  expect(pickerBox.y + pickerBox.height).toBeLessThanOrEqual(mapBox.y + mapBox.height)
   await page.keyboard.press('Escape')
   await expect(picker).not.toBeVisible()
   await expect(page.getByRole('button', { name: /Change basemap:/ })).toBeFocused()
@@ -191,6 +194,14 @@ test('MENTARI logo, compact legend and one extent control keep the map usable', 
   const fit = page.getByRole('button', { name: 'Fit filtered records', exact: true })
   await expect(page.getByRole('button', { name: 'Zoom to Indonesia', exact: true })).toHaveCount(0)
   await expect(page.locator('.map-actions > button')).toHaveCount(1)
+  await expect(page.locator('.map-toolbar')).toHaveCount(0)
+  const mapBox = (await page.getByTestId('map').boundingBox())!
+  const toolsBox = (await page.getByRole('group', { name: 'Map tools', exact: true }).boundingBox())!
+  expect(toolsBox.x).toBeGreaterThan(mapBox.x)
+  expect(toolsBox.x + toolsBox.width).toBeLessThan(mapBox.x + mapBox.width)
+  expect(toolsBox.y).toBeGreaterThan(mapBox.y)
+  const navigationBox = (await page.locator('.maplibregl-ctrl-top-right .maplibregl-ctrl-group').boundingBox())!
+  expect(navigationBox.y).toBeGreaterThan(toolsBox.y + toolsBox.height)
   expect((await fit.textContent())?.trim()).toBe('')
   await expect(fit).toHaveAttribute('title', 'Fit filtered records')
   await page.getByRole('searchbox').fill('-18678451')
