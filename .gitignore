@@ -22,3 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+/data/raw/
+
+# Local preprocessing, QA and secrets
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+/data/qa/
+/data/interim/
+*.tmp
+.env
+.env.*
+!.env.example
+.vercel/
+/test-results/
+/playwright-report/

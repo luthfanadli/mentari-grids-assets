@@ -1,0 +1,12 @@
+/data/
+.venv/
+venv/
+docs/references/
+tests/
+test-results/
+playwright-report/
+__pycache__/
+*.gpkg
+*.pdf
+*.docx
+.env*

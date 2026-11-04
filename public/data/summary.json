@@ -1,0 +1,169 @@
+{
+  "schema_version": 2,
+  "data_version": "6ea22caaae9ef62a-pipeline-1.1.0",
+  "source_data_vintage": "unknown",
+  "source_sha256": "6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba",
+  "raw_counts": {
+    "mast": 10013,
+    "petroleum_site": 149,
+    "petroleum_well": 66,
+    "pipeline": 813,
+    "pipeline_feature": 5,
+    "power_compensator": 1,
+    "power_generator_point": 4677,
+    "power_generator_polygon": 8585,
+    "power_line": 5396,
+    "power_plant": 643,
+    "power_substation_point": 68,
+    "power_substation_polygon": 2753,
+    "power_switch": 8,
+    "power_tower": 121396,
+    "power_transformer": 950,
+    "pumping_station": 267,
+    "telecom_building_point": 14,
+    "telecom_building_polygon": 26,
+    "telecom_cable": 22,
+    "wastewater_plant": 119,
+    "water_reservoir": 2525,
+    "water_tower_point": 572,
+    "water_tower_polygon": 101,
+    "water_treatment_plant": 214,
+    "water_well_point": 436,
+    "water_well_polygon": 57
+  },
+  "datasets": {
+    "lines": {
+      "count": 4374,
+      "statuses": {
+        "not_flagged_in_osm": 4345,
+        "tagged_construction": 25,
+        "tagged_disused": 4,
+        "conflicting_tags": 0
+      },
+      "voltage_kv": {
+        "150": 3497,
+        "275": 170,
+        "500": 342,
+        "70": 365
+      },
+      "missing_values": {
+        "name": 3794,
+        "ref": 4319,
+        "operator": 3269,
+        "max_voltage_kv": 0,
+        "circuits": 3736,
+        "location": 0
+      },
+      "fallback_names": 3794
+    },
+    "primary": {
+      "count": 622,
+      "statuses": {
+        "not_flagged_in_osm": 621,
+        "tagged_construction": 1,
+        "tagged_disused": 0,
+        "conflicting_tags": 0
+      },
+      "voltage_kv": {
+        "150": 527,
+        "275": 29,
+        "500": 31,
+        "70": 35
+      },
+      "missing_values": {
+        "name": 22,
+        "ref": 595,
+        "operator": 81,
+        "max_voltage_kv": 0,
+        "circuits": 622,
+        "location": 622
+      },
+      "fallback_names": 22
+    },
+    "review": {
+      "count": 448,
+      "statuses": {
+        "not_flagged_in_osm": 448,
+        "tagged_construction": 0,
+        "tagged_disused": 0,
+        "conflicting_tags": 0
+      },
+      "voltage_kv": {
+        "150": 339,
+        "275": 4,
+        "500": 5,
+        "70": 63,
+        "unknown": 37
+      },
+      "missing_values": {
+        "name": 34,
+        "ref": 446,
+        "operator": 100,
+        "max_voltage_kv": 37,
+        "circuits": 448,
+        "location": 448
+      },
+      "fallback_names": 34
+    },
+    "point_candidates": {
+      "count": 32,
+      "statuses": {
+        "not_flagged_in_osm": 32,
+        "tagged_construction": 0,
+        "tagged_disused": 0,
+        "conflicting_tags": 0
+      },
+      "voltage_kv": {
+        "unknown": 32
+      },
+      "missing_values": {
+        "name": 10,
+        "ref": 31,
+        "operator": 25,
+        "max_voltage_kv": 32,
+        "circuits": 32,
+        "location": 32
+      },
+      "fallback_names": 10
+    }
+  },
+  "review_reasons": {
+    "transmission_missing_voltage": 37,
+    "high_voltage_distribution_tag": 172,
+    "high_voltage_unknown_type": 239
+  },
+  "default_selection": {
+    "lines": 4345,
+    "primary": 621,
+    "review": 0,
+    "points": 0
+  },
+  "substation_point_matching": {
+    "matching_version": "1.0.0",
+    "classifications": {
+      "matched": 2,
+      "uncertain": 25,
+      "distinct_point_only_candidate": 41
+    },
+    "eligible_point_candidates": 32,
+    "held_distinct_candidates": 9,
+    "pair_comparisons": 187204
+  },
+  "substation_presentation": {
+    "representative_symbol_count": 1070,
+    "footprint_min_zoom": 10,
+    "counts_as_inventory": false
+  },
+  "output_bytes": {
+    "transmission-lines.geojson": 6151922,
+    "substations-primary.geojson": 646266,
+    "substations-review.geojson": 450635,
+    "substations-point-candidates.geojson": 36376,
+    "substation-display-points.geojson": 490830
+  },
+  "planned_assets": {
+    "state": "data_not_provided",
+    "count": null
+  },
+  "official_region_and_power_system": "data_not_provided"
+}

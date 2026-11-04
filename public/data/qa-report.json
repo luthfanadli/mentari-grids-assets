@@ -1,0 +1,388 @@
+{
+  "data_version": "6ea22caaae9ef62a-pipeline-1.1.0",
+  "source_sha256": "6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba",
+  "source_unchanged": true,
+  "raw_layers": [
+    {
+      "name": "mast",
+      "count": 10013,
+      "srs_id": 4326
+    },
+    {
+      "name": "petroleum_site",
+      "count": 149,
+      "srs_id": 4326
+    },
+    {
+      "name": "petroleum_well",
+      "count": 66,
+      "srs_id": 4326
+    },
+    {
+      "name": "pipeline",
+      "count": 813,
+      "srs_id": 4326
+    },
+    {
+      "name": "pipeline_feature",
+      "count": 5,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_compensator",
+      "count": 1,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_generator_point",
+      "count": 4677,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_generator_polygon",
+      "count": 8585,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_line",
+      "count": 5396,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_plant",
+      "count": 643,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_substation_point",
+      "count": 68,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_substation_polygon",
+      "count": 2753,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_switch",
+      "count": 8,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_tower",
+      "count": 121396,
+      "srs_id": 4326
+    },
+    {
+      "name": "power_transformer",
+      "count": 950,
+      "srs_id": 4326
+    },
+    {
+      "name": "pumping_station",
+      "count": 267,
+      "srs_id": 4326
+    },
+    {
+      "name": "telecom_building_point",
+      "count": 14,
+      "srs_id": 4326
+    },
+    {
+      "name": "telecom_building_polygon",
+      "count": 26,
+      "srs_id": 4326
+    },
+    {
+      "name": "telecom_cable",
+      "count": 22,
+      "srs_id": 4326
+    },
+    {
+      "name": "wastewater_plant",
+      "count": 119,
+      "srs_id": 4326
+    },
+    {
+      "name": "water_reservoir",
+      "count": 2525,
+      "srs_id": 4326
+    },
+    {
+      "name": "water_tower_point",
+      "count": 572,
+      "srs_id": 4326
+    },
+    {
+      "name": "water_tower_polygon",
+      "count": 101,
+      "srs_id": 4326
+    },
+    {
+      "name": "water_treatment_plant",
+      "count": 214,
+      "srs_id": 4326
+    },
+    {
+      "name": "water_well_point",
+      "count": 436,
+      "srs_id": 4326
+    },
+    {
+      "name": "water_well_polygon",
+      "count": 57,
+      "srs_id": 4326
+    }
+  ],
+  "core_layer_qa": {
+    "power_line": {
+      "count": 5396,
+      "crs": "EPSG:4326",
+      "bounds": [
+        95.34192056363588,
+        -10.354047182090206,
+        140.79255758892793,
+        5.651460119494994
+      ],
+      "geometry_types": {
+        "LineString": 5396
+      },
+      "errors": {
+        "null_geometry": 0,
+        "empty_geometry": 0,
+        "invalid_geometry": 0,
+        "unexpected_geometry_type": 0,
+        "duplicate_source_ids": 0,
+        "null_source_ids": 0
+      },
+      "voltage_tag_qa": {},
+      "missing_values": {
+        "id": 0,
+        "name": 4772,
+        "name_en": 5395,
+        "ref": 5210,
+        "description": 5359,
+        "operator": 3906,
+        "wd_operator": 4330,
+        "construction": 0,
+        "disused": 0,
+        "location": 0,
+        "max_voltage": 522,
+        "voltages": 0,
+        "frequency": 2510,
+        "circuits": 4452,
+        "cables": 1144,
+        "start_date": 5396
+      },
+      "negative_source_ids": 0
+    },
+    "power_substation_polygon": {
+      "count": 2753,
+      "crs": "EPSG:4326",
+      "bounds": [
+        95.34191486394174,
+        -10.238815710926827,
+        140.7908301625029,
+        5.642235499776422
+      ],
+      "geometry_types": {
+        "Polygon": 2753
+      },
+      "errors": {
+        "null_geometry": 0,
+        "empty_geometry": 0,
+        "invalid_geometry": 0,
+        "unexpected_geometry_type": 0,
+        "duplicate_source_ids": 0,
+        "null_source_ids": 0
+      },
+      "voltage_tag_qa": {
+        "records_with_unparseable_voltage_tokens": 1
+      },
+      "missing_values": {
+        "id": 0,
+        "name": 372,
+        "name_en": 2751,
+        "description": 2752,
+        "substation_type": 380,
+        "construction": 0,
+        "ref": 2716,
+        "operator": 323,
+        "wd_operator": 1592,
+        "voltages": 0,
+        "max_voltage": 1655,
+        "frequency": 2676,
+        "start_date": 2752
+      },
+      "negative_source_ids": 3
+    },
+    "power_substation_point": {
+      "count": 68,
+      "crs": "EPSG:4326",
+      "bounds": [
+        96.93847195251419,
+        -8.630491268489086,
+        129.49743076069547,
+        3.618036225862191
+      ],
+      "geometry_types": {
+        "Point": 68
+      },
+      "errors": {
+        "null_geometry": 0,
+        "empty_geometry": 0,
+        "invalid_geometry": 0,
+        "unexpected_geometry_type": 0,
+        "duplicate_source_ids": 0,
+        "null_source_ids": 0
+      },
+      "voltage_tag_qa": {},
+      "missing_values": {
+        "id": 0,
+        "name": 25,
+        "name_en": 68,
+        "description": 67,
+        "substation_type": 45,
+        "construction": 0,
+        "ref": 67,
+        "operator": 35,
+        "wd_operator": 45,
+        "voltages": 0,
+        "max_voltage": 68,
+        "frequency": 68,
+        "start_date": 68
+      },
+      "negative_source_ids": 0
+    }
+  },
+  "audit_actual": {
+    "source_bytes": 30412800,
+    "source_sha256": "6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba",
+    "layer_count": 26,
+    "raw_lines": 5396,
+    "raw_polygons": 2753,
+    "raw_points": 68,
+    "lines": 4374,
+    "primary": 622,
+    "review": 448,
+    "point_candidates": 32,
+    "lines_not_flagged_in_osm": 4345,
+    "lines_tagged_construction": 25,
+    "lines_tagged_disused": 4,
+    "lines_conflicting_tags": 0,
+    "primary_not_flagged_in_osm": 621,
+    "primary_tagged_construction": 1,
+    "primary_tagged_disused": 0,
+    "primary_conflicting_tags": 0,
+    "lines_150_kv": 3497,
+    "lines_275_kv": 170,
+    "lines_500_kv": 342,
+    "lines_70_kv": 365,
+    "transmission_missing_voltage": 37,
+    "high_voltage_unknown_type": 239,
+    "high_voltage_distribution_tag": 172,
+    "line_missing_voltage": 522,
+    "line_20_kv": 458,
+    "line_other_voltage": 42,
+    "polygon_target_other_type": 19,
+    "transmission_non_target_voltage": 32,
+    "excluded_disused_lines": 2,
+    "raw_polygon_missing_voltage": 1655,
+    "raw_polygon_transmission": 691,
+    "raw_polygon_distribution": 1555,
+    "raw_line_missing_name": 4772,
+    "raw_line_missing_circuits": 4452,
+    "raw_line_missing_start_date": 5396,
+    "point_missing_voltage": 68,
+    "point_transmission": 1
+  },
+  "audit_comparison": {
+    "matches": true,
+    "differences": []
+  },
+  "excluded_counts": {
+    "line_20_kv": 458,
+    "line_missing_voltage": 522,
+    "line_other_voltage": 42,
+    "polygon_outside_selection": 1632,
+    "polygon_target_other_type": 19,
+    "transmission_non_target_voltage": 32
+  },
+  "excluded_layer_counts": {
+    "mast": 10013,
+    "petroleum_site": 149,
+    "petroleum_well": 66,
+    "pipeline": 813,
+    "pipeline_feature": 5,
+    "power_compensator": 1,
+    "power_generator_point": 4677,
+    "power_generator_polygon": 8585,
+    "power_plant": 643,
+    "power_switch": 8,
+    "power_tower": 121396,
+    "power_transformer": 950,
+    "pumping_station": 267,
+    "telecom_building_point": 14,
+    "telecom_building_polygon": 26,
+    "telecom_cable": 22,
+    "wastewater_plant": 119,
+    "water_reservoir": 2525,
+    "water_tower_point": 572,
+    "water_tower_polygon": 101,
+    "water_treatment_plant": 214,
+    "water_well_point": 436,
+    "water_well_polygon": 57
+  },
+  "quarantined_conflicts": 0,
+  "qa_only_points": 36,
+  "substation_point_matching": {
+    "matching_version": "1.0.0",
+    "source_sha256": "6ea22caaae9ef62a32e91d65b79cf972d4aaedeec372d58f49af2f71c22307ba",
+    "policy": {
+      "version": "1.0.0",
+      "proximity_review_m": 500,
+      "name_review_m": 1000,
+      "supported_match_m": 100,
+      "definitions": {
+        "matched": "One supported source correspondence within 100 m, with distinctive name/reference evidence and no attribute conflict. Not an authoritative duplicate certification.",
+        "uncertain": "Intersection, proximity within 500 m, numeric-ID evidence, or a distinctive name/reference association within 1 km without one unambiguous supported match.",
+        "distinct_point_only_candidate": "No plausible polygon correspondence under this policy. Distinct is relative to this export and these thresholds, not verified physical-station identity or transmission function."
+      },
+      "identifier_policy": "Preserve original id and sign. Numeric IDs compared across layers; absent OSM element-kind fields prevent treating equal numeric IDs as confirmed shared OSM identity.",
+      "name_policy": "Case/accent/punctuation normalization; strip generic utility/station words and explicit kV text; retain site-code numbers (PK 276 differs from PK 277). Distinctive token-set equality only; no fuzzy substring or arbitrary place-name inference.",
+      "eligibility_policy": "Only distinct candidates; missing voltage stays null. Hold known distribution/minor_distribution/generation/other non-transmission roles, non-target known numeric voltage, conflicting status flags, and office/park function clues outside the map layer for manual review. These holds do not delete source records.",
+      "distance_method": "Per-point WGS84 azimuthal equidistant projection against every raw polygon; projected stored-edge chord approximation in meters. Intersection uses original EPSG:4326 geometry. Thresholds are QA rules, not surveyed boundaries or network connectivity."
+    },
+    "point_count": 68,
+    "polygon_count": 2753,
+    "pair_comparisons": 187204,
+    "classifications": {
+      "matched": 2,
+      "uncertain": 25,
+      "distinct_point_only_candidate": 41
+    },
+    "eligible_point_candidates": 32,
+    "held_distinct_candidates": 9,
+    "missing_point_numeric_voltage": 68,
+    "confirmed_unique_station_count": null
+  },
+  "representative_symbols": {
+    "count": 1070,
+    "outside_parent_footprint": 0,
+    "counts_as_inventory": false
+  },
+  "publication_validation": {
+    "features_validated": 5476,
+    "duplicate_feature_ids": 0,
+    "geometry_errors": 0,
+    "voltage_scope_errors": 0,
+    "subset_overlaps": 0,
+    "coordinate_precision_decimals": 7,
+    "simplified": false,
+    "coordinate_precision_scope": "Existing line/polygon exports only; source point candidates preserve original coordinates and representative symbols preserve generated interior coordinates.",
+    "coordinate_order": "longitude, latitude",
+    "crs": "EPSG:4326"
+  },
+  "validation_summary": "PASS",
+  "scope": "Structural, attribute and subset QA; not official operational or topology validation."
+}
