@@ -8,7 +8,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { FOOTPRINT_MIN_ZOOM, renderedRecordCount } from '../utils/substationPresentation'
 import MapLegend from './MapLegend.vue'
 import MapBasemapPicker from './MapBasemapPicker.vue'
-import { BASEMAP_LABELS, basemapStyle } from '../utils/basemaps'
+import { BASEMAP_LABELS, OSM_ATTRIBUTION, basemapStyle } from '../utils/basemaps'
 import type { BasemapId } from '../utils/basemaps'
 const props = defineProps<{ features: AssetFeature[]; displayPoints: DisplayPointCollection; selectedId: string | null }>()
 const emit = defineEmits<{ select: [feature: AssetFeature]; viewport: [count: number | null] }>()
@@ -70,7 +70,7 @@ function syncSelected() {
 }
 function addInventory() {
   if (!map || map.getSource('inventory')) return
-  map.addSource('inventory', { type: 'geojson', data: data(), attribution: 'Inventory: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · <a href="https://openinframap.org/" target="_blank" rel="noopener">OpenInfraMap</a> · <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener">ODbL</a>' })
+  map.addSource('inventory', { type: 'geojson', data: data(), attribution: OSM_ATTRIBUTION })
   map.addSource('substation-symbols', { type: 'geojson', data: symbolData() })
   map.addSource('plant-symbols', { type: 'geojson', data: plantSymbolData() })
   addPlantIcons()

@@ -33,7 +33,8 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside))
     </button>
     <div v-if="opened" id="basemap-options" class="basemap-popover" role="dialog" aria-label="Basemap options">
       <fieldset><legend>Basemap</legend>
-        <label v-for="choice in choices" :key="choice" class="basemap-choice">
+        <!-- Keep pointer focus inside the picker until the whole-row click selects a choice. -->
+        <label v-for="choice in choices" :key="choice" class="basemap-choice" @pointerdown.prevent @click.prevent="select(choice)">
           <input type="radio" name="map-basemap" :value="choice" :checked="choice === selected" @change="select(choice)"/>
           <span class="basemap-preview" :class="choice" aria-hidden="true"></span>
           <span>{{ BASEMAP_LABELS[choice] }}</span>
