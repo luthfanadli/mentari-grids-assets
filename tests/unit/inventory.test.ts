@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { defaultFilters, filterAssets, selectionCounts, featureBounds } from '../../src/utils/filterAssets.ts'
 import { formatValue, formatVoltage } from '../../src/utils/formatAssets.ts'
 import { createAssetRepository } from '../../src/services/assetData.ts'
-import { selectedDisplayPoints, renderedRecordCount, selectedMapLegend } from '../../src/utils/substationPresentation.ts'
+import { selectedDisplayPoints, renderedRecordCount, polygonStyleState } from '../../src/utils/substationPresentation.ts'
 import type { AssetCollection, InventorySummary, DisplayPointCollection, AssetFeature } from '../../src/types/assets.ts'
 
 const read = (filename: string) => JSON.parse(readFileSync(new URL(`../../public/data/${filename}`, import.meta.url), 'utf8'))
@@ -125,44 +125,33 @@ test('missing files produce a useful error and failed requests can be retried', 
   assert.equal((await repo.loadReview()).features.length, 448)
 })
 
-test('legend includes only selected original features and keeps unknown-voltage candidates separate', () => {
+test('polygon swatches use selected primary substations and plants, independent of candidates', () => {
   const filters = defaultFilters()
-  assert.deepEqual(selectedMapLegend(filterAssets(all, filters)), {
-    lineVoltages: [500, 275, 150, 70], baselineLines: true, constructionLines: false, disusedLines: false,
-    primary: true, constructionPrimary: false, review: false, points: false, plants: true, constructionPlants: false,
+  assert.deepEqual(polygonStyleState(filterAssets(all, filters)), {
+    primary: true, constructionPrimary: false, plants: true, constructionPlants: false,
   })
   filters.lines = false; filters.primary = false; filters.powerPlants = false; filters.review = true; filters.pointCandidates = true; filters.voltages = []
   const selected = filterAssets(all, filters)
   assert.equal(selected.length, 69) // 37 unknown-voltage review polygons + 32 source points.
-  const key = selectedMapLegend(selected)
-  assert.deepEqual(key.lineVoltages, [])
-  assert.equal(key.review, true); assert.equal(key.points, true); assert.equal(key.primary, false)
-  filters.unknownVoltage = false
-  assert.ok(Object.values(selectedMapLegend(filterAssets(all, filters))).every(value => Array.isArray(value) ? value.length === 0 : value === false))
+  assert.deepEqual(polygonStyleState(selected), polygonStyleState([]))
 })
 
-test('legend distinguishes construction lines from construction-tagged polygon substations', () => {
+test('construction swatches track polygon flags independently of transmission lines', () => {
   const filters = defaultFilters(); filters.statuses = ['tagged_construction']
-  const construction = selectedMapLegend(filterAssets(all, filters))
-  assert.deepEqual(construction.lineVoltages, [500, 275, 150])
-  assert.equal(construction.constructionLines, true); assert.equal(construction.constructionPrimary, true)
-  assert.equal(construction.primary, false); assert.equal(construction.baselineLines, false)
+  const construction = polygonStyleState(filterAssets(all, filters))
+  assert.deepEqual(construction, { primary: false, constructionPrimary: true, plants: false, constructionPlants: true })
   filters.lines = false
-  const polygonOnly = selectedMapLegend(filterAssets(all, filters))
-  assert.deepEqual(polygonOnly.lineVoltages, [])
-  assert.equal(polygonOnly.constructionLines, false); assert.equal(polygonOnly.constructionPrimary, true)
+  assert.deepEqual(polygonStyleState(filterAssets(all, filters)), construction)
   filters.lines = true; filters.statuses = ['tagged_disused']
-  const disused = selectedMapLegend(filterAssets(all, filters))
-  assert.deepEqual(disused.lineVoltages, [500, 70])
-  assert.equal(disused.disusedLines, true); assert.equal(disused.primary, false)
+  assert.deepEqual(polygonStyleState(filterAssets(all, filters)), polygonStyleState([]))
 })
 
-test('legend excludes derived representatives and clears every key for an empty search', () => {
+test('polygon swatches exclude derived representatives and clear for an empty search', () => {
   const original = primary.features[0]!
   const representative = { ...original, properties: { ...original.properties, counts_as_inventory: false as const } }
   const filters = defaultFilters(); filters.query = 'no matching source asset xyz'
-  assert.deepEqual(selectedMapLegend([representative]), selectedMapLegend(filterAssets(all, filters)))
-  assert.deepEqual(selectedMapLegend([representative]), selectedMapLegend([]))
+  assert.deepEqual(polygonStyleState([representative]), polygonStyleState(filterAssets(all, filters)))
+  assert.deepEqual(polygonStyleState([representative]), polygonStyleState([]))
 })
 
 test('power plants use source flags and search while remaining independent of grid voltage', () => {
@@ -172,7 +161,7 @@ test('power plants use source flags and search while remaining independent of gr
   assert.ok(filterAssets(all, filters).every(f => f.properties.asset_type === 'power_plant'))
   filters.statuses = ['tagged_construction']
   assert.equal(filterAssets(all, filters).length, 10)
-  assert.equal(selectedMapLegend(filterAssets(all, filters)).constructionPlants, true)
+  assert.equal(polygonStyleState(filterAssets(all, filters)).constructionPlants, true)
   filters.statuses = ['not_flagged_in_osm']; filters.query = 'Tolo Wind Farm'
   assert.ok(filterAssets(all, filters).some(f => f.properties.plant_name_en === 'Tolo Wind Farm'))
   filters.query = 'geothermal'
@@ -187,8 +176,8 @@ test('power-plant footprints and their display representatives count as one orig
   const counts = selectionCounts([plant, plant, representative])
   assert.equal(counts.plants, 1); assert.equal(counts.primary, 0); assert.equal(counts.total, 1)
   assert.equal(renderedRecordCount([plant, representative, representative]), 1)
-  assert.equal(selectedMapLegend([plant]).plants, true)
-  assert.equal(selectedMapLegend([representative]).plants, false)
+  assert.equal(polygonStyleState([plant]).plants, true)
+  assert.equal(polygonStyleState([representative]).plants, false)
   for (const feature of plants.features) {
     assert.equal(feature.properties.max_voltage_kv, null)
     assert.equal(feature.properties.plant_output_unit, null)

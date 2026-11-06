@@ -1,145 +1,64 @@
-# Spatial Data Filter Specification — MENTARI Grids D2
+# Data filter specification
 
-Current publication note: exact line/primary/review predicates and historic source counts below are unchanged. The matching supplement adds the optional 32-point dataset and 1,070 non-inventory symbols; the plant supplement adds 643 original power-plant footprints. Current publication is six GeoJSONs plus three metadata files; see [DATA_DICTIONARY.md](DATA_DICTIONARY.md), [SUBSTATION_MATCHING.md](SUBSTATION_MATCHING.md) and [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md). Three-file examples retain the starting MVP contract. The current in-map Layers control keeps all five layer choices available, including when off/empty, and combines symbols with folded voltage/status filters. Cards/list still use the same filtered original records; all preprocessing predicates are unchanged. See [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md) for current UI verification and [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md) for the earlier cleanup.
+Input: the supplied `data/raw/IDN.gpkg`. Source-version targets are recorded in [the audit](VERIFIED_DATA_AUDIT.md) and `scripts/expected-*.json`. Rules run in `scripts/prepare_data.py`; counts are validation targets, not selection predicates.
 
-**Status:** approved starting logic for the MVP; source-tag categories are preliminary, **not** confirmation by PLN/DJK ESDM. **Input:** `data/raw/IDN.gpkg`. **Reference:** ToR Deliverable 2 and verified audit in `VERIFIED_DATA_AUDIT.md`.
+## Spatial scope
 
-## A. Single source of truth
+Only `power_line`, `power_substation_polygon`, `power_substation_point` and `power_plant` are read as features. Other layers are counted in QA but excluded, including towers, transformers and individual generators.
 
-Only source layers below may contribute to the production map:
+Numeric target voltage is **{70000, 150000, 275000, 500000} volts**. Use numeric `max_voltage` for selection. Display `max_voltage / 1000` in kV; raw multi-value `voltages` tags never widen the filter.
 
-| Source layer | Input features | Decision |
-|---|---:|---|
-| `power_line` | 5,396 | Filter to 500/275/150/70 kV |
-| `power_substation_polygon` | 2,753 | Filter to primary transmission-tagged polygons; candidate polygons separate |
-| `power_substation_point` | 68 | Review/QA only; zero default map features |
-| `power_plant` | 643 | User-authorized generation context: source footprints, separate count and symbols |
-| `power_tower`, `power_transformer`, individual generators, all non-power layers | Varies | Exclude from MVP |
+## Lines
 
-Retain raw GPKG at `data/raw/` locally; do not publish or git-track that directory. Avoid a `SELECT *` export of all layers.
+Select `power_line.max_voltage` in the target set: **4,374 segments**. Each feature is counted once, without dissolving routes or multiplying by circuits.
 
-## B. Transmission lines: exact predicate and buckets
+| Source status | Predicate | Count | Default |
+| --- | --- | ---: | --- |
+| `not_flagged_in_osm` | Neither construction nor disused true | 4,345 | On |
+| `tagged_construction` | Construction true, disused not true | 25 | Off |
+| `tagged_disused` | Disused true, construction not true | 4 | Off |
+| `conflicting_tags` | Both true | 0 | Quarantine |
 
-**Primary transmission voltage classes:** `{500000, 275000, 150000, 70000}` **volts**, using the numeric `max_voltage` field, **not** string matching of the `voltages` field. `max_voltage_kv = max_voltage / 1000` only when numeric, finite, positive and reliable. Preserve both `max_voltage` and `voltages` raw fields; optionally parse semicolon-separated `voltages` into `all_voltages_kv` for details, but do not use this to silently widen the initial filter.
+The 1,022 excluded lines comprise 458 at 20 kV, 522 with null numeric voltage and 42 at other voltages. Two raw disused lines are outside target scope and remain excluded. Preserve source location/circuits when supplied; do not infer HVDC or assume one circuit.
 
-Pseudocode:
+## Substation polygons
 
-```python
-TARGET_V = {500_000, 275_000, 150_000, 70_000}
-transmission_lines = power_line[power_line["max_voltage"].isin(TARGET_V)].copy()
+Primary: `substation_type == "transmission"` **and** numeric maximum voltage in the target set: **622 polygons**, including one construction-tagged record. Default selection: 621.
 
-def osm_status(record):
-    if record["construction"] and record["disused"]:
-        return "conflicting_tags"          # quarantine/manual review
-    if record["disused"]:
-        return "tagged_disused"
-    if record["construction"]:
-        return "tagged_construction"
-    return "not_flagged_in_osm"             # NOT verified existing/operational
-```
+Review is the disjoint union below, independently toggleable and **off by default**:
 
-From the supplied GPKG:
+| Review reason | Predicate | Count |
+| --- | --- | ---: |
+| `transmission_missing_voltage` | Transmission type, null numeric maximum voltage | 37 |
+| `high_voltage_unknown_type` | Target numeric voltage, null type | 239 |
+| `high_voltage_distribution_tag` | Target numeric voltage, distribution type | 172 |
+| **Total** | | **448** |
 
-| Output group | Count | On first load? |
-|---|---:|---|
-| `not_flagged_in_osm` | **4,345** | **YES** (OSM baseline; unverified status) |
-| `tagged_construction` | **25** | NO, optional status filter |
-| `tagged_disused` | **4** | NO, optional status filter |
-| **All target-voltage lines** | **4,374** | In `transmission-lines.geojson` |
+Keep original type tags unchanged. Exclude 19 target-voltage polygons with other types, 32 transmission polygons with non-target nonnull voltage and 1,632 other polygons. Names containing GI/GITET are review clues, never automatic voltage/function certification.
 
-**Outside target voltage:** 1,022 line features = 5,396 - 4,374; exclude from production GeoJSON but account for them in QA. This includes 458 with `max_voltage=20000`, 522 with null voltage, and 42 with other voltage values. Two additional source `disused=true` features exist outside target voltage and **must not be accidentally included** in the 4,374 total.
+## Source points
 
-**Special cases:** If `voltages` lists multiple values (e.g. `500000;150000`), retain that information, but classify the segment **once** using `max_voltage` for MVP. Avoid double-counting. Retain `location=overhead/underground/underwater/...` as supplied; don't infer HVDC from `location`. The source `circuits` field is sometimes null: preserve its known value and never assume one circuit.
+Audit **all 68 points against all 2,753 raw polygons**, including excluded polygons, using the [matching policy](SUBSTATION_MATCHING.md). Publish only the 32 eligible distinct point-only candidates in a separate default-off layer. Hold matched, uncertain and ineligible records in private QA. All source points lack numeric voltage; none enters the primary polygon inventory or inherits polygon attributes.
 
-## C. Substation polygons: selection and uncertainty
+## Power plants
 
-Primary inventory: `power_substation_polygon` with BOTH `substation_type == "transmission"` AND numeric `max_voltage` in `TARGET_V`. **Count: 622**. One of these has `construction=true`; default map should show the other **621**, with one separately selectable as tagged construction. They are *source-tagged preliminary transmission substations*, not officially validated GI/GITET.
+Publish all **643** valid `power_plant` footprints separately: 633 not construction-tagged and ten construction-tagged. The layer is on by default; construction remains optional. Status and search apply, but grid voltage filters do not: the source has no voltage field.
 
-Do not accidentally drop high-voltage GI/GITET candidates just because OSM says `distribution` or omits the type. Export these separately as *review candidates*:
+Preserve energy-source, method, raw output, raw start-date, English-name, description and Wikidata tags. Output units remain null; do not infer MW, aggregate capacity, verified COD, generator membership or grid connections.
 
-| Candidate reason | Exact predicate | Count |
-|---|---|---:|
-| `transmission_missing_voltage` | type `transmission` AND numeric `max_voltage` is null | **37** |
-| `high_voltage_unknown_type` | `max_voltage` in `TARGET_V` AND `substation_type` null | **239** |
-| `high_voltage_distribution_tag` | `max_voltage` in `TARGET_V` AND type `distribution` | **172** |
-| **Total review candidates** | Non-overlapping union | **448** |
+## Geometry, IDs and counting
 
-The candidates are not counted in the primary inventory and **must be OFF by default**. Render them only when the user enables a clearly labeled `Review candidates (unvalidated)` layer. Show `review_reason` in the details; use different styling from primary polygons. Do not replace any original `substation_type` with `transmission` just to include them.
+- Validate EPSG:4326, expected geometry families, required attributes, numeric values, flags, unique integral source IDs and valid nonempty geometry. Reject malformed inputs; quarantine conflicting flags.
+- Preserve signed source `id`, never GeoPackage `fid`. Original feature IDs are `<source_layer>:<source_id>`. Equal numeric IDs in different layers do not establish OSM identity.
+- Normalize polygon winding. Lines/substation polygons retain seven coordinate decimals without simplification or dissolve. Published original points and plant footprints retain full source precision.
+- Derive interior polygon representatives with Shapely `representative_point`, validate containment and reuse parent IDs. Representatives are display-only, never additional inventory.
+- Measure line geometry with WGS84 `pyproj.Geod`; label it mapped geometry length, not official route length or circuit-km.
+- Preserve missing values as null. No official region/system, planned infrastructure, capacity or operational status is inferred.
 
-Further QA-only categories, to be counted but not automatically included:
-- 19 polygon features have target voltage but another (non-`transmission`/`distribution`/null) substation type, e.g. `transition`, `generation`, `industrial`, `traction`.
-- 32 type=`transmission` polygons have **non-target, non-null** voltage. Keep excluded, document potential other-voltage assets.
-- 68 `power_substation_point` features all lack numeric `max_voltage`; only one is explicitly tagged `transmission`. Store for point-versus-polygon duplicate review, **not** production default. Their missing voltage must not be guessed from name or proximity.
-- Substation names can contain `GI`/`GITET`, but names are review clues, **not a sufficient automatic certification** of voltage, substation function or status.
+## Outputs and validation
 
-Preserve `construction` flags for polygons. `start_date`, `transformer_capacity_mva`, `insulation_type`, `commissioning_year`, and official project status are not available/reliable in the supplied source; show `Not available` rather than guessed attributes.
+Publish the six GeoJSONs and three metadata files listed in [the dictionary](DATA_DICTIONARY.md), with attribution and ODbL notices. Deterministic ordering, UTF-8/CRLF serialization and checksums must remain stable across platforms. Check source SHA-256 before/after processing and report exact audit differences before writing publication files.
 
-## D. Output data contract
+Private QA under `data/qa/` contains exclusions, status conflicts, source-point review and all matching evidence. Do not copy raw data, source references or full internal review tables into `public/`.
 
-Use **three production GeoJSONs**:
-
-```text
-public/data/transmission-lines.geojson
-public/data/substations-primary.geojson
-public/data/substations-review.geojson
-```
-
-Each GeoJSON is a valid `FeatureCollection` with EPSG:4326 geometries (RFC 7946 longitude/latitude). Do not simplify aggressively: preserve geometry fidelity and provide zoom/performance tests. Use lightweight, purpose-specific properties, not all unused source fields. Suggested normalized common properties (null when unavailable):
-
-| Key | Definition |
-|---|---|
-| `feature_id` | Globally unique string `<source_layer>:<source_id>`; source id **as-is**, including negative IDs where present |
-| `source_layer`, `source_id` | Original GeoPackage layer and original `id` converted to string; not GeoPackage `fid` |
-| `asset_type` | `transmission_line` or `substation_polygon` |
-| `display_name` | Original `name` or UI fallback such as `Unnamed line · OSM ID 123` (fallback is NOT official name) |
-| `name`, `ref`, `operator` | Preserved original strings/null |
-| `max_voltage_v`, `max_voltage_kv` | Original `max_voltage` and reliable normalized kV |
-| `voltages_raw`, `all_voltages_kv` | Raw `voltages` and optional parsed kV list; don't force invalid values |
-| `osm_tag_status` | `not_flagged_in_osm` / `tagged_construction` / `tagged_disused` / `conflicting_tags` |
-| `source_status_verified` | Always false for this source (or explicit `null` for not reviewed), never `true` without evidence |
-| `substation_type` | Original type for polygons; null for lines |
-| `review_reason` | Candidate reason only; null in primary datasets |
-| `location`, `circuits` | Original line attributes; null for substations |
-| `mapped_geometry_length_km` | Optional, geodesically measured segment length; **NOT official circuit-km** |
-
-Metadata files in `public/data/`:
-
-- `summary.json`: actual raw counts, subset counts, current source-tag group counts, voltage distributions, completeness metrics and data version. **Generate from data, not hand-entered constants.**
-- `data-catalog.json`: source `OpenInfraMap / OpenStreetMap`, file and layer info, license `ODbL`, original CRS, processing method, data limitations, `source_data_vintage: unknown` unless verified externally. The GeoPackage file modification date is not the OSM data vintage.
-- `qa-report.json`: input counts, excluded counts by reason, missing values, geometry errors, duplicate IDs, source tag inconsistencies and test summary.
-
-Other QA artifacts belong under `data/qa/`, outside deployable `public/`, and may include a rejected-feature inventory and the 68 point substations. Do not export any synthetic planned projects into production data.
-
-## E. Determinism, QA and validation
-
-- Confirm expected layer names, EPSG:4326, expected geometry families, valid/nonempty geometries and numeric fields; fail with clear exceptions if absent or malformed.
-- Sort output consistently by `source_id` as string or stable numeric sort with deterministic ties; write UTF-8 JSON with null-safe serializers.
-- Duplicate `source_id` **within a layer** should raise QA; distinct source layers may legally use the same numeric OSM ID.
-- Verify classified subsets are mutually exclusive, have no duplicated `feature_id`, and every published line is one of the four target voltages.
-- **Don't dissolve lines:** a feature is an OSM mapped segment, not necessarily a unique electrical transmission circuit or corridor.
-- If reporting geometry length, use geodesic ellipsoidal measurement (WGS84, `pyproj.Geod` or equivalent), round for display only, preserve precision in source calculations; call it `mapped line geometry length`, not `circuit-km` or verified route length.
-- If reporting KPI totals, disclose filters and status tags, not claims of verified national coverage.
-- Add tests reproducing expected numbers from this exact GPKG; if another version is supplied, emit actual counts and a source-version mismatch instead of hiding changes.
-
-## F. Planned projects and geographic grouping — intentionally deferred
-
-The ToR also requires RUPTL 2025–2034/RUKN 2025–2060 planned lines/substations, project COD/status, HVDC interconnections and categorization by region/system. These are **not identifiable from the supplied GeoPackage**. Design TypeScript types/extension points for `planned_line`, `planned_substation`, and future `region`/`power_system` fields, but do not fabricate placeholder spatial features, create fake statistics or infer official network-system membership from coordinate proximity. Display `Planned assets — data not yet provided` as needed.
-
-## G. Legal publishing checklist
-
-- The supplied `License.pdf` identifies OpenStreetMap source data under **ODbL**; provide appropriate map/data notices and attribution with links.
-- OSM derivative database redistribution may trigger share-alike/database accessibility requirements. Review ODbL obligations before publicly publishing the processed datasets; include the license notice, data source link and transformation methodology.
-- Credit OpenInfraMap appropriately (appreciated, not mandatory per supplied export notice).
-- Do not publicly deploy the original ToR or BNEF-licensed data. Check basemap service terms separately.
-
-## H. User-authorized substation enhancement
-
-The subsequent enhancement request authorizes an optional, default-off point-only candidate layer after full point–polygon matching QA and derived overview symbols for polygons. It preserves all existing line predicates, 622 primary polygons and 448 review polygons, including their original export bytes. No missing-voltage point enters primary inventory. The versioned policy, all 68 source-point classifications, eligibility rules, eight-file publication schema and counting/representation behavior are documented in [SUBSTATION_MATCHING.md](SUBSTATION_MATCHING.md). This supplement does not authorize deployment or change the historic source audit.
-
-## Power-plant context supplement (user authorized)
-
-Read only `power_plant` in addition to the three existing spatial layers. Publish all 643 structurally valid source footprints (632 Polygon, 11 MultiPolygon), retain signed IDs and full original coordinate precision, and exclude individual generator layers. Preserve 633 not-construction-tagged and ten construction-tagged records; construction is optional under the existing status filter. Power plants are on by default and have a separate count. Grid voltage filters do not apply because no plant voltage field exists.
-
-Keep energy-source, method, numeric raw output, raw start-date string, English-name, description and Wikidata tags with explicit provenance. Output units are not supplied: leave the unit null and do not convert to MW or aggregate verified capacity. Raw start date is not verified COD. No disused field or electrical connections are inferred. Derived `plant_representative_point` coordinates must be inside the original footprint and must never add inventory records.
-
-Publish `power-plants.geojson` with the five unchanged earlier GeoJSONs and three updated metadata files (nine files; summary/catalog schema v3, pipeline v1.2.0). Keep `expected-audit.json` unchanged; the plant audit is recorded separately in `expected-power-plant-audit.json`. [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md) records source fields, exact counts, preservation proof and tests.
+The UI filters the published subsets without changing these rules. Its primary/review/point/plant counts remain separate; viewport counts canonicalize parent IDs across representations. Unknown voltage is an explicit candidate filter, not a guessed numeric value.

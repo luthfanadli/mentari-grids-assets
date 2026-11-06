@@ -1,87 +1,52 @@
 # Coverage and limitations
 
-This is the supplied OpenInfraMap/OpenStreetMap export's preliminary inventory. It is not independently verified by PLN/DJK ESDM, and no national coverage percentage can be established. The source's OSM data vintage is **unknown**; its file modification date is not a data observation date.
+This is a preliminary OpenInfraMap/OpenStreetMap inventory with **unknown source vintage**, not an independently verified national asset registry. The original ToR has not been supplied; Deliverable 2 scope follows the supplied project brief.
 
-## Verified scope
+## What the counts mean
 
-The 30,412,800-byte GeoPackage has 26 layers. Only 5,396 line records, 2,753 substation polygons, 68 point substations and 643 power-plant footprints are read as spatial records. All have EPSG:4326, valid nonempty geometry and unique IDs within their layer. Three polygon IDs are negative and remain unchanged.
+The [source audit](VERIFIED_DATA_AUDIT.md) records raw metrics and [the dictionary](DATA_DICTIONARY.md) lists publication totals.
 
-| Published subset | Total | Not flagged | Tagged construction | Tagged disused |
-| --- | ---: | ---: | ---: | ---: |
-| Target-voltage line segments | 4,374 | 4,345 | 25 | 4 |
-| Primary transmission-tagged polygons | 622 | 621 | 1 | 0 |
-| Separate review polygons | 448 | 448 | 0 | 0 |
-| Separate eligible point-only candidates | 32 | 32 | 0 | 0 |
-| Power-plant context footprints | 643 | 633 | 10 | 0 |
+- Lines are mapped segments, not unique routes, circuits or corridors. Multi-voltage records are classified once by numeric maximum voltage.
+- Primary substations have explicit transmission tags and target voltage; they are not certified GI/GITET stations.
+- Review polygons and point-only candidates remain separate, unvalidated and off by default.
+- Plants are source footprints, not individual generators or verified unique power stations. Repeated names, overlapping geometries and Wikidata tags are not automatically merged.
+- Overview symbols represent the same polygon records. Selected counts do not change with zoom; viewport counts describe deduplicated rendered records.
 
-Substation and power-plant layers have no `disused` field. The zero disused category is a computed source-category count, not proof that no substation is disused. Both candidate layers are off by default. Primary polygons are explicitly tagged transmission and at target numeric voltage; this does not certify GI/GITET identity or operation. Point-only candidates retain unknown voltage and unverified function and are never included in the primary count.
+"Not flagged in OSM" means no construction/disused tag is true where those fields exist. It does **not** verify present existence or operation. Substations and plants have no disused field; their zero disused category is not evidence that none are disused.
 
-| Maximum line voltage | Segments across all flags |
-| --- | ---: |
-| 500 kV | 342 |
-| 275 kV | 170 |
-| 150 kV | 3,497 |
-| 70 kV | 365 |
+## Missing attributes
 
-Each source line is counted once using numeric maximum voltage. Multi-voltage tags remain available in details. Segments are not dissolved into corridors, circuits or unique routes. Source circuits are known on only 638 of the published 4,374 segments; no circuit-km is calculated.
+| Published subset | Missing source values |
+| --- | --- |
+| 4,374 lines | Name 3,794; operator 3,269; reference 4,319; circuits 3,736 |
+| 622 primary polygons | Name 22; operator 81; reference 595 |
+| 448 review polygons | Name 34; operator 100; reference 446; numeric voltage 37 |
+| 32 point candidates | Numeric voltage 32; physical identity/function unverified |
+| 643 plants | Name 113; operator 428; energy source 85; method 283; output 223; start date 613 |
 
-## Explicit exclusions and review
+All raw lines lack start dates. Unknown details display **Not available**; fallback names are identified as interface labels. Operator strings do not establish ownership. Plant output units are unspecified: values are not converted to MW or summed as capacity, and raw start-date strings are not verified COD.
 
-| Exclusion reason | Count |
-| --- | ---: |
-| Lines at 20 kV | 458 |
-| Lines missing numeric voltage | 522 |
-| Other non-target line voltages | 42 |
-| Polygon target voltage, other substation type | 19 |
-| Transmission polygons, non-target nonnull voltage | 32 |
-| Other polygons outside primary/review predicates | 1,632 |
-| Source points audited (32 optional candidates; 36 held from publication) | 68 |
+## Selection and identity limitations
 
-These reconcile exactly: 5,396 = 4,374 + 1,022 lines; 2,753 = 622 + 448 + 19 + 32 + 1,632 polygons. Two of the six raw disused lines lie outside the target scope and stay excluded. The 68 points all lack numeric maximum voltage; only one is tagged transmission. Point voltage is not inferred, and geographic associations do not certify shared station identity.
+The exact [filter rules](DATA_FILTER_SPEC.md) intentionally exclude non-target/missing-voltage lines and polygons outside the primary/review predicates. They cannot establish complete national transmission coverage.
 
-The versioned matching enhancement compares all 68 points against all 2,753 raw polygons: 187,204 pair evaluations. It records two supported matches, 25 uncertain and 41 distinct candidates under conservative thresholds. Supported source associations do not certify duplication. Of the 41 distinct candidates, 32 pass optional-layer eligibility; nine remain held for source-role or office-name review. Matched/uncertain points are withheld regardless of polygon-layer visibility. Original point coordinates and null voltage are retained. See [matching policy](SUBSTATION_MATCHING.md) and internal `data/qa/substation-matching-report.json`/CSV.
+For example, polygon `943539373` (GITET Aur Duri Baru) has raw voltage text `500000/275000/150000`, null numeric maximum voltage and null type. It remains excluded rather than guessed or silently repaired.
 
-The 448 candidates comprise 37 transmission-tagged/missing-voltage polygons, 239 target-voltage/missing-type polygons and 172 target-voltage/distribution-tagged polygons. Original tags remain unchanged. Towers (121,396), transformers (950), individual generators and all telecom/water/pipeline/petroleum layers are excluded. The aggregate QA report lists every excluded layer's actual count.
+[Point/polygon matching](SUBSTATION_MATCHING.md) screens every point against every polygon, but a supported correspondence is not certified duplicate identity. Unknown point voltages never inherit nearby/containing polygon values. Point-point identity, existing polygon overlaps, topology, route identity and plant/substation connections remain unresolved. No official unique-station total or coverage percentage is claimed.
 
-Additional source QA found one unparseable voltage string: polygon ID `943539373`, name `GITET Aur Duri Baru`, raw `voltages='500000/275000/150000'`, with null numeric maximum voltage and null type. It remains excluded by the exact predicates, even though its name is a review clue. Its voltage is not guessed or silently repaired. This illustrates why an OSM-tag subset is incomplete.
+## Remaining Deliverable 2 gaps
 
-## Power-plant source coverage
+| Requirement | Missing evidence |
+| --- | --- |
+| Official existing line/station inventory | Authoritative asset IDs, registry validation and deduplication |
+| Region and power-system grouping | Agreed boundaries and an authoritative electrical-system crosswalk |
+| RUPTL 2025–2034 / RUKN 2025–2060 plans | Approved project records and spatial layers |
+| HVDC, converter stations and interconnections | Verified technology/project classifications |
+| Overhead/submarine/underground coverage | Validation of supplied location tags and route sections |
+| COD, capacity/MVA, thermal rating, circuit-km, AIS/GIS and costs | Authoritative values with units, dates and provenance |
 
-The context layer publishes all 643 footprints, including 11 MultiPolygons; this is not a verified unique-plant registry. Name is missing on 113, operator on 428, energy source on 85, method on 283, output on 223 and start date on 613. No voltage, disused field or output unit is supplied. The 420 known output values retain unspecified units and are not summed or converted to MW. Start dates include partial/approximate strings and are not verified COD. Repeated names/Wikidata tags and multiple footprints are not automatically merged. Generator layers remain excluded. See [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).
+No planned infrastructure or geographic membership is fabricated. Geodesic line geometry length is not official circuit-km. New source versions require reviewed audit differences rather than edits that conceal changes.
 
-## Attribute completeness
+## Publication
 
-Within publication subsets:
-
-- Line names are missing on 3,794/4,374 segments, operators on 3,269, references on 4,319, and circuits on 3,736. Every raw line lacks `start_date`.
-- Primary polygon names are missing on 22/622, operators on 81 and references on 595.
-- Review polygon names are missing on 34/448, operators on 100, references on 446 and numeric voltage on 37.
-
-The source includes one populated raw polygon `start_date`; it is not used as a verified commissioning year. Unknown details display **Not available**. UI fallback names are marked as such. Operator names are source strings, not verified ownership.
-
-## Remaining Deliverable 2 requirements
-
-| ToR requirement from the supplied guide | Current implementation | Needed evidence/data |
-| --- | --- | --- |
-| Existing 70/150/275/500 kV lines | Preliminary OSM subset, status unverified | Authoritative route/asset registry, validation and crosswalk |
-| GI/GITET substations | Tagged primary polygons plus separate review queue | Official station identifiers, scope and deduplication |
-| By power system and region | No fabricated grouping or filter | Authoritative electrical-system crosswalk and agreed regional/province boundaries/attribution |
-| RUPTL 2025–2034 / RUKN 2025–2060 planned lines/substations | Missing data documented in About; no records or speculative runtime type | Approved project inventory and available spatial layers |
-| HVDC, converter stations and interconnections | No verified classification/projects | Authoritative technology/project records |
-| Overhead/submarine/underground | Original `location` shown where supplied | Validation of asset technology and route sections |
-| COD, capacity/MVA, thermal ratings, official circuit-km, AIS/GIS, costs | Not available | Authoritative values, units, dates and source references |
-| Source log and dictionary | Published catalog, QA, hashes, method and dictionary; download UI removed | Source vintage remains unknown |
-
-The original ToR document was not present in the repository, so its text could not be independently inspected. Traceability follows `CODEX_START_HERE.md`. The supplied `data/raw/License.pdf` was read. No restricted BNEF material was supplied or published.
-
-Point–polygon source matching is now screened reproducibly; physical duplicate identity, point–point station identity, electrical connectivity, route identity and official status remain unvalidated. The prior audit also found polygon–polygon overlaps, including two primary–review pairs and a review–review pair; their original feature subsets remain unchanged. No official unique-station total is claimed. Geodesic lengths are not official route lengths or circuit-km.
-
-The map displays derived interior symbols for the same selected polygon records below zoom 10, then original footprints from zoom 10. Symbols are not counted as additional records. Separate point-only symbols retain original source locations. The deduplicated **rendered in viewport** count can differ from selected-record counts because of view extent and scale-dependent rendering; the list retains all matching original records.
-
-## Data reuse
-
-The processed derivative database is distributed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/) with [OpenStreetMap attribution](https://www.openstreetmap.org/copyright) and OpenInfraMap credit. Each GeoJSON embeds the license URI and attribution. The About download section is removed; all nine static `/data/` files remain accessible for browser rendering. Source/reference documents and internal QA stay outside static publication. Basemap reuse follows the configured provider's terms.
-
-## Reading the filters and legend
-
-The in-map Layers panel combines five persistent layer choices, symbols and folded voltage/status controls. Choices remain available even if disabled or without matches; their presence is not evidence of features currently rendered. It shows no source totals. Cards/list count original records matching all filters; viewport counts remain separate. Power plants have their own count/symbol and ignore grid voltage controls. Line colors and source-status patterns stay separate. Review/point candidates remain unvalidated and unknown voltage is not guessed. See [current Layers UI verification](LAYERS_CONTROL_REFACTOR.md).
+The local source `License.pdf` identifies OSM data under ODbL. Source attribution, derivative license notices and basemap credits remain visible; [README](../README.md#attribution-and-assets) records attribution and font provenance. Static data URLs are publicly fetched by the app even without download controls. Raw/reference files, restricted materials and internal QA are not static assets.

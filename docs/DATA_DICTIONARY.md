@@ -1,82 +1,75 @@
 # Data dictionary
 
-The five original-record inventory/review GeoJSONs are RFC 7946 FeatureCollections in EPSG:4326 longitude/latitude. The original three line/polygon exports remain unchanged, without simplification or dissolve, at seven coordinate decimals and normalized ring winding. Point-only candidates retain exact original point coordinates. Each original inventory/review feature has a string `id`, identical to `properties.feature_id`, and geometry-derived `[west,south,east,north]` `bbox`. A sixth GeoJSON contains derived substation display points, separately identified and excluded from inventory counts. Each collection embeds attribution and the ODbL URI.
+Publication schema **3**, pipeline **1.2.0**. GeoJSON uses RFC 7946 longitude/latitude in EPSG:4326, collection attribution/license notices and original signed source IDs. Selection rules belong to [the filter specification](DATA_FILTER_SPEC.md).
+
+## Publication files
+
+| File in `public/data/` | Records / role | Bytes |
+| --- | ---: | ---: |
+| `transmission-lines.geojson` | 4,374 original segments | 6,151,922 |
+| `substations-primary.geojson` | 622 original polygons | 646,266 |
+| `substations-review.geojson` | 448 original review polygons | 450,635 |
+| `substations-point-candidates.geojson` | 32 unvalidated original points | 36,376 |
+| `power-plants.geojson` | 643 original footprints | 1,111,875 |
+| `substation-display-points.geojson` | 1,070 derived, uncounted symbols | 490,830 |
+| `summary.json` | Counts/completeness | 5,017 |
+| `data-catalog.json` | Provenance/policies/checksums | 10,799 |
+| `qa-report.json` | Aggregate structural/source QA | 12,790 |
+
+Six GeoJSONs total **8,887,904 bytes**; all nine files total **8,916,510 bytes**. There are **6,119 original records** across all flags. Symbols do not increase that count. The original line/primary/review geometry exports remain unchanged; points and plant footprints preserve full source coordinate precision.
+
+## Original-record properties
 
 | Property | Type | Meaning |
 | --- | --- | --- |
-| `feature_id` | string | `<source_layer>:<source_id>`, unique across original inventory/review exports. Derived display symbols intentionally reuse their parent's ID. |
-| `source_layer` | string | Original `power_line`, `power_substation_polygon`, `power_substation_point` or `power_plant`. |
-| `source_id` | string | Original `id`, never GeoPackage `fid`. Negative IDs preserved. OSM element kind is not verified. |
-| `asset_type` | string | `transmission_line`, `substation_polygon`, `substation_point` or `power_plant`. Candidate status does not establish physical asset identity. |
-| `display_name` | string | Original nonblank name, otherwise `Unnamed line/substation · OSM ID …`. |
-| `display_name_is_fallback` | boolean | Synthetic interface label flag; a fallback is not an official name. |
-| `name`, `ref`, `operator` | string or null | Original source values, without ownership verification or label-based inference. |
-| `max_voltage_v` | number or null | Original numeric `max_voltage`, in **volts**. |
-| `max_voltage_kv` | number or null | Finite positive numeric `max_voltage_v / 1000`; display only. |
-| `voltages_raw` | string or null | Original `voltages`, including empty/multi-value strings. |
-| `all_voltages_kv` | number[] | Distinct finite positive numeric semicolon tokens / 1000, in source order. Invalid tokens are not coerced; raw value is retained. Never widens the numeric maximum-voltage filter. |
-| `construction` | boolean or null | Original flag. All supplied core-layer records have a nonnull value. |
-| `disused` | boolean or null | Original line flag. Null for substations and plants, whose source layers have no such field. |
-| `osm_tag_status` | string | Source flag category below; not official project or operational status. |
-| `source_status_verified` | false | Always false for these datasets. |
-| `substation_type` | string or null | Original polygon type; null for lines. `distribution` remains unchanged in review records. |
-| `review_reason` | string or null | One of three polygon reasons below or `point_only_unvalidated`; null for lines/primary polygons. |
-| `location` | string or null | Original line location (e.g. overhead/underwater); null for polygons. Not an HVDC classifier. |
-| `circuits` | number or null | Original known line value; null when absent and for polygons. No default of one. |
-| `mapped_geometry_length_km` | number or null | WGS84 ellipsoidal line geometry length via `pyproj.Geod`; full calculation precision in export, two decimals in UI. Not official route length or circuit-km. Null for polygons. |
+| `feature_id` | string | `<source_layer>:<source_id>`, also the GeoJSON feature `id` |
+| `source_layer`, `source_id` | string | Original layer and signed `id`, never GeoPackage `fid`; OSM element kind unknown |
+| `asset_type` | string | `transmission_line`, `substation_polygon`, `substation_point` or `power_plant` |
+| `display_name`, `display_name_is_fallback` | string, boolean | Source name or explicit synthetic label with original ID |
+| `name`, `ref`, `operator` | string or null | Original attributes; no ownership/identity certification |
+| `max_voltage_v`, `max_voltage_kv` | number or null | Source numeric volts and finite positive value / 1000 |
+| `voltages_raw` | string or null | Unchanged source voltage text |
+| `all_voltages_kv` | number[] | Valid positive semicolon tokens / 1000, unique in source order; not a selection predicate |
+| `construction`, `disused` | boolean or null | Source flags; absent disused field remains null for substations/plants |
+| `osm_tag_status` | string | `not_flagged_in_osm`, `tagged_construction`, `tagged_disused`; conflicting flags are quarantined, not published |
+| `source_status_verified` | false | Source flags do not verify operation |
+| `substation_type` | string or null | Original substation role, unchanged |
+| `review_reason` | string or null | One of the three polygon reasons in the filter spec, or `point_only_unvalidated`; otherwise null |
+| `location`, `circuits` | string / number or null | Original line attributes; no inferred location or default circuit count |
+| `mapped_geometry_length_km` | number or null | WGS84 geodesic line length, not official circuit-km; null for other assets |
 
-## Source flag categories
+Original records include a geometry-derived `bbox=[west,south,east,north]`. Null means unavailable; invalid voltage tokens are ignored in parsing while raw text is retained.
 
-| Value | Predicate | Application behavior |
-| --- | --- | --- |
-| `not_flagged_in_osm` | Neither flag true; absent polygon disused field is not asserted false in output. | Default visible; unverified operation. |
-| `tagged_construction` | Construction true, disused not true. | Optional; dashed map styling, explicit details. |
-| `tagged_disused` | Disused true, construction not true. | Optional; dotted/faded lines. |
-| `conflicting_tags` | Both true. | Internal quarantine; never published or included in map filters. Supplied source has zero conflicts. |
+## Point-candidate properties
 
-## Polygon selection
-
-Primary: `substation_type == 'transmission'` and numeric `max_voltage` in `{70000,150000,275000,500000}`. Review is the disjoint union:
-
-| `review_reason` | Exact predicate | Supplied-source count |
-| --- | --- | ---: |
-| `transmission_missing_voltage` | Transmission type and null numeric maximum voltage | 37 |
-| `high_voltage_unknown_type` | Target numeric maximum voltage and null type | 239 |
-| `high_voltage_distribution_tag` | Target numeric maximum voltage and distribution type | 172 |
-
-The two candidate toggles are independent of primary-substation visibility. With either enabled, **Unknown voltage** controls the 37 missing-voltage polygon candidates and all 32 point-only candidates. It is enabled initially; selecting only a numeric voltage still includes unknowns until this checkbox is cleared. No value is guessed from a name, nearby line or containing polygon.
-
-## Point-only candidates and representative symbols
-
-`substations-point-candidates.geojson` contains only eligible `distinct_point_only_candidate` source points under the [versioned matching policy](SUBSTATION_MATCHING.md). It never contains the two matched or 25 uncertain source points. Nine additional distinct records remain held for role/function review. All published source points retain unknown voltage and `source_status_verified=false`.
-
-| Additional point property | Meaning |
+| Property | Meaning |
 | --- | --- |
-| `geometry_role` | `original_point`; original source location retained. |
-| `matching_classification` | `distinct_point_only_candidate`, relative to the policy and export, not verified physical-station identity. |
-| `matching_reason` | Deterministic QA decision reason. |
-| `matching_version` | Matching policy version (`1.0.0`). |
-| `nearest_polygon_feature_id` | Nearest raw source polygon, possibly outside publication; contextual link only. |
-| `nearest_polygon_distance_m` | Point-centered WGS84 AEQD screening distance to polygon geometry, not official survey accuracy. |
+| `geometry_role` | `original_point` |
+| `matching_classification` | `distinct_point_only_candidate`, not certified physical identity |
+| `matching_reason`, `matching_version` | QA decision and policy version |
+| `nearest_polygon_feature_id` | Nearest raw polygon, potentially outside publication; context only |
+| `nearest_polygon_distance_m` | Per-point WGS84 AEQD screening distance, not survey accuracy |
 
-`substation-display-points.geojson` contains 1,070 derived Point features, one per published polygon. Its smaller presentation-only properties are `feature_id`, `source_id`, `represented_feature_id`, `inventory_group` (`primary`/`review`), `geometry_role=derived_polygon_representative_point`, `counts_as_inventory=false` and `method`. Both feature `id` and `represented_feature_id` equal the parent polygon's ID; repeated IDs across a parent and its symbol are intentional, not additional inventory records. Symbols are generated inside the published footprint with Shapely point_on_surface, without changing the footprint. They use the parent's filtered attributes at render time and do not inherit a separate source point's identity.
+All 32 candidates retain null numeric voltage and exact source coordinates. Unknown-voltage filtering also controls the 37 missing-voltage review polygons. It starts enabled and is independent of numeric voltage choices. See [matching](SUBSTATION_MATCHING.md).
 
-## Power-plant properties
+## Plant properties
 
-`power-plants.geojson` has `asset_type=power_plant`, original Polygon/MultiPolygon geometry at full source precision, `geometry_role=original_power_plant_footprint`, original signed IDs and null voltage/disused fields. `plant_source`, `plant_method`, `plant_output_raw`, `plant_start_date_raw`, `plant_name_en`, `plant_description` and `plant_wikidata` preserve source attributes. `plant_output_unit=null` records missing units; raw output is not verified capacity or assumed MW. Raw start date is not verified COD. `plant_representative_point` contains derived interior longitude/latitude for display, not another source record. Runtime symbols reuse the parent ID and set `counts_as_inventory=false`.
+Plants have `geometry_role=original_power_plant_footprint` and null voltage/disused fields. `plant_source`, `plant_method`, `plant_output_raw`, `plant_start_date_raw`, `plant_name_en`, `plant_description` and `plant_wikidata` preserve source attributes.
 
-`datasets.power_plants` and `default_selection.plants` are separate from primary/review counts. `power_plant_presentation` describes embedded representatives; `power_plant_policy` in the catalog documents voltage independence and source limitations. See [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md).
+`plant_output_unit=null`: raw output is not assumed MW or verified capacity. Raw start date is not verified COD. `plant_representative_point=[longitude,latitude]` is a derived interior display location, not another source record.
 
-## Metadata
+## Substation display points
 
-Metadata totals describe complete published subsets across source flags. They are not filter results. The Layers panel does not repeat source totals; cards and the list count matching original records. Layer choices remain available even without matches, while context-dependent construction swatches use matching original records. `Unknown voltage` covers 37 review polygons and all 32 optional source points when those layers are enabled. No data property or serialized output changed for the unified Layers control; see [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md).
+One interior Point per published primary/review polygon. Properties: `feature_id`, `source_id`, `represented_feature_id`, `inventory_group` (`primary`/`review`), `method`, `geometry_role=derived_polygon_representative_point` and `counts_as_inventory=false`.
 
-Schema-v3 `summary.json` contains raw counts for all layers, actual per-subset counts, statuses, maximum-voltage distributions, missing-value metrics, fallback-label counts, review reasons, default selection and GeoJSON byte sizes. `datasets.point_candidates` is separate from `datasets.review`; `substation_point_matching` contains 2/25/41 classification counts and eligibility totals. `substation_presentation` holds symbol count, zoom threshold and its non-inventory role. `planned_assets.count` is null, not zero: no authoritative dataset was provided.
+Both feature ID and represented ID equal the parent polygon ID. Parent/symbol repetition is intentional; filtering, selection and statistics resolve the original record. Plant symbols follow the same counting rule at runtime.
 
-`data-catalog.json` provides source/licensing, unknown source vintage, input SHA-256, original/output CRS, transformation description, matching policy, field meanings, limitations and each GeoJSON's role/count/bytes/SHA-256. Presentation datasets are not added to inventory counts. `data_version` combines source hash prefix and pipeline version (`1.2.0`); no current timestamp is inserted, so identical processing is byte deterministic.
+## Metadata and private QA
 
-`qa-report.json` contains all-layer metadata/counts; core-layer fields/nulls, validity, bounds, geometry types and duplicate/negative IDs; voltage-tag inconsistencies; exclusion counts; conflict/point counts; actual audit metrics; exact expected/actual differences; publication validation and unchanged-source checks. QA PASS covers structural and selection checks, not official asset validation. Frontend/backend test execution results live in the implementation report, not a fabricated test stamp in generated data.
+- `summary.json`: source fingerprint/vintage, raw/per-subset counts, statuses, voltage distributions, missing values, fallback labels, review reasons, default selection, presentation/matching aggregates and GeoJSON byte sizes. Missing planned data has count null, not zero.
+- `data-catalog.json`: source/license links, CRS, method, matching/plant policies, field meanings, limitations and each GeoJSON's role/count/bytes/SHA-256.
+- `qa-report.json`: raw-layer inventory, geometry/attribute/ID checks, voltage inconsistencies, exclusions, audit actuals/differences, matching/plant QA and unchanged-source proof. PASS is structural/selection QA, not official asset validation.
 
-Internal `data/qa/exclusion-report.json` records the layer, original ID, voltage, type, status and exclusion reason for every excluded line/polygon. Other layers have counted scope exclusions; points are held separately. The original ToR and license PDF are not public assets.
+`data_version` combines the source hash prefix with pipeline version; no current timestamp affects determinism. Use all nine files from one run.
 
-Internal `substation-matching-report.json` and CSV account for all 68 points and all 187,204 comparisons, retaining original point attributes/geometries, matching evidence, classifications, publication holds and policy. Public aggregate QA includes the policy/counts and representative-symbol containment check. The source audit in `expected-audit.json` remains unchanged; no station voltage or official identity is inferred.
+Private `data/qa/` contains exclusion records, conflict quarantine, source-point review and reproducible full matching JSON/CSV. Raw source, reference documents and these internal evidence tables are not publication assets.

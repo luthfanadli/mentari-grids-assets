@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { AssetFeature, AssetFilters, OsmStatus } from '../types/assets'
 import { VOLTAGES } from '../utils/filterAssets'
 import { STATUS_LABELS, VOLTAGE_COLORS } from '../utils/formatAssets'
-import { selectedMapLegend } from '../utils/substationPresentation'
+import { polygonStyleState } from '../utils/substationPresentation'
 
 const filters = defineModel<AssetFilters>({ required: true })
 const props = defineProps<{
@@ -13,7 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{ reset: []; retryReview: []; retryPoints: [] }>()
 const root = ref<HTMLElement | null>(null), button = ref<HTMLButtonElement | null>(null)
 const opened = ref(false)
-const key = computed(() => selectedMapLegend(props.features))
+const styles = computed(() => polygonStyleState(props.features))
 const statuses: OsmStatus[] = ['not_flagged_in_osm', 'tagged_construction', 'tagged_disused']
 
 async function toggle() {
@@ -82,8 +82,8 @@ onBeforeUnmount(() => {
         <fieldset class="asset-layer-list">
           <legend class="sr-only">Asset layers</legend>
           <label class="layer-row"><input v-model="filters.lines" type="checkbox"/><span class="symbol-pair" aria-hidden="true"><i class="layer-key line-key"></i></span><span>Transmission lines</span></label>
-          <label class="layer-row"><input v-model="filters.primary" type="checkbox" :aria-description="key.constructionPrimary ? 'Amber symbols mark construction-tagged substations.' : undefined"/><span class="symbol-pair" aria-hidden="true"><i class="layer-key primary-key" :class="{ round: overview, 'construction-primary-sample': key.constructionPrimary && !key.primary }"></i><i v-if="key.constructionPrimary && key.primary" class="layer-key primary-key extra-key construction-primary-sample" :class="{ round: overview }" title="Construction-tagged substation"></i></span><span>Primary substations</span></label>
-          <label class="layer-row"><input v-model="filters.powerPlants" type="checkbox"/><span class="symbol-pair" aria-hidden="true"><i class="layer-key plant-key" :class="{ diamond: overview, 'construction-plant-key': key.constructionPlants && !key.plants }"></i><i v-if="key.constructionPlants && key.plants" class="layer-key plant-key extra-key construction-plant-key" :class="{ diamond: overview }" title="Construction-tagged plant"></i></span><span>Power plants</span></label>
+          <label class="layer-row"><input v-model="filters.primary" type="checkbox" :aria-description="styles.constructionPrimary ? 'Amber symbols mark construction-tagged substations.' : undefined"/><span class="symbol-pair" aria-hidden="true"><i class="layer-key primary-key" :class="{ round: overview, 'construction-primary-sample': styles.constructionPrimary && !styles.primary }"></i><i v-if="styles.constructionPrimary && styles.primary" class="layer-key primary-key extra-key construction-primary-sample" :class="{ round: overview }" title="Construction-tagged substation"></i></span><span>Primary substations</span></label>
+          <label class="layer-row"><input v-model="filters.powerPlants" type="checkbox"/><span class="symbol-pair" aria-hidden="true"><i class="layer-key plant-key" :class="{ diamond: overview, 'construction-plant-key': styles.constructionPlants && !styles.plants }"></i><i v-if="styles.constructionPlants && styles.plants" class="layer-key plant-key extra-key construction-plant-key" :class="{ diamond: overview }" title="Construction-tagged plant"></i></span><span>Power plants</span></label>
           <p class="candidate-label">Optional candidates</p>
           <label class="layer-row"><input v-model="filters.review" type="checkbox"/><span class="symbol-pair" aria-hidden="true"><i class="layer-key review-key" :class="{ round: overview }"></i></span><span>Review polygons</span></label>
           <p v-if="reviewLoading && filters.review" class="layers-note" role="status">Loading review polygons…</p>
@@ -146,7 +146,7 @@ input { width: 15px; height: 15px; margin: 0; flex: none; accent-color: var(--br
 .point-key { background: white; border: 2px solid #b8406a }
 .plant-key { background: #d0203033; border: 1px solid #b72236 }
 .plant-key.diamond { transform: rotate(45deg); background: #b72236; border-color: #fff }
-.plant-key.construction-plant-key { background: #fff9f0; border-color: #b72236; border-style: dashed }
+.plant-styles.construction-plant-key { background: #fff9f0; border-color: #b72236; border-style: dashed }
 .candidate-label { margin: 8px 6px 3px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; font-weight: 650 }
 .layers-note { margin: 5px 6px 7px; color: var(--muted); font-size: 10px; line-height: 1.5 }
 .candidate-note { margin-bottom: 10px }

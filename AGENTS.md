@@ -1,33 +1,28 @@
-# Codex Repository Instructions — MENTARI Grids D2
+# Repository instructions — MENTARI Grids D2
 
-## Context
-This is an **existing Vue 3 + Vite + TypeScript** repository. DO NOT scaffold Vue/Vite again, replace `package.json`, regenerate the lockfile unnecessarily, or rewrite the app without inspecting the current project.
+This is an existing Vue 3 + Vite + TypeScript application. Inspect and reuse it; do not scaffold, replace package.json or regenerate the pnpm lockfile unnecessarily.
 
-Build **MENTARI Grids — Transmission Asset Inventory** for **Deliverable 2 only**. Read `CODEX_START_HERE.md`, `docs/DATA_FILTER_SPEC.md` and `docs/VERIFIED_DATA_AUDIT.md` before making changes. Read the actual source ToR and license if present under `docs/references/`. Inspect the real `data/raw/IDN.gpkg` before implementing the pipeline.
+Read [the maintenance guide](CODEX_START_HERE.md), [filter specification](docs/DATA_FILTER_SPEC.md) and [source audit](docs/VERIFIED_DATA_AUDIT.md) before changes. Inspect the real GeoPackage before changing preprocessing. Read source ToR/license documents if present; keep them outside public assets.
 
-## Invariants
-1. Data provenance first. NEVER invent grid features, verified operational status, RUPTL/RUKN planned projects, COD, official circuit-km, capacity, power-system membership or official province attribution.
-2. Stage the work: **inspect raw data -> implement & test preprocessing -> run it -> verify counts/QA -> implement UI -> build/test -> document Vercel deployment**.
-3. Preserve original GeoPackage unchanged and gitignore `data/raw/`, Python virtual environments, temporary files and secrets.
-4. Filter at preprocessing time. Publish only the intended lines, substation datasets and user-authorized power-plant context dataset to `public/data/`; do not load or deploy all 26 GeoPackage layers.
-5. The default WebGIS represents a **preliminary OSM-based inventory**. `construction=false` and `disused=false` mean **not flagged**, not independently verified existing/operational.
-6. Only `500, 275, 150, 70 kV` are in the default transmission-voltage scope; numeric source `max_voltage` is in **volts**. Use `max_voltage / 1000` strictly for display.
-7. Distinguish substations selected by explicit transmission tags from substations needing manual validation. Review candidates are OFF by default.
-8. Substation polygons, not individual transformers or power plants, form the primary substation layer. Point substations require QA first.
-9. Honor OSM/ODbL attribution. Do not expose the original ToR, restricted BNEF material or other potentially internal reference documents as static assets.
-10. Keep the interface in English, accessible and responsive. Make real functionality work before extra styling. No backend, database, PMTiles or object storage for this MVP unless profiling proves necessary.
+## Data invariants
 
-## Development and reporting
-- Reuse the package manager and lockfile already in the repository.
-- New frontend dependencies should be few and justified (MapLibre GL JS is expected).
-- Implement the deterministic filter and metadata scripts in Python (GeoPandas/Pyogrio or Fiona, Shapely and PyProj are appropriate).
-- Add programmatic tests for counts, voltage normalization, status categorization and candidate selection.
-- Show exact QA differences rather than silently updating expected counts.
-- Update the existing README and provide `docs/DATA_DICTIONARY.md`, `docs/DATA_COVERAGE_AND_LIMITATIONS.md` and `docs/DEPLOYMENT.md` as implementation outputs.
-- Final Codex report must state changed files, output sizes/counts, commands executed, test/build results, and remaining ToR gaps.
+- Never invent features, operational status, planned RUPTL/RUKN projects, COD, capacity, circuit-km, electrical connectivity or official region/system membership.
+- Preserve the source GeoPackage unchanged. Keep raw data, QA, virtual environments, secrets and restricted references out of publication.
+- Read only the four approved spatial layers. Select lines by numeric max_voltage in {70000, 150000, 275000, 500000} volts; divide by 1000 for display only.
+- Keep 622 primary substation polygons distinct from 448 review polygons and 32 optional point candidates. Candidate layers are off by default. Missing-voltage points never enter primary inventory.
+- Matching must evaluate all source points against all raw polygons. Intersection/proximity/ID equality alone does not prove duplicate identity or supply voltage.
+- Publish source power-plant footprints as separate generation context. Do not import individual generators or infer output units, MW, COD or connections.
+- Not flagged means neither construction nor disused is tagged where those fields exist; it does not verify operation.
+- Preserve original IDs, geometry, source attribution and ODbL notices. Derived symbols reuse parent IDs and never inflate statistics.
 
-## Current UI and maintenance
-- Follow the current [Layers and filter behavior](README.md#filters-and-legend): one in-map Layers panel, no sidebar or standalone legend. Keep all five layer choices available, including when off/empty; derive contextual swatches and counts from matching original records. See [LAYERS_CONTROL_REFACTOR.md](docs/LAYERS_CONTROL_REFACTOR.md).
-- Power plants are user-authorized context: publish source footprints, preserve output units as unknown, and keep them independent of grid voltage filters. Do not import generator layers or infer MW/COD/connections. See [the plant report](docs/POWER_PLANTS_REPORT.md).
-- Keep line-voltage colors separate from source-status patterns. Candidate layers stay optional/default-off, and missing voltage never becomes an inferred value.
-- Retain data/source QA and historical evidence during cleanup. Remove confirmed unused demo assets/styles/types; do not recreate starter components or speculative planned records. See [the cleanup report](docs/SIMPLIFICATION_REPORT.md).
+## Development
+
+Use the existing pnpm scripts and Python GIS pipeline. For data changes: inspect source, update/test preprocessing, generate to a temporary directory, review exact QA differences, then update all nine publication files together. Do not weaken checksum checks or silently rewrite expected audit fixtures.
+
+Keep the English UI accessible and responsive. Maintain one in-map Layers panel, persistent off/empty choices, independent candidate loading, and separate inventory/viewport counts. Preserve map-interaction and keyboard behavior.
+
+Keep dependencies few. No backend, database, object store or PMTiles without demonstrated need. Deployment requires user authorization.
+
+Maintain the focused documents linked from README; update facts in their owning document instead of adding repetitive change reports. Remove confirmed unused code/assets while retaining provenance, audit fixtures, reproducible matching and meaningful tests.
+
+Run relevant tests and the production build. Final reports should state changes, commands/results, unchanged or changed data counts/sizes, and unresolved scope gaps.
