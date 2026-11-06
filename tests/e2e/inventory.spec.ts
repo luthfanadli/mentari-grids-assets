@@ -40,6 +40,14 @@ test('real map, flags, lazy candidates, search, details and empty state work tog
   await page.getByRole('button', { name: /GITET Pedan/ }).click()
   await expect(page.getByTestId('asset-details')).toContainText('500000;150000;20000')
   await expect(page.getByTestId('asset-details')).toContainText('Unverified operation')
+  await expect(page.locator('.map-card').getByTestId('asset-details')).toBeVisible()
+  const selectedMap = (await page.getByTestId('map').boundingBox())!
+  const selectedDetails = (await page.getByTestId('asset-details').boundingBox())!
+  expect(selectedDetails.x).toBeGreaterThan(selectedMap.x)
+  expect(selectedDetails.y).toBeGreaterThan(selectedMap.y)
+  expect(selectedDetails.x + selectedDetails.width).toBeLessThan(selectedMap.x + selectedMap.width)
+  expect(selectedDetails.y + selectedDetails.height).toBeLessThan(selectedMap.y + selectedMap.height)
+  await expect(page.getByTestId('asset-details').locator('.detail-footnote')).toHaveCount(0)
   await page.getByRole('button', { name: 'Close feature details' }).click()
   // The selected footprint is centered by the map; confirm map clicks open its details too.
   await expect(page.locator('.viewport-count')).toContainText('1 rendered in viewport')
@@ -157,6 +165,35 @@ test('mobile filters, details and attribution fit the viewport', async ({ page }
   await page.getByRole('searchbox').fill('-18678451')
   await page.getByRole('button', { name: /GITET Pedan/ }).click()
   await expect(page.getByTestId('asset-details')).toBeVisible()
+  const mobileMap = (await page.getByTestId('map').boundingBox())!
+  const mobileDetails = (await page.getByTestId('asset-details').boundingBox())!
+  const mobileFrame = (await page.locator('.map-frame').boundingBox())!
+  expect(mobileDetails.y).toBeGreaterThan(mobileMap.y)
+  expect(mobileDetails.x).toBeGreaterThan(mobileMap.x)
+  expect(mobileDetails.y + mobileDetails.height).toBeLessThanOrEqual(mobileFrame.y + mobileFrame.height + 1)
+  expect(mobileMap.height).toBeCloseTo(mobileFrame.height, 0)
+  expect(mobileMap.height).toBeGreaterThanOrEqual(480)
+  expect(mobileMap.height).toBeLessThanOrEqual(620)
+  const symbol = displaySymbols.find((feature: any) => feature.id === 'power_substation_polygon:-18678451')
+  const project = (lng: number, lat: number) => [(lng + 180) / 360, (1 - Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) / Math.PI) / 2]
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 })
+    await expect.poll(async () => {
+      const map = page.getByTestId('map'), bounds = (await map.boundingBox())!
+      const popup = (await page.getByTestId('asset-details').boundingBox())!
+      const view = project(Number(await map.getAttribute('data-center-lng')), Number(await map.getAttribute('data-center-lat')))
+      const point = project(...symbol.geometry.coordinates as [number, number])
+      const size = 512 * 2 ** Number(await map.getAttribute('data-zoom'))
+      const x = bounds.x + bounds.width / 2 + (point[0]! - view[0]!) * size
+      const y = bounds.y + bounds.height / 2 + (point[1]! - view[1]!) * size
+      return x > bounds.x + 20 && x < bounds.x + bounds.width - 20 && y > bounds.y + 30 && y < popup.y - 10
+    }).toBe(true)
+  }
+  const attributes = page.getByRole('region', { name: 'Asset attributes', exact: true })
+  await attributes.focus()
+  await attributes.press('End')
+  await expect.poll(() => attributes.evaluate(element => element.scrollTop)).toBeGreaterThan(0)
+  await expect(page.getByRole('button', { name: 'Close feature details' })).toBeVisible()
   await page.getByRole('button', { name: 'Close feature details' }).click()
   await page.getByRole('button', { name: /Change basemap:/ }).click()
   const picker = page.getByRole('dialog', { name: 'Basemap options' })
@@ -186,6 +223,19 @@ test('MENTARI logo, compact legend and one extent control keep the map usable', 
   await expect.poll(async () => decodeURIComponent(await logo.getAttribute('src') ?? '')).toBe('/images/Mentari Logo_Tagline Revamp_Color.png')
   await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0)
   await expect(page.getByRole('region', { name: 'Selected record counts' }).locator('.metric-card')).toHaveCount(5)
+  const filterToggle = (await page.locator('.filter-toggle').boundingBox())!
+  const searchBox = (await page.locator('.search-box').boundingBox())!
+  expect(filterToggle.x + filterToggle.width).toBeLessThanOrEqual(searchBox.x)
+  expect(searchBox.x - filterToggle.x - filterToggle.width).toBeLessThanOrEqual(12)
+  const mapBeforeCollapse = (await page.getByTestId('map').boundingBox())!
+  expect(mapBeforeCollapse.height).toBeGreaterThanOrEqual(520)
+  expect(mapBeforeCollapse.height).toBeLessThanOrEqual(720)
+  await page.getByRole('button', { name: 'Filters −', exact: true }).click()
+  await expect(page.getByRole('complementary', { name: 'Inventory filters' })).not.toBeVisible()
+  const expandedMap = (await page.getByTestId('map').boundingBox())!
+  expect(expandedMap.width).toBeGreaterThan(mapBeforeCollapse.width + 200)
+  await page.getByRole('button', { name: 'Filters +', exact: true }).click()
+  await expect(page.getByRole('complementary', { name: 'Inventory filters' })).toBeVisible()
   await expect(page.getByText('CURRENT SCOPE', { exact: true })).toHaveCount(0)
   const legend = page.getByRole('button', { name: 'Legend', exact: true })
   await expect(legend).toHaveAttribute('aria-expanded', 'false')
@@ -333,6 +383,17 @@ test('Google basemap switch retains filters, camera, overlays and separate attri
   await picker.getByText('Google Satellite', { exact: true }).click()
   await expect(picker).not.toBeVisible()
   await expect(page.getByRole('button', { name: /Change basemap:/ })).toBeFocused()
+  for (const width of [1280, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 })
+    const inner = attribution.locator('.maplibregl-ctrl-attrib-inner')
+    await expect.poll(() => inner.evaluate(element => element.getBoundingClientRect().height <= parseFloat(getComputedStyle(element).lineHeight) + 1)).toBe(true)
+    const creditBox = (await attribution.boundingBox())!
+    const mapBox = (await map.boundingBox())!
+    expect(creditBox.x).toBeGreaterThanOrEqual(mapBox.x)
+    expect(creditBox.x + creditBox.width).toBeLessThanOrEqual(mapBox.x + mapBox.width + 1)
+    await expect(attribution.getByRole('link', { name: 'Google Maps', exact: true })).toBeVisible()
+    await expect(attribution.getByRole('link', { name: 'OpenStreetMap contributors', exact: true })).toBeVisible()
+  }
 })
 
 test('power-plant symbols open original footprints and stay independent of grid voltage', async ({ page }) => {

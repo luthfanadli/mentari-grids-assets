@@ -4,7 +4,7 @@ defineEmits<{ about: [] }>()
 <template>
   <header class="app-header">
     <a class="brand" href="#main" aria-label="MENTARI Grids inventory"><img class="brand-logo" src="/images/Mentari Logo_Tagline Revamp_Color.png" alt="MENTARI logo" width="1890" height="1063"/><span><strong>MENTARI <span>Grids</span></strong><small>TRANSMISSION ASSET INVENTORY</small></span></a>
-    <nav aria-label="Main navigation"><a class="nav-active" href="#main" aria-current="page">Inventory</a><button class="nav-button" @click="$emit('about')">About the data <span aria-hidden="true">↗</span></button></nav>
+    <button class="nav-button" @click="$emit('about')">About the data <span aria-hidden="true">↗</span></button>
   </header>
 </template>
 

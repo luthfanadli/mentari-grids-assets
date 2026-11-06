@@ -5,16 +5,22 @@ import { STATUS_LABELS, REVIEW_LABELS, formatValue, formatVoltage } from '../uti
 const props = defineProps<{ feature: AssetFeature }>()
 const emit = defineEmits<{ close: [] }>()
 const closeButton = ref<HTMLButtonElement | null>(null)
+const content = ref<HTMLElement | null>(null)
 const previousFocus = document.activeElement as HTMLElement | null
 const p = computed(() => props.feature.properties)
-watch(() => props.feature, async () => { await nextTick(); closeButton.value?.focus() }, { immediate: true })
+watch(() => props.feature, async () => {
+  await nextTick()
+  if (content.value) content.value.scrollTop = 0
+  closeButton.value?.focus()
+}, { immediate: true })
 function onEscape(event: KeyboardEvent) { if (event.key === 'Escape') emit('close') }
 onMounted(() => document.addEventListener('keydown', onEscape))
 onBeforeUnmount(() => { document.removeEventListener('keydown', onEscape); previousFocus?.focus() })
 </script>
 <template>
   <aside class="details-drawer" role="region" aria-labelledby="detail-title" data-testid="asset-details">
-    <div class="drawer-heading"><span class="eyebrow">SOURCE RECORD</span><button ref="closeButton" class="icon-button" aria-label="Close feature details" @click="$emit('close')">×</button></div>
+    <div class="drawer-heading"><span class="eyebrow">ASSET DETAILS</span><button ref="closeButton" class="icon-button" aria-label="Close feature details" @click="$emit('close')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <div ref="content" class="details-content" role="region" aria-label="Asset attributes" tabindex="0">
     <span class="asset-kind">{{ p.asset_type === 'power_plant' ? 'Power plant footprint' : p.asset_type === 'substation_point' ? 'Unvalidated point-only candidate' : p.review_reason ? 'Review polygon candidate' : p.asset_type === 'transmission_line' ? 'Transmission line segment' : 'Primary substation polygon' }}</span>
     <h2 id="detail-title">{{ p.display_name }}</h2><p v-if="p.display_name_is_fallback" class="filter-note">Interface fallback label. No source name is available.</p>
     <div class="detail-badges"><span v-if="p.asset_type !== 'power_plant'" class="badge">{{ formatVoltage(p.max_voltage_kv) }}</span><span v-else class="badge">{{ p.plant_source || 'Energy source unavailable' }}</span><span class="badge muted-badge">Unverified operation</span></div>
@@ -49,6 +55,6 @@ onBeforeUnmount(() => { document.removeEventListener('keydown', onEscape); previ
       <div v-if="p.asset_type === 'transmission_line'"><dt>Mapped geometry length</dt><dd>{{ p.mapped_geometry_length_km === null ? 'Not available' : p.mapped_geometry_length_km.toFixed(2) + ' km' }}<small>WGS84 geodesic measurement; not official circuit-km.</small></dd></div>
       <div><dt>Official region / power system</dt><dd>Not available</dd></div><div><dt>Verified COD / capacity / AIS–GIS</dt><dd>Not available</dd></div>
     </dl>
-    <p class="detail-footnote">OSM flags are source observations, not confirmation of present existence or operation. Substation and power-plant layers have no disused field. Source IDs alone do not establish OSM element type. Missing voltages, output units and electrical connections are never inferred from names or proximity.</p>
+    </div>
   </aside>
 </template>

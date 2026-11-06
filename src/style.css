@@ -38,52 +38,58 @@ fieldset > legend + * { clear: both }
 .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; flex-shrink: 0 }
 .brand strong { font-size: 23px; font-weight: 750; letter-spacing: -.3px }
 .brand strong span { color: #e2edfb; font-weight: 400 } .brand small { display: block; font-size: 8px; letter-spacing: 1.65px; margin-top: 4px; color: #d2e1f4 }
-.app-header nav { margin-left: auto; display: flex; align-items: center; align-self: stretch; gap: 32px }
-.app-header nav a, .nav-button { height: 100%; display: flex; align-items: center; gap: 12px; color: #dfeafb; font-size: 12px; text-decoration: none; position: relative }
-.app-header nav .nav-active { color: white } .nav-active:after { content: ''; position: absolute; height: 3px; background: var(--brand-red); border-radius: 3px 3px 0 0; bottom: 0; left: 0; right: 0 }
-.app-header nav a:hover, .nav-button:hover { color: #fff }
+.nav-button { margin-left: auto; align-self: stretch; display: flex; align-items: center; gap: 12px; color: #dfeafb; font-size: 12px }
+.nav-button:hover { color: #fff }
 .app-header a:focus-visible, .app-header button:focus-visible { outline-color: #fff }
 
-main { width: 100%; margin: auto; padding: 34px 24px 0 }
-.page-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 22px }
+main { width: 100%; max-width: 1360px; margin: auto; padding: 18px 24px 0 }
+.page-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 12px }
 
 h1 { font-size: clamp(26px, 2.5vw, 38px); font-weight: 700; letter-spacing: -.045em; line-height: 1.28; color: var(--ink-strong) }
 
 .outline-button { border: 1px solid var(--border); background: var(--surface); border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; padding: 10px 14px; min-height: 38px; font-size: 12px; font-weight: 550; white-space: nowrap }
 .outline-button:hover, .small-button:hover:not(:disabled) { background: var(--surface-blue); border-color: var(--border-strong) }
-.summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 29px }
-.metric-card { padding: 19px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 9px }
-.metric-label { font-size: 12px; color: #4b617a; display: flex; align-items: center; gap: 8px }
-.metric-icon { height: 20px; width: 20px; background: var(--surface-blue); color: var(--brand-blue); border-radius: 4px; display: inline-grid; place-items: center; font-size: 16px }
-.metric-card>strong { color: var(--ink-strong); font-size: 33px; font-weight: 700; letter-spacing: -1px; font-variant-numeric: tabular-nums; line-height: 1.2 }
-.metric-card>small { font-size: 11px; color: var(--muted); line-height: 1.5 }
+.summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px }
+.metric-card { padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 5px }
+.metric-label { font-size: 11px; color: #4b617a; display: flex; align-items: center; gap: 6px }
+.metric-icon { height: 18px; width: 18px; background: var(--surface-blue); color: var(--brand-blue); border-radius: 4px; display: inline-grid; place-items: center; font-size: 14px }
+.metric-card>strong { color: var(--ink-strong); font-size: 28px; font-weight: 700; letter-spacing: -1px; font-variant-numeric: tabular-nums; line-height: 1.2 }
+.metric-card>small { font-size: 10px; color: var(--muted); line-height: 1.4 }
 .review-metric .metric-icon { background: #fbf1de; color: #ae7b1e }
-.workspace-heading { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 17px }
+.workspace-heading { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 12px }
 .workspace-heading>div { display: flex; align-items: center; gap: 14px; flex: 1 } .workspace-rule { height: 1px; background: var(--border); width: 55px }
-.search-toolbar { display: flex; align-items: center; gap: 18px; margin-bottom: 16px }
+.search-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px }
 .search-box { display: flex; align-items: center; gap: 12px; height: 43px; padding: 0 13px; border: 1px solid var(--border); border-radius: 5px; background: white; color: var(--muted); max-width: 600px; flex: 1; min-width: 0 }
 .search-box:focus-within { outline: 2px solid #9dbbdf; outline-offset: 1px } .search-box input { width: 100%; height: 100%; border: 0; outline: 0; background: transparent; font-size: 12px; min-width: 0; color: var(--ink) } .search-box input::placeholder { color: var(--muted) } .search-box input:focus-visible { outline: 0 }
- .workspace { display: grid; grid-template-columns: 262px minmax(0, 1fr); gap: 18px; align-items: start }
-.filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); padding: 20px 18px 0 }
+ .workspace { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 14px; align-items: start }
+.workspace:not(.filters-open) { grid-template-columns: minmax(0, 1fr) }
+.workspace:not(.filters-open) > .filter-panel { display: none }
+.filter-toggle { display: inline-flex; flex: none; min-height: 43px }
+.filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); padding: 14px 14px 0 }
 .panel-title { display: flex; align-items: center; justify-content: space-between } .panel-title h2 { font-size: 14px; font-weight: 650 }
 .text-button { font-size: 12px; font-weight: 550; color: var(--brand-blue); padding: 3px 0; text-decoration: underline; text-underline-offset: 3px }
-.check-row { display: flex; align-items: center; gap: 9px; min-height: 36px; font-size: 12px; cursor: pointer } .check-row span:not(.voltage-swatch) { flex: 1 }
+.check-row { display: flex; align-items: center; gap: 8px; min-height: 28px; font-size: 12px; cursor: pointer } .check-row span:not(.voltage-swatch) { flex: 1 }
 
-.candidate-options { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border) }
-.candidate-heading { font-size: 11px; font-weight: 650; color: var(--muted); margin-bottom: 4px }
+.candidate-options { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border) }
+.candidate-heading { font-size: 11px; font-weight: 650; color: var(--muted); margin-bottom: 2px }
 .candidate-key { width: 9px; height: 9px; flex: none } .review-key { background: #fff7df; border: 1px dashed #b46c00 } .point-key { background: #fff; border: 2px solid #b8406a; border-radius: 50% }
 .filter-note { font-size: 11px; color: var(--muted); line-height: 1.7; margin-top: 9px } .voltage-swatch { width: 17px; height: 3px; border-radius: 1px; margin: 0 2px; flex: none }
+.filter-panel fieldset { padding: 12px 0 }
+.filter-panel legend { margin-bottom: 8px }
+.filter-panel .filter-note { margin-top: 5px; line-height: 1.55 }
 .filter-panel fieldset:last-child { border-bottom: 0 }
-.workspace-main { min-width: 0 } .map-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); overflow: hidden }
+.workspace-main { min-width: 0 } .map-card { container-type: inline-size; container-name: asset-map; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); overflow: hidden }
 .map-actions { position: absolute; top: 14px; right: 14px; z-index: 4; display: flex; align-items: center; gap: 6px; padding: 5px; background: #fffffff5; border: 1px solid var(--border); border-radius: 7px; box-shadow: 0 2px 8px #123b6814 }
 .map-tool-button { display: grid; place-items: center; width: 34px; height: 34px; min-width: 34px; padding: 0; border: 1px solid var(--border); border-radius: 5px; background: #fff; color: var(--brand-blue); transition: color 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease) }
 .map-tool-button:hover:not(:disabled), .map-tool-button[aria-expanded=true] { background: var(--surface-blue); border-color: var(--border-strong); color: var(--brand-blue-deep) }
 .map-tools-divider { width: 1px; height: 19px; background: var(--border); margin: 0 3px }
 .small-button { font-size: 11px; border: 1px solid var(--border); border-radius: 4px; background: white; padding: 6px 10px; min-height: 29px; white-space: nowrap }
-.map-body { height: clamp(600px, 72vh, 900px); position: relative; isolation: isolate; background: var(--map-background) } .map-container { position: absolute; inset: 0; z-index: 0 }
+.map-frame { position: relative; height: clamp(520px, 66vh, 720px) }
+.map-details { position: absolute; z-index: 3; top: 72px; right: 56px; bottom: 44px; width: 340px; max-height: 600px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 12px 36px #103b7033, 0 2px 8px #123b6814; overflow: hidden }
+.map-body { height: 100%; min-width: 0; min-height: 0; position: relative; isolation: isolate; background: var(--map-background) } .map-container { position: absolute; inset: 0; z-index: 0 }
 .map-container .maplibregl-ctrl-top-right { top: 64px; right: 4px }
-.zoom-label { position: absolute; bottom: 38px; right: 13px; font-size: 9px; letter-spacing: 1px; color: var(--muted); background: #ffffffe0; padding: 4px 6px; border-radius: 2px; pointer-events: none }
-.maplibregl-ctrl-attrib { font-size: 10px !important; line-height: 16px !important; max-width: 75% } .maplibregl-ctrl-scale { font-size: 10px !important } .maplibregl-canvas:focus-visible { outline: 3px solid #3271bc; outline-offset: -3px }
+.zoom-label { position: absolute; bottom: 20px; right: 13px; font-size: 9px; letter-spacing: 1px; color: var(--muted); background: #ffffffe0; padding: 4px 6px; border-radius: 2px; pointer-events: none }
+.maplibregl-ctrl-attrib { font-size: 10px !important; line-height: 16px !important; max-width: none; white-space: nowrap } .maplibregl-ctrl-scale { font-size: 10px !important } .maplibregl-canvas:focus-visible { outline: 3px solid #3271bc; outline-offset: -3px }
 .map-failure, .map-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 45px; text-align: center; background: var(--map-background); color: var(--muted); font-size: 13px; line-height: 1.8 } .map-failure { z-index: 3 }
 .basemap-error { position: absolute; bottom: 48px; left: 12px; right: 12px; max-width: 440px; padding: 10px; background: #fff7e4; border: 1px solid #e5c783; border-radius: 4px; font-size: 11px; line-height: 1.6; z-index: 2 } .basemap-error button { text-decoration: underline; color: #76590c } .basemap-error span { display: block }
 .asset-table-card { margin-top: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); overflow: hidden } .results-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px }
@@ -94,21 +100,24 @@ td { padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 11px
 .asset-name small { display: block; font-size: 10px; color: var(--muted); margin-top: 3px; text-decoration: none } .asset-symbol { display: grid; place-items: center; font-size: 17px; color: var(--brand-blue); background: var(--surface-blue); border: 1px solid var(--border); border-radius: 4px; width: 27px; height: 28px; flex: none } .candidate-symbol { color: #ac7517; background: #fcf4e3; border-color: #eddfbd }
 .voltage-pill { display: inline-block; padding: 4px 7px; background: var(--surface-soft); border-radius: 3px; white-space: nowrap; font-weight: 500; font-size: 11px } .status-text { font-size: 10px; color: var(--muted) } .tagged_construction { color: #805614 } .tagged_disused { color: #98545a } .source-id { color: var(--muted); font-size: 10px }
 .pagination { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 13px 18px; font-size: 11px; color: var(--muted) } .pagination>div { display: flex; align-items: center; gap: 11px } .pagination .small-button { font-size: 13px; min-height: 27px; padding: 2px 9px }
-.app-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 27px 0 23px; color: var(--muted); font-size: 11px } .app-footer>span { font-weight: 600 } .app-footer p { font-size: 10px } .app-footer a { text-underline-offset: 2px } .app-footer .text-button { font-size: 11px }
-.details-drawer { animation: surface-in 180ms var(--ease); position: fixed; z-index: 20; top: 100px; bottom: 20px; right: 20px; width: 385px; max-width: calc(100% - 32px); background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 60px #123b682b; padding: 21px 25px; overflow-y: auto }
-.drawer-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 16px } .drawer-heading .eyebrow { color: var(--muted); font-size: 10px } .icon-button { font-size: 25px; line-height: 1; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 4px; color: var(--muted) }
+.app-footer { padding: 27px 0 23px; color: var(--muted); text-align: center } .app-footer p { font-size: 10px } .app-footer a { text-underline-offset: 2px }
+.details-drawer { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--surface) }
+.details-drawer > .drawer-heading { flex: none; margin: 0; padding: 14px 18px; border-bottom: 1px solid var(--border) }
+.details-content { flex: 1; min-height: 0; padding: 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable }
+.details-content:focus-visible { outline: 2px solid #3271bc; outline-offset: -2px }
+.drawer-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 16px } .drawer-heading .eyebrow { color: var(--muted); font-size: 10px } .icon-button { line-height: 1; width: 30px; height: 30px; flex: none; padding: 0; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 4px; color: var(--muted) }
 .asset-kind { font-size: 11px; color: var(--muted) } .details-drawer h2 { font-size: 22px; line-height: 1.4; letter-spacing: -.5px; margin-top: 8px; overflow-wrap: anywhere }
 .detail-badges { display: flex; gap: 7px; margin: 17px 0 } .badge { font-size: 11px; background: var(--surface-blue); color: var(--brand-blue); padding: 5px 8px; border-radius: 3px } .muted-badge { background: #f7efdc; color: #805a1c }
 .review-callout { background: #fbf3df; border: 1px solid #edddb4; padding: 10px; font-size: 12px; color: #7d5819; line-height: 1.7; border-radius: 4px; margin-bottom: 15px } .review-callout strong { display: block; margin-bottom: 3px }
-.detail-fields { margin: 0 } .detail-fields>div { display: grid; grid-template-columns: 44% 56%; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 5px } .detail-fields dt { font-size: 11px; color: var(--muted) } .detail-fields dd { font-size: 12px; margin: 0; overflow-wrap: anywhere; line-height: 1.6 } .detail-fields dd small { display: block; color: var(--muted); font-size: 10px; margin-top: 3px } .detail-footnote { font-size: 11px; color: var(--muted); line-height: 1.8; margin-top: 18px }
+.detail-fields { margin: 0 } .detail-fields>div { display: grid; grid-template-columns: minmax(0, 42fr) minmax(0, 58fr); padding: 12px 0; border-bottom: 1px solid var(--border); gap: 5px } .detail-fields dt { font-size: 11px; color: var(--muted) } .detail-fields dd { font-size: 12px; margin: 0; overflow-wrap: anywhere; line-height: 1.6 } .detail-fields dd small { display: block; color: var(--muted); font-size: 10px; margin-top: 3px }
 .provenance-dialog { animation: surface-in 180ms var(--ease); background: var(--surface); width: 660px; max-width: calc(100% - 30px); max-height: 85vh; border: 1px solid var(--border); border-radius: 9px; box-shadow: 0 15px 100px #123b682b; padding: 27px 32px; color: var(--ink) } .provenance-dialog::backdrop { background: #102c5080; backdrop-filter: blur(3px) }
 .provenance-dialog h2 { font-size: 27px; line-height: 1.3; letter-spacing: -.8px; margin-bottom: 17px } .provenance-dialog h3 { font-size: 15px; margin: 23px 0 10px } .provenance-dialog p { font-size: 13px; line-height: 1.8; color: #526984; margin: 11px 0 } .about-callout { padding: 15px; background: #f7f1df; border: 1px solid #e5d8ad; border-radius: 5px; margin: 19px 0; color: #7d5819; font-size: 13px } .about-callout p { margin: 5px 0 0; color: #805e20; font-size: 12px }
 .empty-state { padding: 45px 25px; text-align: center; font-size: 14px; color: var(--ink); border-top: 1px solid var(--border) } .empty-state p { font-size: 12px; margin: 10px 0 20px; color: var(--muted) }
 .loading-state, .error-state { padding: 70px 30px; text-align: center; background: white; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); line-height: 1.8 } .error-state h2 { font-size: 20px } .error-state p { margin: 12px auto; max-width: 660px; font-size: 13px } .error-state button { margin-top: 8px } .inline-error { font-size: 11px; color: #9c592d; line-height: 1.7; overflow-wrap: anywhere }
-.loading-spinner { display: inline-block; vertical-align: middle; margin-right: 10px; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--brand-blue); border-radius: 50%; animation: spin 1s linear infinite } .mobile-filter-toggle { display: none } @keyframes spin { to { transform: rotate(360deg) } }
-@media(min-width:1500px) { .workspace { grid-template-columns: 280px minmax(0,1fr) } .filter-panel { padding: 22px 24px 0 } .metric-card { padding: 22px 24px } .metric-card>strong { font-size: 36px } }
-@media(max-width:1050px) { .app-header { gap: 26px; padding: 0 25px } .app-header nav { gap: 22px }  .summary-grid { grid-template-columns: 1fr 1fr; gap: 12px } .metric-card { padding: 16px 20px } .workspace { grid-template-columns: 240px minmax(0,1fr); gap: 13px } .filter-panel { padding: 18px 14px 0 } .map-body { height: clamp(560px, 70vh, 800px) } main { padding-left: 16px; padding-right: 16px }  .table-scroll table { min-width: 620px } .app-footer { flex-wrap: wrap } .app-footer p { order: 3; width: 100% } }
-@media(max-width:720px) { .app-header { height: 75px; padding: 0 18px; gap: 12px } .brand strong { font-size: 20px } .brand small { font-size: 6.5px; letter-spacing: 1.2px }  .brand { gap: 10px } .app-header nav { gap: 0 } .app-header nav>a { display: none } .nav-button { font-size: 11px; gap: 6px } .nav-button>span { display: none } main { padding: 26px 12px 0 } .page-intro { align-items: flex-start }     h1 { font-size: 29px; letter-spacing: -1px }  .summary-grid { gap: 9px; margin-bottom: 24px } .metric-card { padding: 13px 12px; gap: 7px; min-height: 133px } .metric-label { font-size: 11px; gap: 5px } .metric-icon { width: 17px; height: 17px; font-size: 14px } .metric-card>strong { font-size: 29px } .metric-card>small { font-size: 10px } .workspace-heading .eyebrow { font-size: 10px; letter-spacing: 1.2px } .workspace-rule { display: none } .search-toolbar { gap: 9px } .search-box { padding: 0 10px; height: 41px } .search-box input { font-size: 12px } .mobile-filter-toggle { display: flex; min-height: 41px; padding: 9px 13px; font-size: 12px; gap: 7px } .workspace { display: flex; flex-direction: column; gap: 13px } .filter-panel { display: none; width: 100%; padding: 20px 20px 0 } .filter-panel.filters-open { display: block } .check-row { font-size: 13px; min-height: 39px }  .filter-note { font-size: 11px } .workspace-main { width: 100% } .map-actions { top: 10px; right: 10px; gap: 5px } .map-container .maplibregl-ctrl-top-right { top: 60px; right: 0 } .small-button { padding: 6px 8px; font-size: 10px } .map-body { height: clamp(520px, 72svh, 760px) }  .results-heading { padding: 16px 13px } .results-heading h2 { font-size: 13px } .results-heading p, .viewport-count { font-size: 10px } .pagination { padding: 12px; font-size: 10px; gap: 8px } .pagination>div { gap: 7px } .asset-table-card { margin-top: 13px } .table-scroll table { min-width: 620px } th { padding: 10px 13px } td { padding: 12px 13px } .app-footer { padding: 23px 0; gap: 10px } .app-footer p { font-size: 9px; line-height: 1.8 } .details-drawer { top: auto; right: 10px; bottom: 10px; width: calc(100% - 20px); max-width: none; max-height: 75svh; padding: 20px 23px; border-radius: 9px } .provenance-dialog { padding: 20px; max-height: 87svh } .provenance-dialog h2 { font-size: 24px } .provenance-dialog p { font-size: 12px } .maplibregl-ctrl-attrib { max-width: 85%; font-size: 9px !important } }
+.loading-spinner { display: inline-block; vertical-align: middle; margin-right: 10px; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--brand-blue); border-radius: 50%; animation: spin 1s linear infinite }  @keyframes spin { to { transform: rotate(360deg) } }
+@media(min-width:1500px) { .workspace { grid-template-columns: 244px minmax(0,1fr) } .filter-panel { padding: 16px 16px 0 } .metric-card { padding: 14px 16px } }
+@media(max-width:1050px) { .app-header { gap: 26px; padding: 0 25px }   .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px } .workspace { grid-template-columns: 220px minmax(0,1fr); gap: 13px } .filter-panel { padding: 14px 12px 0 } .map-frame { height: clamp(500px, 64vh, 680px) } main { padding-left: 16px; padding-right: 16px }  .table-scroll table { min-width: 620px }  }
+@media(max-width:720px) { .app-header { height: 75px; padding: 0 18px; gap: 12px } .brand strong { font-size: 20px } .brand small { font-size: 6.5px; letter-spacing: 1.2px }  .brand { gap: 10px }  .nav-button { font-size: 11px; gap: 6px } .nav-button>span { display: none } main { padding: 16px 12px 0 } .page-intro { align-items: flex-start }     h1 { font-size: 29px; letter-spacing: -1px }  .summary-grid { gap: 8px; margin-bottom: 16px } .metric-card { padding: 10px; gap: 4px; min-height: 108px } .metric-label { font-size: 11px; gap: 5px } .metric-icon { width: 16px; height: 16px; font-size: 13px } .metric-card>strong { font-size: 25px } .metric-card>small { font-size: 10px } .workspace-heading .eyebrow { font-size: 10px; letter-spacing: 1.2px } .workspace-rule { display: none } .search-toolbar { gap: 9px } .search-box { padding: 0 10px; height: 41px } .search-box input { font-size: 12px } .filter-toggle { min-height: 41px; padding: 9px 13px; font-size: 12px; gap: 7px } .workspace { display: flex; flex-direction: column; gap: 13px } .filter-panel { display: none; width: 100%; padding: 14px 16px 0 } .filter-panel.filters-open { display: block } .check-row { font-size: 13px; min-height: 34px }  .filter-note { font-size: 11px } .workspace-main { width: 100% } .map-actions { top: 10px; right: 10px; gap: 5px } .map-container .maplibregl-ctrl-top-right { top: 60px; right: 0 } .small-button { padding: 6px 8px; font-size: 10px } .map-frame { height: clamp(480px, 62svh, 620px) }  .results-heading { padding: 16px 13px } .results-heading h2 { font-size: 13px } .results-heading p, .viewport-count { font-size: 10px } .pagination { padding: 12px; font-size: 10px; gap: 8px } .pagination>div { gap: 7px } .asset-table-card { margin-top: 13px } .table-scroll table { min-width: 620px } th { padding: 10px 13px } td { padding: 12px 13px } .app-footer { padding: 23px 0 } .app-footer p { font-size: 9px; line-height: 1.8 }  .provenance-dialog { padding: 20px; max-height: 87svh } .provenance-dialog h2 { font-size: 24px } .provenance-dialog p { font-size: 12px } .maplibregl-ctrl-attrib { font-size: 9px !important } }
 .point-metric .metric-icon, .point-symbol { color: #a5355d; background: #f9eaf0; border-color: #ecd0dc }
 
 @media(max-width:720px) { .map-tool-button { width: 36px; height: 36px; min-width: 36px } }
@@ -117,3 +126,9 @@ td { padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 11px
 
 .plant-metric .metric-icon, .plant-symbol { color: #b72236; background: #fff0f2; border-color: #efd2d8 }
 @media(max-width:1050px) { .plant-metric { grid-column: 1 / -1 } }
+
+@container asset-map (max-width: 760px) {
+  .map-details { top: auto; right: 12px; bottom: 36px; left: 12px; width: auto; height: min(340px, 44%); max-height: none }
+  .details-drawer > .drawer-heading { padding: 10px 14px }
+  .details-content { padding: 14px }
+}
