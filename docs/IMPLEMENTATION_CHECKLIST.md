@@ -7,12 +7,12 @@
 - [x] Publish six GeoJSONs plus three metadata files, with original geometries and stable IDs.
 - [x] Keep 1,070 derived polygon symbols outside inventory totals; retain overview/footprint transitions.
 - [x] Keep optional candidate layers independently lazy, retryable and off by default.
-- [x] Simplify Layers, Voltage and OSM status controls; remove static sidebar totals.
-- [x] Derive legend items from matching original records; separate line colors from status patterns.
+- [x] Merge layer toggles, symbols and folded voltage/status controls into one closed-by-default in-map Layers panel; remove the sidebar, external Filters toggle and standalone legend.
+- [x] Keep every layer choice available when off/empty; derive contextual swatches from matching originals and separate line voltage colors from source-status patterns.
 - [x] Handle unknown voltage, empty searches, optional layers and construction-tagged substations in the key.
 - [x] Remove confirmed unused demo component/assets, speculative interface and obsolete CSS.
 - [x] Update every project Markdown document and validate local documentation links.
-- [x] Run 16 Node tests, Vue/TypeScript checks, production build and ten production-browser scenarios.
+- [x] Run 16 Node tests, Vue/TypeScript checks, production build and eleven production-browser scenarios.
 - [x] Inspect/publish 643 original power-plant footprints, preserve source units as unknown and add independent markers/counts.
 - [x] Verify power-plant toggle, grid-voltage independence, status/search, marker clicks, footprints, retry and basemap switching.
 - [x] Preserve attribution, font license, audit evidence, dataset hashes and existing deployment configuration.

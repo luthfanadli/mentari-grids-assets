@@ -29,7 +29,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside))
 <template>
   <div ref="root" class="basemap-picker" @keydown.esc.stop.prevent="close(true)" @focusout="focusOutside">
     <button ref="button" class="map-tool-button" :disabled="disabled" :aria-label="`Change basemap: ${BASEMAP_LABELS[selected]}`" :title="`Basemap: ${BASEMAP_LABELS[selected]}`" aria-haspopup="dialog" aria-controls="basemap-options" :aria-expanded="opened" @click="toggle">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="m3 8 9-5 9 5-9 5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/></svg>
     </button>
     <div v-if="opened" id="basemap-options" class="basemap-popover" role="dialog" aria-label="Basemap options">
       <fieldset><legend>Basemap</legend>

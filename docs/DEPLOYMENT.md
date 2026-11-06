@@ -39,7 +39,7 @@ No client-side router is used. The app is served at `/`; no catch-all rewrite is
 - Search `-18678451` to find the source's `GITET Pedan` polygon; details retain the negative ID and original multi-voltage tag. Test list selection and clicking the zoomed footprint.
 - Enable construction/disused and verify the resulting 4,374 lines and 622 primary polygons. Enable review and verify 448 separate candidates; their source distribution/unknown tags remain visible in details.
 - Enable point-only candidates and verify 32 separate records with unknown voltage, with primary/review polygon counts unchanged. Both candidate layers are initially off. At overview zoom, click a representative symbol to inspect the original polygon; zoom 10 and above must show footprints instead of those symbols. Selected-record counts must stay constant through zoom changes. Matched/uncertain raw points must not appear as additional records.
-- Test a narrow mobile viewport, keyboard navigation, About dialog, empty search, retries and basemap failure. OSM/ODbL and map-provider attribution must remain visible.
+- Open Layers inside the full-width map. Check all five choices remain available when off or empty; Voltage and OSM status start folded. Opening Layers must not fetch candidates. Exercise Reset, whole-row clicks/taps, internal scrolling, Escape/outside-map dismissal, focus restoration and basemap switching. Pan, wheel-zoom and use native zoom buttons with Layers open, then toggle another layer without reopening it. Verify full-width cards/search/map/table at laptop and large-screen widths. Test mobile at 320 px, About, retries and basemap failure. OSM/ODbL and provider attribution must remain visible.
 - Refresh `/` and inspect the Network panel: review must not download before it is enabled; no raw GPKG, internal point layer or restricted reference document is served. Stable data requests should revalidate after a deployment.
 
 The existing Playwright suite can target a Vercel preview without launching a local dev server:
@@ -51,7 +51,7 @@ $env:PLAYWRIGHT_CHANNEL='msedge'
 pnpm.cmd test:e2e
 ```
 
-Local production verification uses `pnpm preview --host 127.0.0.1 --port 5175` and the ten-scenario suite with that local base URL. Check that the legend follows the current filters, optional candidates are absent from it until they match, and construction/disused line patterns are separate from kV colors. Sidebar controls have no totals; matching counts are shown in the cards/list. Current results and schema-v3 nine-file publication are in [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md); source QA remains in `SUBSTATION_ENHANCEMENT_REPORT.md`. Local verification does not verify a future Vercel account, domain, protection setting or CDN response.
+Local production verification uses `pnpm preview --host 127.0.0.1 --port 5175` and the eleven-scenario suite with that local base URL. Check that Layers starts closed, keeps all five choices available when off/empty, and combines voltage colors and source-status patterns without a separate sidebar or legend. Matching counts remain in the cards/list. Current interaction results are in [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md); schema-v3 publication/source QA remains in [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md) and `SUBSTATION_ENHANCEMENT_REPORT.md`. Local verification does not verify a future Vercel account, domain, protection setting or CDN response.
 
 ## Updating the source later
 

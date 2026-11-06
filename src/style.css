@@ -25,16 +25,11 @@ button { cursor: pointer; color: inherit; background: none; border: 0 } button:d
 a { color: inherit } h1, h2, h3, p { margin: 0 }
 button:focus-visible, a:focus-visible, input:focus-visible, main:focus-visible { outline: 3px solid #3271bc; outline-offset: 3px }
 input[type=checkbox] { accent-color: var(--brand-blue); width: 16px; height: 16px; margin: 0; flex: none }
-fieldset { border: 0; border-bottom: 1px solid var(--border); margin: 0; padding: 22px 0; min-width: 0 }
-fieldset:after { content: ''; display: block; clear: both }
-legend { font-size: 12px; font-weight: 650; width: 100%; float: left; margin-bottom: 14px }
-legend span { float: right; color: var(--muted); font-weight: 400 }
-fieldset > legend + * { clear: both }
 .muted { color: var(--muted) } .eyebrow { font-size: 10px; letter-spacing: 1.6px; font-weight: 650 }
 .mono { font-family: ui-monospace, Consolas, monospace }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap }
 .skip-link { position: fixed; top: -60px; left: 20px; padding: 12px; background: white; z-index: 100 } .skip-link:focus { top: 12px }
-.app-header { height: 84px; padding: 0 3.7%; background: linear-gradient(110deg, var(--brand-blue-deep), var(--brand-blue) 65%, #123e74); color: #fff; display: flex; align-items: center; gap: 46px; border-bottom: 1px solid #ffffff24; box-shadow: 0 3px 16px #103b7010 }
+.app-header { height: 84px; padding: 0 clamp(16px, 1.25vw, 32px); background: linear-gradient(110deg, var(--brand-blue-deep), var(--brand-blue) 65%, #123e74); color: #fff; display: flex; align-items: center; gap: 46px; border-bottom: 1px solid #ffffff24; box-shadow: 0 3px 16px #103b7010 }
 .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; flex-shrink: 0 }
 .brand strong { font-size: 23px; font-weight: 750; letter-spacing: -.3px }
 .brand strong span { color: #e2edfb; font-weight: 400 } .brand small { display: block; font-size: 8px; letter-spacing: 1.65px; margin-top: 4px; color: #d2e1f4 }
@@ -42,7 +37,7 @@ fieldset > legend + * { clear: both }
 .nav-button:hover { color: #fff }
 .app-header a:focus-visible, .app-header button:focus-visible { outline-color: #fff }
 
-main { width: 100%; max-width: 1360px; margin: auto; padding: 18px 24px 0 }
+main { width: 100%; margin: 0; padding: 18px clamp(16px, 1.25vw, 32px) 0 }
 .page-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 12px }
 
 h1 { font-size: clamp(26px, 2.5vw, 38px); font-weight: 700; letter-spacing: -.045em; line-height: 1.28; color: var(--ink-strong) }
@@ -59,25 +54,11 @@ h1 { font-size: clamp(26px, 2.5vw, 38px); font-weight: 700; letter-spacing: -.04
 .workspace-heading { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 12px }
 .workspace-heading>div { display: flex; align-items: center; gap: 14px; flex: 1 } .workspace-rule { height: 1px; background: var(--border); width: 55px }
 .search-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px }
-.search-box { display: flex; align-items: center; gap: 12px; height: 43px; padding: 0 13px; border: 1px solid var(--border); border-radius: 5px; background: white; color: var(--muted); max-width: 600px; flex: 1; min-width: 0 }
+.search-box { display: flex; align-items: center; gap: 12px; height: 43px; padding: 0 13px; border: 1px solid var(--border); border-radius: 5px; background: white; color: var(--muted); flex: 1; min-width: 0 }
 .search-box:focus-within { outline: 2px solid #9dbbdf; outline-offset: 1px } .search-box input { width: 100%; height: 100%; border: 0; outline: 0; background: transparent; font-size: 12px; min-width: 0; color: var(--ink) } .search-box input::placeholder { color: var(--muted) } .search-box input:focus-visible { outline: 0 }
- .workspace { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 14px; align-items: start }
-.workspace:not(.filters-open) { grid-template-columns: minmax(0, 1fr) }
-.workspace:not(.filters-open) > .filter-panel { display: none }
-.filter-toggle { display: inline-flex; flex: none; min-height: 43px }
-.filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); padding: 14px 14px 0 }
-.panel-title { display: flex; align-items: center; justify-content: space-between } .panel-title h2 { font-size: 14px; font-weight: 650 }
 .text-button { font-size: 12px; font-weight: 550; color: var(--brand-blue); padding: 3px 0; text-decoration: underline; text-underline-offset: 3px }
-.check-row { display: flex; align-items: center; gap: 8px; min-height: 28px; font-size: 12px; cursor: pointer } .check-row span:not(.voltage-swatch) { flex: 1 }
 
-.candidate-options { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border) }
-.candidate-heading { font-size: 11px; font-weight: 650; color: var(--muted); margin-bottom: 2px }
-.candidate-key { width: 9px; height: 9px; flex: none } .review-key { background: #fff7df; border: 1px dashed #b46c00 } .point-key { background: #fff; border: 2px solid #b8406a; border-radius: 50% }
-.filter-note { font-size: 11px; color: var(--muted); line-height: 1.7; margin-top: 9px } .voltage-swatch { width: 17px; height: 3px; border-radius: 1px; margin: 0 2px; flex: none }
-.filter-panel fieldset { padding: 12px 0 }
-.filter-panel legend { margin-bottom: 8px }
-.filter-panel .filter-note { margin-top: 5px; line-height: 1.55 }
-.filter-panel fieldset:last-child { border-bottom: 0 }
+.filter-note { font-size: 11px; color: var(--muted); line-height: 1.7; margin-top: 9px }
 .workspace-main { min-width: 0 } .map-card { container-type: inline-size; container-name: asset-map; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-soft); overflow: hidden }
 .map-actions { position: absolute; top: 14px; right: 14px; z-index: 4; display: flex; align-items: center; gap: 6px; padding: 5px; background: #fffffff5; border: 1px solid var(--border); border-radius: 7px; box-shadow: 0 2px 8px #123b6814 }
 .map-tool-button { display: grid; place-items: center; width: 34px; height: 34px; min-width: 34px; padding: 0; border: 1px solid var(--border); border-radius: 5px; background: #fff; color: var(--brand-blue); transition: color 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease) }
@@ -115,9 +96,9 @@ td { padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 11px
 .empty-state { padding: 45px 25px; text-align: center; font-size: 14px; color: var(--ink); border-top: 1px solid var(--border) } .empty-state p { font-size: 12px; margin: 10px 0 20px; color: var(--muted) }
 .loading-state, .error-state { padding: 70px 30px; text-align: center; background: white; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); line-height: 1.8 } .error-state h2 { font-size: 20px } .error-state p { margin: 12px auto; max-width: 660px; font-size: 13px } .error-state button { margin-top: 8px } .inline-error { font-size: 11px; color: #9c592d; line-height: 1.7; overflow-wrap: anywhere }
 .loading-spinner { display: inline-block; vertical-align: middle; margin-right: 10px; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--brand-blue); border-radius: 50%; animation: spin 1s linear infinite }  @keyframes spin { to { transform: rotate(360deg) } }
-@media(min-width:1500px) { .workspace { grid-template-columns: 244px minmax(0,1fr) } .filter-panel { padding: 16px 16px 0 } .metric-card { padding: 14px 16px } }
-@media(max-width:1050px) { .app-header { gap: 26px; padding: 0 25px }   .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px } .workspace { grid-template-columns: 220px minmax(0,1fr); gap: 13px } .filter-panel { padding: 14px 12px 0 } .map-frame { height: clamp(500px, 64vh, 680px) } main { padding-left: 16px; padding-right: 16px }  .table-scroll table { min-width: 620px }  }
-@media(max-width:720px) { .app-header { height: 75px; padding: 0 18px; gap: 12px } .brand strong { font-size: 20px } .brand small { font-size: 6.5px; letter-spacing: 1.2px }  .brand { gap: 10px }  .nav-button { font-size: 11px; gap: 6px } .nav-button>span { display: none } main { padding: 16px 12px 0 } .page-intro { align-items: flex-start }     h1 { font-size: 29px; letter-spacing: -1px }  .summary-grid { gap: 8px; margin-bottom: 16px } .metric-card { padding: 10px; gap: 4px; min-height: 108px } .metric-label { font-size: 11px; gap: 5px } .metric-icon { width: 16px; height: 16px; font-size: 13px } .metric-card>strong { font-size: 25px } .metric-card>small { font-size: 10px } .workspace-heading .eyebrow { font-size: 10px; letter-spacing: 1.2px } .workspace-rule { display: none } .search-toolbar { gap: 9px } .search-box { padding: 0 10px; height: 41px } .search-box input { font-size: 12px } .filter-toggle { min-height: 41px; padding: 9px 13px; font-size: 12px; gap: 7px } .workspace { display: flex; flex-direction: column; gap: 13px } .filter-panel { display: none; width: 100%; padding: 14px 16px 0 } .filter-panel.filters-open { display: block } .check-row { font-size: 13px; min-height: 34px }  .filter-note { font-size: 11px } .workspace-main { width: 100% } .map-actions { top: 10px; right: 10px; gap: 5px } .map-container .maplibregl-ctrl-top-right { top: 60px; right: 0 } .small-button { padding: 6px 8px; font-size: 10px } .map-frame { height: clamp(480px, 62svh, 620px) }  .results-heading { padding: 16px 13px } .results-heading h2 { font-size: 13px } .results-heading p, .viewport-count { font-size: 10px } .pagination { padding: 12px; font-size: 10px; gap: 8px } .pagination>div { gap: 7px } .asset-table-card { margin-top: 13px } .table-scroll table { min-width: 620px } th { padding: 10px 13px } td { padding: 12px 13px } .app-footer { padding: 23px 0 } .app-footer p { font-size: 9px; line-height: 1.8 }  .provenance-dialog { padding: 20px; max-height: 87svh } .provenance-dialog h2 { font-size: 24px } .provenance-dialog p { font-size: 12px } .maplibregl-ctrl-attrib { font-size: 9px !important } }
+@media(min-width:1500px) { .metric-card { padding: 14px 16px } }
+@media(max-width:1050px) { .app-header { gap: 26px; padding: 0 16px }   .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px } .map-frame { height: clamp(500px, 64vh, 680px) } main { padding-left: 16px; padding-right: 16px }  .table-scroll table { min-width: 620px }  }
+@media(max-width:720px) { .app-header { height: 75px; padding: 0 18px; gap: 12px } .brand strong { font-size: 20px } .brand small { font-size: 6.5px; letter-spacing: 1.2px }  .brand { gap: 10px }  .nav-button { font-size: 11px; gap: 6px } .nav-button>span { display: none } main { padding: 16px 12px 0 } .page-intro { align-items: flex-start }     h1 { font-size: 29px; letter-spacing: -1px }  .summary-grid { gap: 8px; margin-bottom: 16px } .metric-card { padding: 10px; gap: 4px; min-height: 108px } .metric-label { font-size: 11px; gap: 5px } .metric-icon { width: 16px; height: 16px; font-size: 13px } .metric-card>strong { font-size: 25px } .metric-card>small { font-size: 10px } .workspace-heading .eyebrow { font-size: 10px; letter-spacing: 1.2px } .workspace-rule { display: none } .search-box { padding: 0 10px; height: 41px } .search-box input { font-size: 12px } .map-actions { top: 10px; right: 10px; gap: 5px } .map-container .maplibregl-ctrl-top-right { top: 60px; right: 0 } .small-button { padding: 6px 8px; font-size: 10px } .map-frame { height: clamp(480px, 62svh, 620px) }  .results-heading { padding: 16px 13px } .results-heading h2 { font-size: 13px } .results-heading p, .viewport-count { font-size: 10px } .pagination { padding: 12px; font-size: 10px; gap: 8px } .pagination>div { gap: 7px } .asset-table-card { margin-top: 13px } .table-scroll table { min-width: 620px } th { padding: 10px 13px } td { padding: 12px 13px } .app-footer { padding: 23px 0 } .app-footer p { font-size: 9px; line-height: 1.8 }  .provenance-dialog { padding: 20px; max-height: 87svh } .provenance-dialog h2 { font-size: 24px } .provenance-dialog p { font-size: 12px } .maplibregl-ctrl-attrib { font-size: 9px !important } }
 .point-metric .metric-icon, .point-symbol { color: #a5355d; background: #f9eaf0; border-color: #ecd0dc }
 
 @media(max-width:720px) { .map-tool-button { width: 36px; height: 36px; min-width: 36px } }

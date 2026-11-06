@@ -27,7 +27,7 @@ Build **MENTARI Grids — Transmission Asset Inventory** for **Deliverable 2 onl
 - Final Codex report must state changed files, output sizes/counts, commands executed, test/build results, and remaining ToR gaps.
 
 ## Current UI and maintenance
-- Follow the current [filters and legend behavior](README.md#filters-and-legend): no static sidebar totals; the cards/list count selected original records; legend categories come from those same records.
+- Follow the current [Layers and filter behavior](README.md#filters-and-legend): one in-map Layers panel, no sidebar or standalone legend. Keep all five layer choices available, including when off/empty; derive contextual swatches and counts from matching original records. See [LAYERS_CONTROL_REFACTOR.md](docs/LAYERS_CONTROL_REFACTOR.md).
 - Power plants are user-authorized context: publish source footprints, preserve output units as unknown, and keep them independent of grid voltage filters. Do not import generator layers or infer MW/COD/connections. See [the plant report](docs/POWER_PLANTS_REPORT.md).
 - Keep line-voltage colors separate from source-status patterns. Candidate layers stay optional/default-off, and missing voltage never becomes an inferred value.
 - Retain data/source QA and historical evidence during cleanup. Remove confirmed unused demo assets/styles/types; do not recreate starter components or speculative planned records. See [the cleanup report](docs/SIMPLIFICATION_REPORT.md).

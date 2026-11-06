@@ -17,25 +17,25 @@ Open http://localhost:5174. The preprocessed publication files are included unde
 
 ## Filters and legend
 
-- **Layers:** choose transmission lines, primary substations and power plants. Optional **Review polygons** and **Point-only candidates** are unvalidated and off by default. Point voltages remain unknown.
-- **Voltage:** applies to lines and substations; power plants have no voltage field and remain independent of these controls. **Unknown voltage** appears when either candidate layer is enabled.
-- **OSM status:** choose source tags; they do not verify operational status. Search applies to the same selection.
-- Sidebar controls use compact row/section spacing and have no dataset totals. The five compact cards and record list show matching original records; **rendered in viewport** is a separate map count.
-- The legend follows the current filtered selection, including searches. It hides absent categories and shows an empty message for no matches. It describes the selection, not only the current viewport.
-- **Transmission lines · kV** explains line colors. **Line pattern** explains construction/disused tags when present; patterns do not replace voltage colors. **Substations** distinguishes primary, review, point-only and construction-tagged primary symbols. At overview zoom, polygon symbols become circles; at local zoom, the key represents their footprints.
+- Open **Layers** at the top left inside the map. It starts closed on every screen size; there is no separate sidebar or Legend button.
+- Toggle **Transmission lines**, **Primary substations** and **Power plants** directly. **Review polygons** and **Point-only candidates** are optional, unvalidated and off by default. All five choices remain available when switched off or when a search has no matches.
+- Open **Voltage** for 500/275/150/70 kV and, when candidates are enabled, **Unknown voltage**. Grid voltage filters apply to lines and substations; power plants remain independent. Colored line samples explain line voltage.
+- Open **OSM status** for source tags and solid/dashed/dotted line patterns. Tags do not verify operation. Layer symbols also distinguish overview markers, local footprints and matching construction styles.
+- Layers stays open while selecting controls, panning, wheel zooming or using map navigation. Use **Layers**, Close or Escape to dismiss it, or click/focus outside the map. Opening the basemap menu closes Layers to avoid stacked menus. The panel scrolls within the map; Reset restores the same default filters and clears search as before.
+- Search remains above the full-width map. The five compact cards and list count matching original records; **rendered in viewport** remains a separate map count. Layer controls have no source totals, and display symbols never add records.
 
 ## Dashboard map controls
 
 The footer contains only centered source/license credits. Data information remains accessible through **About the data** in the header; close icons use centered SVGs.
 
 - The zoom label sits 4 px above the single-line map attribution.
-- The legend starts collapsed. **Legend** opens/closes a compact symbol key without a permanent overlay obscuring the map.
+- **Layers** combines layer visibility, map symbols and folded voltage/status controls in one in-map panel. It stays inside the map on desktop and mobile.
 - Extent icon: **Fit filtered records**, the single extent action. It fits the active selection and provides a tooltip, keyboard label and smooth camera transition that respects reduced-motion settings. Clear filters to fit the full selected inventory again.
 - The header uses the supplied full-color MENTARI logo from `public/images`, with a white background for legibility and responsive sizing. **About the data** is its only action; the redundant Inventory link and active underline were removed.
-- Layers icon: select **OpenStreetMap**, **Google Satellite** or **Plain background**. A configured custom style is retained as another choice. Click anywhere in a choice row (preview, text or padding) to select it; native radio keyboard controls remain available. Switching preserves camera, asset filters, selection and counts.
+- Basemap map icon: select **OpenStreetMap**, **Google Satellite** or **Plain background**. A configured custom style is retained as another choice. Click anywhere in a choice row (preview, text or padding) to select it; native radio keyboard controls remain available. Switching preserves camera, asset filters, selection and counts.
 - Selecting a record opens **Asset details** as a floating card over the map, with rounded corners, inset margins and a shadow. On narrow maps the card floats near the bottom. The canvas stays full size and selected features are fitted clear of the card. The repeated footer note is omitted. Attributes scroll independently; the close button stays visible.
-- **Filters + / Filters -** sits immediately before search on the left and also works on desktop. Hide the sidebar to give the map the full content width; its asset filters remain active. Desktop filters start open and mobile filters start closed.
-- Extent and basemap controls float inside the map at the upper right, with zoom controls below them. The external toolbar has been removed. The dashboard is centered within a 1360 px maximum width and the map uses a more compact responsive height; the basemap menu remains within the map on mobile.
+- The map always uses the full content width. The external Filters toggle and sidebar were removed; height, search, compact cards, selection and dataset counts retain their behavior.
+- Extent and basemap controls float inside the map at the upper right, with zoom controls below them. The external toolbar has been removed. The dashboard fills the available viewport with small adaptive side gutters, so cards, search, map and table grow together; the compact responsive map height is retained and the basemap menu remains within the map on mobile.
 - The dashboard shows five separate metrics, including power-plant footprints. Planned RUPTL/RUKN data gaps and official region/system limitations remain in **About the data**, alongside source scope and provenance.
 
 Google Satellite uses the exact `mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}` endpoint supplied for this local implementation. Map attribution stays on one line on desktop and mobile, without clipping its links. The map uses compact linked credits: `© Google Maps | © OpenStreetMap contributors` for imagery, and one OSM credit for OpenStreetMap/plain backgrounds. Full OpenInfraMap and ODbL notices remain in the footer and publication metadata. This is a direct raster integration, without the key/session workflow or provider-specific metadata of the [documented Google Map Tiles API](https://developers.google.com/maps/documentation/tile/satellite). No offline tile download, proxy or prefetch was added. See [dashboard UI changes, verification and integration limits](docs/DASHBOARD_UX_UPDATE.md).
@@ -129,11 +129,12 @@ $env:PLAYWRIGHT_CHANNEL='msedge'
 pnpm.cmd test:e2e
 ```
 
-For a production build, start `pnpm preview --host 127.0.0.1 --port 5175`, set `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, and run the ten browser scenarios, including selection-driven legend keys, unknown voltage, candidate loading, dashboard controls and basemap switching. See the [simplification and cleanup report](docs/SIMPLIFICATION_REPORT.md), [dashboard UI history](docs/DASHBOARD_UX_UPDATE.md) and [substation data report](docs/SUBSTATION_ENHANCEMENT_REPORT.md). No deployment or hosting configuration change is part of these enhancements.
+For a production build, start `pnpm preview --host 127.0.0.1 --port 5175`, set `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5175`, and run the eleven browser scenarios, including persistent Layers during pan/zoom, fluid laptop/wide-screen layout, unknown voltage, candidate loading, dashboard controls and basemap switching. See the [simplification and cleanup report](docs/SIMPLIFICATION_REPORT.md), [dashboard UI history](docs/DASHBOARD_UX_UPDATE.md) and [substation data report](docs/SUBSTATION_ENHANCEMENT_REPORT.md). No deployment or hosting configuration change is part of these enhancements.
 
 ## Data scope and documentation
 
 - [Power-plant source audit and verification](docs/POWER_PLANTS_REPORT.md)
+- [Unified in-map Layers control and verification](docs/LAYERS_CONTROL_REFACTOR.md)
 - [Data dictionary](docs/DATA_DICTIONARY.md)
 - [Coverage, exclusions and remaining ToR gaps](docs/DATA_COVERAGE_AND_LIMITATIONS.md)
 - [Architecture and filtering behavior](docs/ARCHITECTURE.md)

@@ -1,5 +1,7 @@
 # Filters, legend and repository cleanup — 4 November 2026
 
+Latest UI refactor (6 November 2026): [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md) replaces the sidebar, external Filters toggle and standalone legend with one default-closed Layers panel inside the full-width map. Earlier layouts, screenshots and measurements below are retained as history.
+
 Later user-authorized extension: [POWER_PLANTS_REPORT.md](POWER_PLANTS_REPORT.md) documents 643 plant footprints, nine-file/schema-v3 publication and current tests. The stage-specific counts, hashes and UI descriptions below are preserved as history; the five earlier GeoJSONs and raw source remain unchanged.
 
 The sidebar now contains simple controls without source totals, while the legend describes only original records matching the current filters. Confirmed unused starter files, obsolete CSS and an unused speculative type were removed. README and all 16 other existing project Markdown documents were refreshed; historical source findings, measurements and audit results were preserved with links to this current report. No data, preprocessing, dependencies, hosting configuration, commit, push or deployment changed.

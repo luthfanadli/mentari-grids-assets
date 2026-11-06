@@ -1,5 +1,9 @@
 # Dashboard UI update — 4 November 2026
 
+6 November 2026 follow-up: Layers now remains open during map panning, wheel zoom and navigation controls. The dashboard also fills the viewport with small responsive gutters instead of a 1360 px content cap; cards, search, map and table expand together. Build and the **11-case** production-browser suite passed. Current behavior, responsive measurements, touch verification and the map-boundary dismissal policy are recorded in [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md). Earlier sizing/dismissal behavior below is historical. Data, output counts/sizes and remaining ToR gaps are unchanged; no deployment occurred.
+
+Latest UI refactor (6 November 2026): [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md) replaces the sidebar, external Filters toggle and standalone legend with one default-closed Layers panel inside the full-width map. Earlier layouts, screenshots and measurements below are retained as history.
+
 ## Compact summary cards and grouped filter control — 6 November 2026
 
 The five statistic cards are shorter: desktop padding is 12 by 14 px, internal gaps 5 px and values 28 px; wide-screen padding is 14 by 16 px. Mobile padding is 10 px, gaps 4 px, values 25 px and minimum card height 108 px instead of 133 px. Descriptions, values, icons and candidate distinctions remain available. Card-grid gaps and the space below cards are smaller. The desktop header-to-title gap is now 18 px instead of 34 px, the title-to-cards margin 12 px instead of 22 px, and mobile top padding is 16 px instead of 26 px.

@@ -69,7 +69,7 @@ The two candidate toggles are independent of primary-substation visibility. With
 
 ## Metadata
 
-Metadata totals describe complete published subsets across source flags. They are not filter results. The sidebar no longer repeats these totals; cards and the list count matching original records, and the legend is derived from those records. `Unknown voltage` covers 37 review polygons and all 32 optional source points when those layers are enabled. No data property or serialized output changed for the sidebar/legend simplification; see [SIMPLIFICATION_REPORT.md](SIMPLIFICATION_REPORT.md).
+Metadata totals describe complete published subsets across source flags. They are not filter results. The Layers panel does not repeat source totals; cards and the list count matching original records. Layer choices remain available even without matches, while context-dependent construction swatches use matching original records. `Unknown voltage` covers 37 review polygons and all 32 optional source points when those layers are enabled. No data property or serialized output changed for the unified Layers control; see [LAYERS_CONTROL_REFACTOR.md](LAYERS_CONTROL_REFACTOR.md).
 
 Schema-v3 `summary.json` contains raw counts for all layers, actual per-subset counts, statuses, maximum-voltage distributions, missing-value metrics, fallback-label counts, review reasons, default selection and GeoJSON byte sizes. `datasets.point_candidates` is separate from `datasets.review`; `substation_point_matching` contains 2/25/41 classification counts and eligibility totals. `substation_presentation` holds symbol count, zoom threshold and its non-inventory role. `planned_assets.count` is null, not zero: no authoritative dataset was provided.
 

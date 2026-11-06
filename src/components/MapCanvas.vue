@@ -6,7 +6,6 @@ import { featureBounds } from '../utils/filterAssets'
 import { VOLTAGE_COLORS } from '../utils/formatAssets'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { FOOTPRINT_MIN_ZOOM, renderedRecordCount } from '../utils/substationPresentation'
-import MapLegend from './MapLegend.vue'
 import MapBasemapPicker from './MapBasemapPicker.vue'
 import { BASEMAP_LABELS, OSM_ATTRIBUTION, basemapStyle } from '../utils/basemaps'
 import type { BasemapId } from '../utils/basemaps'
@@ -226,7 +225,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(basemapTimeout); resize?.d
 </script>
 <template>
   <section class="map-card" aria-label="Spatial asset inventory">
-    <div class="map-frame" :class="{ 'has-details': !!selectedId }">
+    <div class="map-frame">
     <div class="map-body"><div ref="container" class="map-container" role="region" aria-label="Interactive map of selected lines, substations, power plants and point-only candidates" data-testid="map" :data-ready="ready" :data-basemap="basemap" :data-substation-mode="zoom < FOOTPRINT_MIN_ZOOM ? 'representative-symbols' : 'footprints'" :data-rendered-symbols="renderedSymbols" :data-rendered-point-candidates="renderedPoints" :data-rendered-plant-symbols="renderedPlantSymbols" :data-zoom="zoom" :data-center-lng="center.lng" :data-center-lat="center.lat"></div>
       <div class="map-actions" role="group" aria-label="Map tools">
       <button class="map-tool-button" :disabled="!ready || !features.length" aria-label="Fit filtered records" title="Fit filtered records" @click="fitFeatures(features)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
@@ -235,7 +234,7 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(basemapTimeout); resize?.d
       </div>
       <div v-if="mapError" class="map-failure" role="alert">{{ mapError }}</div><div v-else-if="!ready" class="map-loading" role="status">Loading map…</div>
       <div v-if="basemapError" class="basemap-error" role="status">{{ BASEMAP_LABELS[basemap] }} is unavailable or taking too long. <button @click="usePlainBackground">Use plain background</button><span>Inventory overlays and records remain available.</span></div>
-      <MapLegend :overview="zoom < FOOTPRINT_MIN_ZOOM" :features="features"/>
+      <slot name="layers" :overview="zoom < FOOTPRINT_MIN_ZOOM"/>
       <span v-if="ready" class="zoom-label">ZOOM {{ zoom.toFixed(1) }}</span>
     </div>
       <div v-if="selectedId" ref="detailsPopup" class="map-details"><slot name="details"/></div>

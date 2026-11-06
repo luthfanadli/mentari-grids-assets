@@ -2,7 +2,7 @@
 
 Latest authorized scope: add the source `power_plant` layer as generation context, not individual generators or planned projects. There are 643 source footprints (633 not construction-tagged, ten construction-tagged), with no voltage/disused field or output unit. Preserve raw attributes and geometry; do not infer MW/COD/connections. Current publication is nine files, schema v3/pipeline v1.2.0. The original grid predicates and five prior GeoJSONs remain unchanged. See [the plant report](docs/POWER_PLANTS_REPORT.md).
 
-Current implementation: the existing project publishes six GeoJSONs and three metadata files, including 32 optional point-only candidates and 1,070 uncounted polygon representatives after source QA. The original three-file MVP examples below describe the starting stage; use [the current data dictionary](docs/DATA_DICTIONARY.md) and [matching policy](docs/SUBSTATION_MATCHING.md) for the complete contract. The current UI keeps counts in the cards/list, omits static sidebar totals, and derives its legend from the filtered selection. Planned-data gaps remain in About; no speculative unused planned-asset interface is required. Follow [README](README.md#filters-and-legend) and [the simplification report](docs/SIMPLIFICATION_REPORT.md) for current UI/cleanup verification. The original source-selection predicates and data-integrity invariants remain unchanged. Do not deploy without user authorization.
+Current implementation: the existing project publishes six GeoJSONs and three metadata files, including 32 optional point-only candidates and 1,070 uncounted polygon representatives after source QA. The original three-file MVP examples below describe the starting stage; use [the current data dictionary](docs/DATA_DICTIONARY.md) and [matching policy](docs/SUBSTATION_MATCHING.md) for the complete contract. The current UI has one default-closed Layers control inside a full-width map, with persistent layer choices, contextual symbols and folded voltage/status filters. The separate sidebar and Legend button were removed. Counts remain in cards/list. See [LAYERS_CONTROL_REFACTOR.md](docs/LAYERS_CONTROL_REFACTOR.md). Planned-data gaps remain in About; no speculative unused planned-asset interface is required. Follow [README](README.md#filters-and-legend) and [the simplification report](docs/SIMPLIFICATION_REPORT.md) for current UI/cleanup verification. The original source-selection predicates and data-integrity invariants remain unchanged. Do not deploy without user authorization.
 
 **Project state:** Vue 3 + Vite + TypeScript is **already installed** in the repository. This guide supersedes the earlier prompt that assumed a new repo and Cloudflare Pages hosting.
 
@@ -84,7 +84,7 @@ Work within the existing `src/` tree. Suggested modules (adapt to what's already
 src/
   components/
     AppHeader.vue
-    FilterSidebar.vue
+    MapLayersControl.vue
     MapCanvas.vue
     AssetDetailsDrawer.vue
     InventorySummary.vue
