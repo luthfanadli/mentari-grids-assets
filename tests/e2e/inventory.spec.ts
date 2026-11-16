@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page, type Route } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 const lines = JSON.parse(readFileSync('public/data/transmission-lines.geojson', 'utf8')).features
 const displaySymbols = JSON.parse(readFileSync('public/data/substation-display-points.geojson', 'utf8')).features
@@ -167,9 +167,54 @@ test('missing inventory can be retried and basemap errors preserve the inventory
   missing = false
   await page.getByRole('button', { name: 'Retry inventory' }).click()
   await expect(page.getByTestId('line-count')).toHaveText('4,345')
-  await page.getByRole('button', { name: 'Use plain background' }).click()
+  await expect(page.locator('.basemap-error')).toHaveCount(0)
+  await page.getByRole('button', { name: /Change basemap:/ }).click()
+  const picker = page.getByRole('dialog', { name: 'Basemap options' })
+  await expect(picker.getByRole('status')).toHaveText('Tiles unavailable')
+  await picker.getByText('Plain background', { exact: true }).click()
+  await expect(picker).not.toBeVisible()
+  await expect(page.getByTestId('map')).toHaveAttribute('data-basemap', 'plain')
+  await page.getByRole('button', { name: /Change basemap:/ }).click()
+  await expect(picker.getByRole('status')).toHaveCount(0)
   await expect(page.getByTestId('map')).toHaveAttribute('data-ready', 'true')
   await expect(page.locator('.viewport-count')).toContainText('rendered in viewport')
+})
+
+test('basemap status ignores a single failure and slow tiles, then clears on recovery', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  const pending: Route[] = []
+  let requests = 0
+  await page.route('https://tile.openstreetmap.org/**', route => {
+    if (++requests === 1) return route.abort()
+    pending.push(route)
+  })
+  await page.goto('/')
+  const map = page.getByTestId('map')
+  await expect(map).toHaveAttribute('data-ready', 'true')
+  await expect.poll(() => pending.length).toBeGreaterThanOrEqual(2)
+  await page.getByRole('button', { name: /Change basemap:/ }).click()
+  const picker = page.getByRole('dialog', { name: 'Basemap options' })
+  await expect(picker.getByRole('status')).toHaveCount(0)
+  await page.clock.install()
+  await page.clock.fastForward(13000)
+  await expect(picker.getByRole('status')).toHaveCount(0)
+  await expect(map).toHaveAttribute('data-basemap', 'osm')
+  await pending.shift()!.abort()
+  const status = picker.getByRole('status')
+  await expect(status).toHaveText('Tiles unavailable')
+  await expect(picker.getByRole('radio', { name: 'OpenStreetMap', exact: true })).toHaveAttribute('aria-describedby', 'basemap-tile-status')
+  const menuBox = (await picker.boundingBox())!, mapBox = (await map.boundingBox())!
+  expect(menuBox.x).toBeGreaterThanOrEqual(mapBox.x)
+  expect(menuBox.x + menuBox.width).toBeLessThanOrEqual(mapBox.x + mapBox.width)
+  await page.keyboard.press('Escape')
+  await expect(page.getByText('Tiles unavailable', { exact: true })).toHaveCount(0)
+  await page.getByRole('button', { name: /Change basemap:/ }).click()
+  await expect(status).toBeVisible()
+  await pending.shift()!.fulfill({ contentType: 'image/png', body: readFileSync('public/images/Mentari Logo_Tagline Revamp_Color.png') })
+  await expect(status).toHaveCount(0)
+  await expect(map).toHaveAttribute('data-basemap', 'osm')
+  await expect(page.getByTestId('line-count')).toHaveText('4,345')
+  await expect(page.locator('.basemap-error')).toHaveCount(0)
 })
 
 test('mobile filters, details and attribution fit the viewport', async ({ page }) => {

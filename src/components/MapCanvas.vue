@@ -7,7 +7,7 @@ import { VOLTAGE_COLORS } from '../utils/formatAssets'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { FOOTPRINT_MIN_ZOOM, renderedRecordCount } from '../utils/substationPresentation'
 import MapBasemapPicker from './MapBasemapPicker.vue'
-import { BASEMAP_LABELS, OSM_ATTRIBUTION, basemapStyle } from '../utils/basemaps'
+import { OSM_ATTRIBUTION, basemapStyle, isBasemapTileEvent } from '../utils/basemaps'
 import type { BasemapId } from '../utils/basemaps'
 const props = defineProps<{ features: AssetFeature[]; displayPoints: DisplayPointCollection; selectedId: string | null }>()
 const emit = defineEmits<{ select: [feature: AssetFeature]; viewport: [count: number | null] }>()
@@ -20,8 +20,7 @@ const renderedSymbols = ref(0), renderedPoints = ref(0), center = ref({ lng: 118
 const renderedPlantSymbols = ref(0)
 let map: LibreMap | undefined, resize: ResizeObserver | undefined, disposed = false
 let viewportDirty = true
-let basemapTimeout: ReturnType<typeof setTimeout> | undefined
-let basemapHasError = false
+let basemapTileFailures = 0
 let pendingFit: AssetFeature[] | undefined
 let measuredWidth = 0, measuredHeight = 0
 const clickable = ['plant-symbols', 'plant-fill', 'plant-outline', 'construction-plant-outline', 'point-candidates', 'primary-symbols', 'review-symbols', 'primary-fill', 'primary-outline', 'construction-polygon-outline', 'review-fill', 'review-outline', 'line-hit']
@@ -155,19 +154,17 @@ function resizeMap() {
 function cameraTransition() {
   return { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700, linear: true, easing: (t: number) => t * t * (3 - 2 * t) }
 }
-function watchBasemapAvailability() {
-  clearTimeout(basemapTimeout)
-  if (basemap.value !== 'plain') basemapTimeout = setTimeout(() => { if (map && !map.areTilesLoaded()) basemapError.value = true }, 12000)
+function resetBasemapStatus() {
+  basemapTileFailures = 0
+  basemapError.value = false
 }
 function changeBasemap(next: BasemapId) {
   if (!map || disposed || basemap.value === next) return
   basemap.value = next
-  basemapError.value = false; basemapHasError = false; ready.value = false; viewportDirty = true
+  resetBasemapStatus(); ready.value = false; viewportDirty = true
   emit('viewport', null)
   map.setStyle(basemapStyle(next, customStyleUrl), { diff: false })
-  watchBasemapAvailability()
 }
-function usePlainBackground() { changeBasemap('plain') }
 watch([() => props.features, () => props.displayPoints], () => {
   viewportDirty = true
   emit('viewport', null)
@@ -196,9 +193,10 @@ onMounted(async () => {
     map.addControl(new libre.ScaleControl({ unit: 'metric' }), 'bottom-left')
     map.addControl(new libre.AttributionControl({ compact: false }), 'bottom-right')
     map.on('style.load', addInventory)
-    map.on('idle', () => { updateViewport(); if (map?.areTilesLoaded()) { if (!basemapHasError) basemapError.value = false; clearTimeout(basemapTimeout) } })
+    map.on('idle', updateViewport)
     map.on('sourcedata', event => {
       if (['inventory', 'substation-symbols', 'plant-symbols'].includes(event.sourceId)) viewportDirty = true
+      if (isBasemapTileEvent(event) && event.tile.state === 'loaded' && map?.getSource(event.sourceId)) resetBasemapStatus()
     })
     // Inventory counts must not wait for slow or unavailable external raster tiles.
     map.on('render', () => {
@@ -206,10 +204,12 @@ onMounted(async () => {
         updateViewport(); viewportDirty = false
       }
     })
-    map.on('movestart', () => { viewportDirty = true; emit('viewport', null) })
+    map.on('movestart', () => { resetBasemapStatus(); viewportDirty = true; emit('viewport', null) })
     map.on('moveend', () => { pendingFit = undefined })
-    map.on('error', () => { basemapHasError = true; basemapError.value = true })
-    watchBasemapAvailability()
+    map.on('error', event => {
+      if (basemap.value === 'plain' || !isBasemapTileEvent(event) || !map?.getSource(event.sourceId)) return
+      basemapError.value = ++basemapTileFailures >= 2
+    })
     map.on('click', event => {
       if (!ready.value || !map) return
       const hits = map.queryRenderedFeatures([[event.point.x - 4, event.point.y - 4], [event.point.x + 4, event.point.y + 4]], { layers: clickable })
@@ -221,7 +221,7 @@ onMounted(async () => {
     resize = new ResizeObserver(resizeMap); resize.observe(container.value)
   } catch (cause) { mapError.value = `Map unavailable. ${cause instanceof Error ? cause.message : 'WebGL could not start'}. You can still search and inspect records below.` }
 })
-onBeforeUnmount(() => { disposed = true; clearTimeout(basemapTimeout); resize?.disconnect(); map?.remove() })
+onBeforeUnmount(() => { disposed = true; resize?.disconnect(); map?.remove() })
 </script>
 <template>
   <section class="map-card" aria-label="Spatial asset inventory">
@@ -230,10 +230,9 @@ onBeforeUnmount(() => { disposed = true; clearTimeout(basemapTimeout); resize?.d
       <div class="map-actions" role="group" aria-label="Map tools">
       <button class="map-tool-button" :disabled="!ready || !features.length" aria-label="Fit filtered records" title="Fit filtered records" @click="fitFeatures(features)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
       <span class="map-tools-divider" aria-hidden="true"></span>
-      <MapBasemapPicker :selected="basemap" :custom-available="!!customStyleUrl" :disabled="!mapAvailable" @change="changeBasemap"/>
+      <MapBasemapPicker :selected="basemap" :custom-available="!!customStyleUrl" :disabled="!mapAvailable" :tile-error="basemapError" @change="changeBasemap"/>
       </div>
       <div v-if="mapError" class="map-failure" role="alert">{{ mapError }}</div><div v-else-if="!ready" class="map-loading" role="status">Loading map…</div>
-      <div v-if="basemapError" class="basemap-error" role="status">{{ BASEMAP_LABELS[basemap] }} is unavailable or taking too long. <button @click="usePlainBackground">Use plain background</button><span>Inventory overlays and records remain available.</span></div>
       <slot name="layers" :overview="zoom < FOOTPRINT_MIN_ZOOM"/>
       <span v-if="ready" class="zoom-label">ZOOM {{ zoom.toFixed(1) }}</span>
     </div>

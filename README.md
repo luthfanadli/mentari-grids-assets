@@ -20,7 +20,7 @@ Open http://localhost:5174. Published data is included in `public/data/`; Python
 - Search by name, reference, operator or source ID. Plant search also includes energy source and method. Reset restores defaults and clears search.
 - Below zoom 10, polygon records use interior symbols; zooming in shows original footprints. Selecting either opens the same source record. Pink outlined circles represent separate unvalidated source points.
 - Cards and the table count all matching original records. The viewport count deduplicates visible representations. Symbols never add records.
-- Basemaps: OpenStreetMap, Google Satellite, plain background and an optional configured MapLibre style. The extent button fits filtered records. Failed tiles can fall back to the plain background.
+- Basemaps: OpenStreetMap, Google Satellite, plain background and an optional configured MapLibre style. The extent button fits filtered records. Repeated basemap-tile failures show a short "Tiles unavailable" note only inside the Basemap menu; choose another basemap there.
 
 The layout fills the viewport with small responsive margins. Candidate data loads only when enabled; requests are cached and failures can be retried. **About the data** explains provenance and missing coverage.
 

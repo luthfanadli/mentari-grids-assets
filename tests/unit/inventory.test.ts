@@ -5,6 +5,7 @@ import { defaultFilters, filterAssets, selectionCounts, featureBounds } from '..
 import { formatValue, formatVoltage } from '../../src/utils/formatAssets.ts'
 import { createAssetRepository } from '../../src/services/assetData.ts'
 import { selectedDisplayPoints, renderedRecordCount, polygonStyleState } from '../../src/utils/substationPresentation.ts'
+import { isBasemapTileEvent } from '../../src/utils/basemaps.ts'
 import type { AssetCollection, InventorySummary, DisplayPointCollection, AssetFeature } from '../../src/types/assets.ts'
 
 const read = (filename: string) => JSON.parse(readFileSync(new URL(`../../public/data/${filename}`, import.meta.url), 'utf8'))
@@ -16,6 +17,18 @@ const plants = read('power-plants.geojson') as AssetCollection
 const symbols = read('substation-display-points.geojson') as DisplayPointCollection
 const summary = read('summary.json') as InventorySummary
 const all = [...lines.features, ...primary.features, ...review.features, ...points.features, ...plants.features]
+
+test('basemap tile status ignores inventory errors and events without tile context', () => {
+  const tile = { state: 'errored' }
+  for (const [sourceId, type] of [['osm', 'raster'], ['google-satellite', 'raster'], ['custom-background', 'vector']]) {
+    assert.ok(isBasemapTileEvent({ sourceId, source: { type }, tile }))
+  }
+  for (const event of [null, new Error('Map error'), { sourceId: 'osm', source: { type: 'raster' } },
+    { sourceId: 'data', source: { type: 'geojson' }, tile },
+    ...['inventory', 'substation-symbols', 'plant-symbols'].map(sourceId => ({ sourceId, source: { type: 'vector' }, tile }))]) {
+    assert.equal(isBasemapTileEvent(event), false)
+  }
+})
 
 test('actual export counts and default selection match the generated summary', () => {
   assert.equal(lines.features.length, summary.datasets.lines.count)

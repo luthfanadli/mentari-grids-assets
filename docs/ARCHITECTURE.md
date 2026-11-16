@@ -41,7 +41,7 @@ Responsive CSS shares MENTARI colors and a locally hosted variable font. Small v
 
 `utils/basemaps.ts` defines OSM raster, Google imagery, plain background and an optional public `VITE_BASEMAP_STYLE_URL`. Style reloads restore asset sources, plant images, selection and viewport calculations without resetting filters/camera. Provider credits and inventory attribution remain visible.
 
-MapLibre and its Vite worker are bundled separately. Inventory rendering does not wait for raster tiles. Tile errors or a 12-second pending-tile timeout offer plain background. WebGL failure leaves the searchable table/details available; failed data requests show filename-specific retry messages.
+MapLibre and its Vite worker are bundled separately. Inventory rendering does not wait for raster tiles. Two consecutive tile failures from an active raster/vector basemap show "Tiles unavailable" beneath its selected menu option. Inventory/general map errors and slow requests alone do not trigger it. Successful tile loading, a view change or a basemap switch clears the status; no banner covers the map and no automatic fallback changes the selection. WebGL failure leaves the searchable table/details available; failed data requests show filename-specific retry messages.
 
 ## Delivery
 

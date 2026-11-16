@@ -3,7 +3,7 @@ import { computed, nextTick, onMounted, onBeforeUnmount, ref } from 'vue'
 import { BASEMAP_LABELS } from '../utils/basemaps'
 import type { BasemapId } from '../utils/basemaps'
 
-const props = defineProps<{ selected: BasemapId; customAvailable: boolean; disabled: boolean }>()
+const props = defineProps<{ selected: BasemapId; customAvailable: boolean; disabled: boolean; tileError: boolean }>()
 const emit = defineEmits<{ change: [value: BasemapId] }>()
 const root = ref<HTMLElement | null>(null), button = ref<HTMLButtonElement | null>(null), opened = ref(false)
 const choices = computed<BasemapId[]>(() => ['osm', 'google_satellite', ...(props.customAvailable ? ['custom' as const] : []), 'plain'])
@@ -35,9 +35,9 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside))
       <fieldset><legend>Basemap</legend>
         <!-- Keep pointer focus inside the picker until the whole-row click selects a choice. -->
         <label v-for="choice in choices" :key="choice" class="basemap-choice" @pointerdown.prevent @click.prevent="select(choice)">
-          <input type="radio" name="map-basemap" :value="choice" :checked="choice === selected" @change="select(choice)"/>
+          <input type="radio" name="map-basemap" :value="choice" :checked="choice === selected" :aria-label="BASEMAP_LABELS[choice]" :aria-describedby="tileError && choice === selected && choice !== 'plain' ? 'basemap-tile-status' : undefined" @change="select(choice)"/>
           <span class="basemap-preview" :class="choice" aria-hidden="true"></span>
-          <span>{{ BASEMAP_LABELS[choice] }}</span>
+          <span class="basemap-label"><span>{{ BASEMAP_LABELS[choice] }}</span><small v-if="tileError && choice === selected && choice !== 'plain'" id="basemap-tile-status" role="status">Tiles unavailable</small></span>
         </label>
       </fieldset>
     </div>
@@ -52,6 +52,8 @@ legend { float: none; padding: 6px 8px 10px; margin: 0; font-size: 11px; font-we
 .basemap-choice { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; min-height: 43px }
 .basemap-choice:hover { background: var(--surface-soft) }
 .basemap-choice:has(input:checked) { background: var(--surface-blue); color: var(--brand-blue) }
+.basemap-label { min-width: 0 }
+.basemap-label small { display: block; margin-top: 3px; color: #805614; font-size: 10px; line-height: 1.4 }
 input { margin: 0; accent-color: var(--brand-blue); width: 14px; height: 14px; flex: none }
 .basemap-preview { width: 29px; height: 27px; border: 1px solid var(--border-strong); border-radius: 3px; flex: none; background-color: var(--map-background) }
 .osm { background: linear-gradient(35deg, transparent 42%, #fff 43%, #fff 51%, transparent 52%), linear-gradient(100deg, #dce7cc 40%, #c1d9e1 42%, #c1d9e1 52%, #e6edda 54%) }

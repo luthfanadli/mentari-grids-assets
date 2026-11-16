@@ -12,6 +12,14 @@ export const BASEMAP_LABELS: Record<BasemapId, string> = {
 export const GOOGLE_SATELLITE_TILE_URL = 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
 export const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
 
+type BasemapTileEvent = { sourceId: string; source: { type: string }; tile: { state?: string } }
+export function isBasemapTileEvent(event: unknown): event is BasemapTileEvent {
+  if (!event || typeof event !== 'object') return false
+  const data = event as Partial<BasemapTileEvent>
+  return typeof data.sourceId === 'string' && !['inventory', 'substation-symbols', 'plant-symbols'].includes(data.sourceId) &&
+    ['raster', 'raster-dem', 'vector'].includes(data.source?.type ?? '') && !!data.tile && typeof data.tile === 'object'
+}
+
 export function basemapStyle(id: BasemapId, customStyleUrl?: string): StyleSpecification | string {
   if (id === 'custom' && customStyleUrl) return customStyleUrl
   const style: StyleSpecification = {
