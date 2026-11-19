@@ -127,7 +127,6 @@ onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.r
           <p v-else class="layers-note">Loading project filters…</p>
         </details>
       </div>
-      <div class="layers-footer"><span v-if="busy" role="status">Loading layers…</span><span v-else>{{ formatNumber(features.length) }} OSM · {{ formatNumber(mappedProjectCount) }} mapped {{ mappedProjectCount === 1 ? 'project' : 'projects' }}</span></div>
     </div>
   </aside>
 </template>

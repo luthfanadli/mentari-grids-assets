@@ -80,7 +80,7 @@ function syncSelected() {
 }
 function addInventory() {
   if (!map || map.getSource('inventory')) return
-  map.addSource('inventory', { type: 'geojson', data: data(), attribution: OSM_ATTRIBUTION + ' · <a href="https://openinframap.org/">OpenInfraMap</a> · <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL</a>' })
+  map.addSource('inventory', { type: 'geojson', data: data(), attribution: OSM_ATTRIBUTION })
   map.addSource('substation-symbols', { type: 'geojson', data: symbolData() })
   map.addSource('plant-symbols', { type: 'geojson', data: plantSymbolData() })
   addPlantIcons()
@@ -213,7 +213,7 @@ onMounted(async () => {
     mapAvailable.value = true
     map.addControl(new libre.NavigationControl({ showCompass: false }), 'top-right')
     map.addControl(new libre.ScaleControl({ unit: 'metric', maxWidth: 80 }), 'bottom-left')
-    map.addControl(new libre.AttributionControl(), 'bottom-right')
+    map.addControl(new libre.AttributionControl({ compact: false, customAttribution: [] }), 'bottom-right')
     map.on('style.load', addInventory)
     map.on('idle', updateViewport)
     map.on('sourcedata', event => {

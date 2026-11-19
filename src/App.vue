@@ -147,5 +147,5 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHashChange))
         @select="select" @show="showPlans" @retry="loadLayer" @retry-catalog="loadCatalog" @reset="clearRegisterFilters"/>
     </section>
   </ReportDialog>
-  <DataProvenanceDialog v-if="aboutOpen" :summary="summary" :catalog="catalog" @close="aboutOpen = false"/>
+  <DataProvenanceDialog v-if="aboutOpen" @close="aboutOpen = false"/>
 </template>

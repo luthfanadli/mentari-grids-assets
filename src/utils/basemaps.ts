@@ -10,7 +10,7 @@ export const BASEMAP_LABELS: Record<BasemapId, string> = {
 }
 
 const GOOGLE_SATELLITE_TILE_URL = 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-export const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
+export const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
 const GEOGRAPHY_SOURCE = 'regional-context'
 
 type BasemapTileEvent = { sourceId: string; source: { type: string }; tile: { state?: string } }
@@ -24,7 +24,6 @@ export function isBasemapTileEvent(event: unknown): event is BasemapTileEvent {
 function addGeographicContext(style: StyleSpecification) {
   style.sources[GEOGRAPHY_SOURCE] = {
     type: 'geojson', data: `${import.meta.env?.BASE_URL ?? '/'}basemap/regional-context.geojson`, maxzoom: 8,
-    attribution: '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>',
   }
   style.layers.push({
     id: 'regional-land', type: 'fill', source: GEOGRAPHY_SOURCE, filter: ['==', ['geometry-type'], 'Polygon'],

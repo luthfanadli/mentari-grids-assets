@@ -43,6 +43,18 @@ async function searchMap(page: Page, value: string) {
 }
 async function reset(page: Page) { await rail(page).getByRole('button', { name: 'Reset filters' }).click() }
 
+async function expectInventoryCount(page: Page, count: string) {
+  await nav(page, 'Summary')
+  await expect(page.getByRole('heading', { name: 'Selected records ' + count, exact: true })).toBeVisible()
+  await nav(page, 'Map')
+}
+
+async function expectMappedProjectCount(page: Page, count: string) {
+  await nav(page, 'RUPTL plans')
+  await expect(page.getByRole('region', { name: 'Planning register', exact: true }).locator('.viewport-count')).toContainText(count + ' selected for map')
+  await nav(page, 'Map')
+}
+
 function projectCoordinate(lng: number, lat: number) {
   return [(lng + 180) / 360, (1 - Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) / Math.PI) / 2]
 }
@@ -60,9 +72,10 @@ test('map opens full-height; navigation exposes summaries, project records and a
   page.on('request', r => calls.push(r.url()))
   await start(page)
   await expect(rail(page)).toBeVisible()
+  const osmCredit = page.locator('.maplibregl-ctrl-attrib').getByRole('link', { name: 'OpenStreetMap', exact: true })
+  await expect(osmCredit).toHaveAttribute('href', 'https://www.openstreetmap.org/copyright')
   await expect(page.getByTestId('line-count')).not.toBeVisible()
   await expect(page.locator('.asset-table-card')).not.toBeVisible()
-  await expect(rail(page).locator('.layers-footer')).toContainText('5,599 OSM')
   expect(calls.filter(url => /planning\/.*\.geojson|substations-(review|point-candidates)/.test(url))).toHaveLength(0)
   for (const width of [1366, 1920, 390, 320]) {
     await page.setViewportSize({ width, height: 844 })
@@ -71,6 +84,7 @@ test('map opens full-height; navigation exposes summaries, project records and a
     expect(bounds.height + header.height).toBeCloseTo(844, 0)
     expect(bounds.x + bounds.width).toBeCloseTo(width, 0)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    await expect(osmCredit).toBeVisible()
   }
   await nav(page, 'Summary')
   for (const [key, count] of Object.entries({ line: '4,345', primary: '621', plant: '633', review: '0', point: '0' })) {
@@ -87,8 +101,17 @@ test('map opens full-height; navigation exposes summaries, project records and a
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'About the data' }).click()
   const about = page.getByRole('dialog', { name: 'About the data' })
-  await expect(about).toContainText('IPM’s 15 November 2026 release')
+  await expect(about).toContainText('RUPTL 2025–2034 and RUKN 2025–2060')
   await expect(about.getByRole('link', { name: 'ODbL 1.0' })).toBeVisible()
+  await expect(about.getByRole('link', { name: 'CC BY-SA 4.0' })).toBeVisible()
+  await expect(about.getByRole('link', { name: 'Indonesia Power Map', exact: true })).toBeVisible()
+  await expect(about.getByRole('link', { name: 'Natural Earth', exact: true })).toBeHidden()
+  await about.locator('summary').filter({ hasText: 'Additional credits' }).click()
+  await expect(about.getByRole('link', { name: 'Natural Earth', exact: true })).toBeVisible()
+  await expect(about.getByRole('link', { name: 'MapLibre GL JS', exact: true })).toBeVisible()
+  await about.locator('.about-body').evaluate(element => { element.scrollTop = element.scrollHeight })
+  await expect(about.getByRole('button', { name: 'Close about data' })).toBeInViewport()
+  expect(await about.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
   await page.keyboard.press('Escape')
   await expect(about).not.toBeVisible()
   await nav(page, 'Summary')
@@ -121,7 +144,7 @@ test('an empty map retains its choices and search; OSM flags and candidates stay
   await nav(page, 'Map')
   await check(page, 'Power-plant footprints', false)
   for (const kV of [70, 150, 275, 500]) await check(page, kV + ' kV', false)
-  await expect(rail(page).locator('.layers-footer')).toContainText('37 OSM')
+  await expectInventoryCount(page, '37')
   await check(page, 'Unknown voltage', false)
   await expect(rail(page).locator('.layers-empty')).toContainText('No records match')
   await page.getByRole('button', { name: 'Collapse map layers' }).click()
@@ -129,7 +152,7 @@ test('an empty map retains its choices and search; OSM flags and candidates stay
   await expect(rail(page).getByRole('checkbox', { name: 'Review polygons' })).toBeChecked()
   await expect(rail(page).getByRole('checkbox', { name: 'Unknown voltage' })).not.toBeChecked()
   await reset(page)
-  await expect(rail(page).locator('.layers-footer')).toContainText('5,599 OSM')
+  await expectInventoryCount(page, '5,599')
 })
 
 test('failed candidate retries independently; an original point remains separate from primary polygons', async ({ page }) => {
@@ -244,7 +267,7 @@ test('inventory and basemap failures remain retryable without blocking the plan 
   await nav(page, 'Map')
   fail = false
   await page.getByRole('button', { name: 'Retry inventory' }).click()
-  await expect(rail(page).locator('.layers-footer')).toContainText('5,599 OSM')
+  await expectInventoryCount(page, '5,599')
   expect(requests).toBe(2)
   await page.getByRole('button', { name: /Change basemap/ }).click()
   const picker = page.getByRole('dialog', { name: 'Basemap options' })
@@ -289,13 +312,15 @@ test('planned overlays load separately, retry, and survive a basemap change with
   await expect(rail(page).getByRole('alert')).toContainText('generators.geojson')
   fail = false
   await rail(page).getByRole('button', { name: 'Retry projects' }).click()
-  await expect(rail(page).locator('.layers-footer')).toContainText('1,059 mapped projects')
+  await expect(rail(page).getByText('Loading projects…', { exact: true })).toHaveCount(0)
+  await expect(rail(page).getByRole('alert')).toHaveCount(0)
   expect(urls.some(u => u.endsWith('/planning/transmission.geojson') || u.endsWith('/planning/substations.geojson'))).toBe(false)
+  await expectMappedProjectCount(page, '1,059')
   await expand(page, 'Project filters')
   await projectFilters.getByRole('combobox', { name: 'Plan source', exact: true }).selectOption('RUKN 2025-2060')
-  await expect(rail(page).locator('.layers-footer')).toContainText('1 mapped project')
+  await expectMappedProjectCount(page, '1')
   await projectFilters.getByRole('combobox', { name: 'Target COD year', exact: true }).selectOption('2025')
-  await expect(rail(page).locator('.layers-footer')).toContainText('0 mapped projects')
+  await expectMappedProjectCount(page, '0')
   await expect(projectFilters).toBeVisible()
   await projectFilters.getByRole('combobox', { name: 'Target COD year', exact: true }).selectOption('')
   await check(page, 'Generation projects', false)
@@ -303,7 +328,7 @@ test('planned overlays load separately, retry, and survive a basemap change with
   await check(page, 'Generation projects', true)
   await expect(projectFilters).toBeVisible()
   await expect(projectFilters).toHaveJSProperty('open', false)
-  await expect(rail(page).locator('.layers-footer')).toContainText('1 mapped project')
+  await expectMappedProjectCount(page, '1')
   await expand(page, 'Project filters')
   await expect(projectFilters.getByRole('combobox', { name: 'Plan source', exact: true })).toHaveValue('RUKN 2025-2060')
   await nav(page, 'RUPTL plans')
@@ -312,7 +337,8 @@ test('planned overlays load separately, retry, and survive a basemap change with
   await nav(page, 'Map')
   const project = generators.features.find(f => f.properties.source.startsWith('RUKN'))!
   await searchMap(page, project.properties.id)
-  await expect(rail(page).locator('.layers-footer')).toContainText('0 OSM · 1 mapped project')
+  await expectInventoryCount(page, '0')
+  await expectMappedProjectCount(page, '1')
   const zoom = await map(page).getAttribute('data-zoom')
   await page.getByRole('button', { name: /Change basemap/ }).click()
   await page.getByRole('dialog', { name: 'Basemap options' }).getByText('Google Satellite', { exact: true }).click()
@@ -321,8 +347,8 @@ test('planned overlays load separately, retry, and survive a basemap change with
   await expect(map(page)).toHaveAttribute('data-zoom', zoom!)
   const credits = page.locator('.maplibregl-ctrl-attrib')
   await expect(credits).toContainText('Google Maps')
-  await expect(credits).toContainText('OpenStreetMap contributors')
-  await expect(credits).toContainText('Indonesia Power Map')
+  await expect(credits.getByRole('link', { name: 'OpenStreetMap', exact: true })).toBeVisible()
+  await expect(credits.getByRole('link', { name: 'Indonesia Power Map', exact: true })).toHaveCount(0)
   const xy = project.geometry!.type === 'Point' ? project.geometry!.coordinates : []
   await expect(async () => {
     await page.locator('.maplibregl-canvas').click({ position: await mapPosition(page, xy) })
@@ -352,7 +378,7 @@ test('planning register distinguishes all records, mapped routes, sources and co
   await register.getByRole('combobox', { name: 'Target COD year', exact: true }).selectOption('2045')
   await expect(heading).toHaveText('Project register 3')
   await page.getByRole('button', { name: 'Show results on map' }).click()
-  await expect(rail(page).locator('.layers-footer')).toContainText('3 mapped projects')
+  await expectMappedProjectCount(page, '3')
   await expect(rail(page).getByRole('checkbox', { name: 'Substation projects' })).toBeChecked()
   await nav(page, 'RUPTL plans')
   await register.getByRole('button', { name: 'Reset filters' }).click()

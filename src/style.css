@@ -103,7 +103,6 @@ details[open] > summary > .chevron { transform: rotate(45deg) }
 .unknown-voltage { margin-bottom: 6px }
 .status-key.tagged_construction { border-top-style: dashed }
 .status-key.tagged_disused { border-top-style: dotted }
-.layers-footer { border-top: 1px solid var(--border); min-height: 45px; padding: 8px 16px; display: flex; align-items: center; color: var(--muted); background: var(--surface-soft); font-size: .74rem }
 .text-button { padding: 3px 0; font-size: .81rem; font-weight: 650; color: var(--brand-blue); text-underline-offset: 3px }
 .text-button:hover { text-decoration: underline }
 .map-actions { position: absolute; z-index: 2; top: 14px; right: 14px; display: flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--border-strong); background: white; border-radius: 6px; box-shadow: var(--shadow-soft) }
@@ -111,7 +110,8 @@ details[open] > summary > .chevron { transform: rotate(45deg) }
 .map-tool-button:hover:not(:disabled), .map-tool-button[aria-expanded=true] { background: var(--surface-blue) }
 .map-tools-divider { width: 1px; height: 17px; background: var(--border) }
 .map-container .maplibregl-ctrl-top-right { top: 58px; right: 4px }
-.maplibregl-ctrl-attrib { font-size: 11px }
+.maplibregl-ctrl-attrib { font-size: 11px; line-height: 16px }
+.maplibregl-ctrl-attrib a { display: inline-block; max-width: 100%; vertical-align: bottom }
 .map-loading, .map-failure, .map-data-status { position: absolute; z-index: 1; padding: 10px 14px; background: #fffffff5; border-radius: 5px; box-shadow: var(--shadow-soft); text-align: center; font-size: .85rem; line-height: 1.5 }
 .map-loading, .map-failure { top: 45%; left: 50%; transform: translate(-50%, -50%); max-width: min(440px, 80%) }
 .map-data-status { bottom: 40px; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px) }
@@ -202,12 +202,19 @@ select { appearance: none; padding-right: 26px; background-image: url("data:imag
 .asset-group .plan-filter-fields { display: grid; gap: 8px; padding: 4px 0 12px }
 .register-options { flex-wrap: wrap; justify-content: space-between; margin-bottom: 10px; color: var(--muted); font-size: .74rem }
 .load-error { padding: 12px; overflow-wrap: anywhere; background: #fff3e8; border-radius: 4px; font-size: .85rem }
-.provenance-dialog { width: min(660px, calc(100% - 24px)); max-height: 85dvh; padding: 0; border: 1px solid var(--border); border-radius: 9px; color: var(--ink) }
+.provenance-dialog { width: min(600px, calc(100% - 24px)); max-height: calc(100dvh - 40px); padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 9px; color: var(--ink) }
+.provenance-dialog[open] { display: flex; flex-direction: column }
 .provenance-dialog::backdrop { background: #14354860 }
-.dialog-inner { padding: clamp(18px, 3vw, 28px) }
-.provenance-dialog h2 { font-size: 1.5rem; letter-spacing: -.04em }
-.provenance-dialog h3 { font-size: 1rem; margin: 21px 0 7px }
-.provenance-dialog p { margin: 7px 0; font-size: .89rem; line-height: 1.75; color: var(--muted) }
+.provenance-dialog .dialog-inner { display: flex; flex-direction: column; min-height: 0; padding: 18px 22px }
+.provenance-dialog .drawer-heading { flex: none; margin-bottom: 14px }
+.provenance-dialog .about-body { min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; overflow-wrap: anywhere }
+.provenance-dialog h2 { font-size: 1.2rem; letter-spacing: -.035em }
+.provenance-dialog h3 { font-size: .875rem; margin: 0 0 5px }
+.provenance-dialog section + section { margin-top: 16px }
+.provenance-dialog p { margin: 5px 0 0; font-size: .8125rem; line-height: 1.6; color: var(--muted) }
+.provenance-dialog .source-links { font-size: .75rem }
+.additional-credits { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border) }
+.additional-credits summary { font-size: .75rem; color: var(--muted); cursor: pointer }
 @media(max-width: 900px) {
   .app-header { gap: 14px }
   .primary-nav > a, .primary-nav > button { padding-inline: 12px }

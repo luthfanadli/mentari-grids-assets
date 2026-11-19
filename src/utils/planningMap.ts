@@ -20,7 +20,6 @@ export function projectMapData(projects: ProjectFeature[]): FeatureCollection<Pr
 export function addProjectLayers(map: LibreMap, projects: ProjectFeature[]) {
   map.addSource(projectSource, {
     type: 'geojson', data: projectMapData(projects),
-    attribution: '<a href="https://indonesiapowermap.com/#data" target="_blank" rel="noopener">Indonesia Power Map</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>',
   })
   map.addLayer({ id: 'planning-lines', type: 'line', source: projectSource, filter: ['==', ['get', 'kind'], 'transmission'],
     paint: { 'line-color': planColor, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 1.7, 12, 4], 'line-dasharray': [3, 2] },
