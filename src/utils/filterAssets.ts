@@ -5,7 +5,7 @@ export const VOLTAGES = [500, 275, 150, 70] as const
 export function defaultFilters(): AssetFilters {
   return { query: '', voltages: [...VOLTAGES], statuses: ['not_flagged_in_osm'], lines: true, primary: true, powerPlants: true, review: false, pointCandidates: false, unknownVoltage: true }
 }
-export function matchesFeature(feature: AssetFeature, filters: AssetFilters): boolean {
+function matchesFeature(feature: AssetFeature, filters: AssetFilters): boolean {
   const p = feature.properties
   if (p.osm_tag_status === 'conflicting_tags' || !filters.statuses.includes(p.osm_tag_status)) return false
   if (p.asset_type === 'power_plant') {

@@ -28,7 +28,7 @@ onMounted(() => dialog.value?.showModal())
       <h3>Planning projects</h3>
       <p>The three supplied Indonesia Power Map files cite RUPTL 2025–2034 and RUKN 2025–2060. Each row describes a project or work item. Locations and routes are mapped by IPM. The details show the reported stage, target year, location confidence or route status, and source page when supplied.</p>
       <p v-if="planTotals">Map geometry is available for {{ formatNumber(planTotals.mapped) }} of {{ formatNumber(planTotals.records) }} projects. The register also lists transmission projects whose route has coincident vertices or is marked unavailable by the source.</p>
-      <p>Sitompul, S. A. · <a href="https://indonesiapowermap.com/#data">Indonesia Power Map</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. The dashboard adds map identifiers and withholds unusable route geometries.</p>
+      <p><a href="https://indonesiapowermap.com/#data">Indonesia Power Map</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. The dashboard adds map identifiers and withholds unusable route geometries.</p>
       <h3>Comparison with Indonesia Power Map</h3>
       <p>IPM’s 15 November 2026 release lists 1,947 existing transmission entries, 1,158 substations and 3,199 generation entries. MENTARI counts OSM segments and footprints. For planning, the three supplied files match the IPM downloads byte for byte.</p>
       <p><a href="https://indonesiapowermap.com/#data">IPM open data</a> · <a href="https://indonesiapowermap.com/docs/publication_policy.md">IPM publication policy</a></p>

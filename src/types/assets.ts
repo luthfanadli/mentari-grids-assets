@@ -3,7 +3,7 @@ import type { Feature, FeatureCollection, LineString, MultiLineString, Polygon, 
 export type OsmStatus = 'not_flagged_in_osm' | 'tagged_construction' | 'tagged_disused' | 'conflicting_tags'
 export type ReviewReason = 'transmission_missing_voltage' | 'high_voltage_unknown_type' | 'high_voltage_distribution_tag' | 'point_only_unvalidated'
 export type AssetGeometry = LineString | MultiLineString | Polygon | MultiPolygon | Point
-export interface AssetProperties {
+interface AssetProperties {
   feature_id: string
   source_layer: string
   source_id: string
@@ -45,7 +45,7 @@ export interface AssetProperties {
 }
 export type AssetFeature = Feature<AssetGeometry, AssetProperties>
 export type AssetCollection = FeatureCollection<AssetGeometry, AssetProperties>
-export interface DisplayPointProperties {
+interface DisplayPointProperties {
   feature_id: string
   represented_feature_id: string
   source_id: string
@@ -66,7 +66,7 @@ export interface AssetFilters {
   pointCandidates: boolean
   unknownVoltage: boolean
 }
-export interface DatasetSummary {
+interface DatasetSummary {
   count: number
   statuses: Record<OsmStatus, number>
   voltage_kv: Record<string, number>

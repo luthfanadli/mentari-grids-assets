@@ -8,6 +8,7 @@ import AssetTable from './components/AssetTable.vue'
 import AssetDetailsDrawer from './components/AssetDetailsDrawer.vue'
 import DataProvenanceDialog from './components/DataProvenanceDialog.vue'
 import ProjectRegister from './components/ProjectRegister.vue'
+import ReportDialog from './components/ReportDialog.vue'
 import { useAssetFilters } from './composables/useAssetFilters'
 import { usePlanning } from './composables/usePlanning'
 import { createAssetRepository } from './services/assetData'
@@ -26,6 +27,7 @@ const main = ref<HTMLElement>()
 const viewportCount = ref<number | null>(null), planViewport = ref<number | null>(null)
 const sidebar = ref<InstanceType<typeof MapLayersControl>>()
 const mapCanvas = ref<InstanceType<typeof MapCanvas>>()
+const assetDetails = ref<InstanceType<typeof AssetDetailsDrawer>>()
 const selected = shallowRef<AssetFeature | ProjectFeature | null>(null)
 const selectedId = computed(() => selected.value ? String(selected.value.id) : null)
 const mappedProjectCount = computed(() => projects.value.filter(project => project.geometry).length)
@@ -64,8 +66,16 @@ async function select(record: AssetFeature | ProjectFeature) {
   }
   navigate('map')
   sidebar.value?.closeOnMobile()
+  await nextTick()
   selected.value = record
-  if (sameRecord) { await nextTick(); mapCanvas.value?.fitFeatures([record]) }
+  await nextTick()
+  assetDetails.value?.focus()
+  if (sameRecord) mapCanvas.value?.fitFeatures([record])
+}
+async function showMapFilters() {
+  navigate('map')
+  await nextTick()
+  sidebar.value?.open()
 }
 async function showPlans(kinds: PlanningKind[]) {
   enabled.value = [...kinds]
@@ -100,7 +110,7 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHashChange))
   <a class="skip-link" href="#main" @click.prevent="main?.focus()">Skip to content</a>
   <AppHeader :page="page" @navigate="navigate" @about="aboutOpen = true"/>
   <main id="main" ref="main" tabindex="-1">
-    <div class="map-workspace" :class="{ 'inactive-map': page !== 'map' }" :inert="page !== 'map'" :aria-hidden="page !== 'map' ? true : undefined">
+    <div class="map-workspace">
       <h1 class="sr-only">Indonesia power map</h1>
       <MapCanvas ref="mapCanvas" :features="selectedFeatures" :projects="projects" :display-points="selectedSymbols" :selected-id="selectedId" @select="select" @viewport="updateViewport">
         <template #layers="{ overview }">
@@ -114,12 +124,14 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHashChange))
           <div v-if="error" class="map-data-status load-error" role="alert">{{ error }} <button class="text-button" @click="load">Retry inventory</button></div>
           <div v-else-if="loading" class="map-data-status" role="status">Loading mapped inventory…</div>
         </template>
-        <template #details><AssetDetailsDrawer v-if="selected" :feature="selected" :colocated="colocated" @select="select" @close="selected = null"/></template>
+        <template #details><AssetDetailsDrawer v-if="selected" ref="assetDetails" :feature="selected" :colocated="colocated" @select="select" @close="selected = null"/></template>
       </MapCanvas>
     </div>
-    <section v-if="visited.summary" v-show="page === 'summary'" class="report-page" aria-label="Inventory summary">
+  </main>
+  <ReportDialog :view="page" @close="navigate('map')">
+    <section v-if="visited.summary" v-show="page === 'summary'" class="report-panel" aria-label="Inventory summary">
       <div class="page-content">
-        <div class="page-heading"><div><h1>Inventory summary</h1><p>Selected OpenStreetMap records across Indonesia. Map filters apply.</p></div><button class="outline-button" @click="navigate('map')">Map filters</button></div>
+        <div class="page-heading"><p>Selected OpenStreetMap records across Indonesia. Map filters apply.</p><button class="outline-button" @click="showMapFilters">Map filters</button></div>
         <InventorySummary :counts="counts" :summary="summary" :loading="loading || !!error"/>
         <div v-if="error" role="alert" class="load-error">{{ error }} <button class="text-button" @click="load">Retry inventory</button></div>
         <p v-else-if="loading" role="status">Loading mapped inventory…</p>
@@ -127,14 +139,13 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHashChange))
           <label class="search-box summary-search"><span class="sr-only">Search inventory records</span><input v-model="filters.query" type="search" placeholder="Search by name, reference, operator or ID…"/></label>
           <AssetTable :features="selectedFeatures" :selected-id="selectedId" :viewport-count="viewportCount" @select="select" @reset="reset"/>
         </template>
-        <p class="report-footnote">The RUPTL plans register lists planning projects separately. <a href="#plans">Browse projects</a></p>
       </div>
     </section>
-    <section v-if="visited.plans" v-show="page === 'plans'" class="report-page" aria-label="Planning register">
+    <section v-if="visited.plans" v-show="page === 'plans'" class="report-panel" aria-label="Planning register">
       <ProjectRegister v-model:query="filters.query" v-model:criteria="criteria" :catalog="catalog" :catalog-error="catalogError"
         :matches="matching" :loading="planLoading" :errors="planErrors" :selected-count="mappedProjectCount" :viewport-count="planViewport" :voltages="filters.voltages"
         @select="select" @show="showPlans" @retry="loadLayer" @retry-catalog="loadCatalog" @reset="clearRegisterFilters"/>
     </section>
-  </main>
+  </ReportDialog>
   <DataProvenanceDialog v-if="aboutOpen" :summary="summary" :catalog="catalog" @close="aboutOpen = false"/>
 </template>

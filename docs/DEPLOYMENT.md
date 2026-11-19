@@ -46,7 +46,7 @@ The same suite can target an authorized Vercel preview by changing the base URL.
 - Both catalogs and their data URLs return the expected bytes. Verify the planning register shows 4,057 records and that all three overlays together offer 4,047 mappable projects.
 - Optional candidates and construction/disused flags remain separate. Point voltage and plant output units remain unknown.
 - Search `-18678451` opens GITET Pedan with its original signed ID and geometry.
-- Map fills the viewport below the navbar. Test the collapsible sidebar, Summary, RUPTL plans, map/details selection, attribution and mobile controls.
+- Map fills the viewport below the navbar. Test the collapsible sidebar, Summary and RUPTL plans modals, keyboard dismissal and focus restoration, map/details selection, attribution and mobile controls.
 - Refresh works; data revalidates. Raw GPKG, references, internal QA and secrets are absent from the build.
 
 The app fetches static data publicly even without download controls. External basemaps require provider availability and applicable usage terms; Google Satellite uses the supplied direct endpoint rather than a Map Tiles API session integration. Local tests do not verify a hosted account, domain, deployment protection or CDN settings.

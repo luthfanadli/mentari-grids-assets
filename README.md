@@ -1,4 +1,4 @@
-# MENTARI Grids — Indonesia power atlas
+# MENTARI Grids
 
 A Vue 3, Vite, TypeScript and MapLibre WebGIS for Deliverable 2. Explore Indonesia’s mapped electricity network alongside the supplied IPM planning projects. The inventory and project register retain the source IDs, attributes and units of each publication.
 
@@ -11,15 +11,16 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open http://localhost:5174. The repository includes the prepared map data. Python and the private inputs are needed for regeneration. Optional basemap configuration is in [.env.example](.env.example).
+Open http://localhost:5174. Windows PowerShell users can run the commands with `pnpm.cmd`. The repository includes the prepared map data. Python and the private inputs are needed for regeneration. Optional basemap configuration is in [.env.example](.env.example).
 
 ## Use the dashboard
 
 - **Map** fills the space below the navbar. The left sidebar is open on desktop. On a phone, use **Layers** to open it. Panning and zooming preserve the panel and your selections.
 - In the sidebar, toggle mapped assets and project layers by asset type. Open **Review candidates** for the two optional substation layers. Grid voltage applies to lines and substations. **OSM status** applies to the baseline, and **Plan filters** controls the plan source, stage and target COD year.
 - Search the enabled layers by name or source ID and select a result to inspect it. Plan search also accepts provinces, systems and source site IDs. Select an overlapping project point to browse the matching projects at those coordinates.
-- **Summary** opens filtered OSM record counts and the paginated asset table. It distinguishes the selected inventory from the records currently drawn in the viewport. Polygon symbols below zoom 10 and the original footprints at local zoom represent the same records.
-- **RUPTL plans** opens all three planning files, including RUKN studies and entries without a drawable route. Filter the register, use **Show results on map**, or select a row to inspect one project. The map sidebar can load any one planning layer independently.
+- **Summary** opens a modal over the map with filtered OSM record counts and the paginated asset table. Its search updates the shared map selection. It distinguishes the selected inventory from the records drawn in the viewport. Polygon symbols below zoom 10 and original footprints at local zoom represent the same records.
+- **RUPTL plans** opens the project register in the same modal, including RUKN studies and entries without a drawable route. Filter the register, use **Show results on map**, or select a row to close the modal and inspect one project. The map sidebar can load any one planning layer independently.
+- Close a report using its close button, Escape or the desktop backdrop, and open reports from the navbar. Tables show ten records per page with pagination at the bottom of the visible table. Reports fill the screen on phones. Reopening preserves search, filter choices, table pages and scroll positions. The map camera stays in place while reading a report. Existing `#summary` and `#plans` links and browser Back/Forward open the corresponding report.
 - The basemap picker offers OpenStreetMap, Google Satellite, plain background and an optional custom style. Natural Earth cartography provides regional context while OSM tiles load. Source attribution and the dated data comparison are available under **About the data**.
 
 ## Published scope
@@ -59,9 +60,9 @@ pnpm build
 pnpm test:e2e
 ```
 
-Build runs the publication checksum/count guard, Vue/TypeScript checking and Vite. Node tests cover filters, counting, request caching/retry and Git byte preservation. Python tests cover source selection, geometry, matching and deterministic exports; source-dependent cases explicitly skip if the private GeoPackage is absent.
+Build runs the publication checksum/count guard, Vue/TypeScript checking and Vite. Node tests cover filters, counting, request caching/retry and Git byte preservation. Python tests cover source selection, geometry, matching, inherited planning-file access permissions on Windows and deterministic exports. Source-dependent cases report skips when their required private inputs are absent.
 
-Browser tests use real MapLibre rendering and start the local dev server automatically. Install Chromium with `pnpm exec playwright install chromium`, or set `PLAYWRIGHT_CHANNEL=msedge` to use installed Edge. Production-preview commands are in [deployment](docs/DEPLOYMENT.md). The existing MapLibre vendor-size warning is nonfatal; it is not suppressed.
+Browser tests use real MapLibre rendering and start the local dev server automatically. They cover modal dismissal, focus restoration, browser history, shared map filters, candidate retries, project selection and responsive layouts. Install Chromium with `pnpm exec playwright install chromium`, or set `PLAYWRIGHT_CHANNEL=msedge` to use installed Edge. Production-preview commands are in [deployment](docs/DEPLOYMENT.md). The MapLibre vendor-size warning is nonfatal.
 
 ## Documentation
 

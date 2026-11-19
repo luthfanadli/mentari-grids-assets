@@ -52,7 +52,7 @@ function escape(event: KeyboardEvent) {
 }
 function closeOnMobile() { if (!desktop.matches) close() }
 function select(record: AssetFeature | ProjectFeature) { closeOnMobile(); emit('select', record) }
-defineExpose({ closeOnMobile })
+defineExpose({ closeOnMobile, open })
 onMounted(() => { desktop.addEventListener('change', adapt); document.addEventListener('keydown', escape) })
 onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.removeEventListener('keydown', escape) })
 </script>
@@ -63,9 +63,15 @@ onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.r
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="m3 8 9-5 9 5-9 5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg>Layers
     </button>
     <div v-show="opened" id="map-layers-panel" class="layers-panel" role="region" aria-label="Map layers">
-      <div class="layers-heading"><h2>Map layers</h2><button class="icon-button" aria-label="Collapse map layers" aria-controls="map-layers-panel" :aria-expanded="opened" @click="close(true)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M9 4v16m7-11-3 3 3 3"/></svg>
-      </button></div>
+      <div class="layers-heading">
+        <h2>Map layers</h2>
+        <div class="layers-heading-actions">
+          <button type="button" class="outline-button" @click="emit('reset')">Reset filters</button>
+          <button type="button" class="icon-button" aria-label="Collapse map layers" aria-controls="map-layers-panel" :aria-expanded="opened" @click="close(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M9 4v16m7-11-3 3 3 3"/></svg>
+          </button>
+        </div>
+      </div>
       <div class="layers-body">
         <div class="sidebar-search">
           <label class="search-box"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>
@@ -102,7 +108,7 @@ onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.r
               <label class="layer-row"><input v-model="filters.pointCandidates" type="checkbox"/><i class="layer-key point" aria-hidden="true"></i><span>Point-only candidates</span><small aria-hidden="true">{{ summary?.datasets.point_candidates.count }}</small></label>
               <p v-if="pointLoading && filters.pointCandidates" class="layers-note" role="status">Loading points…</p>
               <p v-if="pointError && filters.pointCandidates" class="layers-error" role="alert">{{ pointError }} <button class="text-button" @click="emit('retryPoints')">Retry point candidates</button></p>
-              <p class="layers-note">Manual review required. Point voltages are unknown.</p>
+              <p class="layers-note">Review required. Point voltages are unknown.</p>
             </details>
           </div>
         </details>
@@ -121,7 +127,7 @@ onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.r
           <p v-else class="layers-note">Loading plan filters…</p>
         </details>
       </div>
-      <div class="layers-footer"><span v-if="busy" role="status">Loading layers…</span><span v-else>{{ formatNumber(features.length) }} OSM · {{ formatNumber(mappedProjectCount) }} mapped {{ mappedProjectCount === 1 ? 'project' : 'projects' }}</span><button class="text-button" @click="emit('reset')">Reset filters</button></div>
+      <div class="layers-footer"><span v-if="busy" role="status">Loading layers…</span><span v-else>{{ formatNumber(features.length) }} OSM · {{ formatNumber(mappedProjectCount) }} mapped {{ mappedProjectCount === 1 ? 'project' : 'projects' }}</span></div>
     </div>
   </aside>
 </template>

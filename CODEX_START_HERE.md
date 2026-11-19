@@ -21,7 +21,15 @@ Run `pnpm test`, `pnpm build` and relevant `pnpm test:e2e` scenarios. Update the
 
 The IPM planning publication has its own four files, source audit fixture and QA report. With the three supplied `ruptl_*.geojson` files in `data/raw/`, stage with `python scripts/prepare_planning.py --output data/interim/planning-preview --qa-output data/qa`. Review `planning-qa.json`, compare the catalog and source hashes, then run `python scripts/prepare_planning.py` to replace the set in `public/data/planning/`. `pnpm check:data` validates both publications. Project targets, confidence, scenario years and source attribution belong to the project records.
 
+Planning publication replacements use sibling temporary files so Windows access permissions inherit from the destination directory.
+
 Internal QA includes exclusions, status conflicts, source points and complete point/polygon matching reports. It is not a static asset. Individual publication files are replaced atomically; the nine-file set must be reviewed and committed together.
+
+## Local generated files
+
+`dist/` is recreated by `pnpm build`. Reviewed staging output in `data/interim/`, UI screenshots, obsolete build snapshots, `test-results/`, `playwright-report/` and Python `__pycache__/` directories can be cleared after verification.
+
+Keep the current QA evidence in `data/qa/`, including `qa-report.json`, `exclusion-report.json`, `conflicting-status.geojson`, `substation-points.geojson`, `substation-matching-report.json`, `substation-matching-report.csv` and `planning-qa.json`. Retain source/licence files in `data/raw/`, audit fixtures in `scripts/` and supplementary source-analysis evidence used for validation.
 
 ## QGIS Python fallback on Windows
 

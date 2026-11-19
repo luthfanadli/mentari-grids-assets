@@ -18,7 +18,7 @@ const listOnly = ref(false)
 const kinds = computed(() => kind.value ? [kind.value] : [...planningKinds])
 const records = computed(() => kinds.value.flatMap(k => props.matches[k]).filter(f => !listOnly.value || !f.geometry))
 const busy = computed(() => kinds.value.some(k => props.loading[k]))
-const page = ref(1), pageSize = 20
+const page = ref(1), pageSize = 10
 const pages = computed(() => Math.max(1, Math.ceil(records.value.length / pageSize)))
 const pageRows = computed(() => records.value.slice((page.value - 1) * pageSize, page.value * pageSize))
 watch(records, () => { page.value = 1 })
@@ -27,7 +27,7 @@ function reset() { kind.value = ''; listOnly.value = false; emit('reset') }
 <template>
   <div class="page-content">
     <div class="page-heading">
-      <div><h1>Planning projects</h1><p>RUPTL 2025–2034 and RUKN 2025–2060 · Indonesia Power Map</p></div>
+      <p>RUPTL 2025–2034 and RUKN 2025–2060 · Indonesia Power Map</p>
       <button class="primary-button" :disabled="busy || !records.some(f => f.geometry)" @click="emit('show', kinds)">Show results on map</button>
     </div>
     <section v-if="catalog" class="plan-totals" aria-label="Published planning records">

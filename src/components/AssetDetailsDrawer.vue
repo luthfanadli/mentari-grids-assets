@@ -9,6 +9,8 @@ const props = defineProps<{ feature: AssetFeature | ProjectFeature; colocated: P
 const emit = defineEmits<{ close: []; select: [record: ProjectFeature] }>()
 const closeButton = ref<HTMLButtonElement | null>(null)
 const content = ref<HTMLElement | null>(null)
+function focus() { closeButton.value?.focus({ preventScroll: true }) }
+defineExpose({ focus })
 const previousFocus = document.activeElement as HTMLElement | null
 const project = computed(() => isProject(props.feature) ? props.feature : null)
 const asset = computed(() => isProject(props.feature) ? null : props.feature)
@@ -16,7 +18,7 @@ const p = computed(() => asset.value?.properties)
 watch(() => props.feature, async () => {
   await nextTick()
   if (content.value) content.value.scrollTop = 0
-  closeButton.value?.focus()
+  focus()
 }, { immediate: true })
 function onEscape(event: KeyboardEvent) {
   if (event.key === 'Escape' && !event.defaultPrevented && !document.querySelector('dialog[open]') && !content.value?.closest('[inert]')) emit('close')

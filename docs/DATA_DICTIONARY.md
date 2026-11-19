@@ -30,6 +30,8 @@ The records represent individual project entries from the three supplied Indones
 | `catalog.json` | | | 4,053 |
 | **Total** | **4,057** | **4,047** | **6,507,622** |
 
+The map labels `Substation works` and `Generation projects` refer to `substations.geojson` and `generators.geojson`. Substation work includes the source scopes `New`, `Extension` and `Uprate`. Generation projects include generation, hybrid generation/storage and dedicated storage entries.
+
 The feature ID is `planning:<dataset>:<source ID>`. The dataset is the file basename without the extension. `properties.id` keeps the original identifier. Substation and generation projects use source points. Transmission projects use the supplied LineString or MultiLineString, or null for rows without a usable route. Properties preserve source values, their units, and missing fields. Distinct projects at the same coordinates retain their own IDs.
 
 | Fields | Meaning in the planning files |

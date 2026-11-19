@@ -46,7 +46,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', outside))
 
 <style scoped>
 .basemap-picker { position: relative }
-.basemap-popover { position: absolute; right: 0; top: calc(100% + 9px); width: 232px; z-index: 5; padding: 8px; background: #fff; border: 1px solid var(--border); border-radius: 7px; box-shadow: 0 5px 22px #123b6824; color: var(--ink); transform-origin: top right; animation: surface-in 160ms var(--ease) }
+.basemap-popover { position: absolute; right: 0; top: calc(100% + 9px); width: 232px; z-index: 5; padding: 8px; background: #fff; border: 1px solid var(--border); border-radius: 7px; box-shadow: 0 5px 22px #123b6824; color: var(--ink) }
 fieldset { padding: 0; margin: 0; border: 0 }
 legend { float: none; padding: 6px 8px 10px; margin: 0; font-size: 11px; font-weight: 650 }
 .basemap-choice { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; min-height: 43px }

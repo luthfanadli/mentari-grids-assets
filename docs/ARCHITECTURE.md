@@ -19,11 +19,13 @@ Audit fixtures detect source changes and report exact differences before publica
 | `composables/usePlanning.ts`, `utils/planning.ts` | Independent project layer loads, plan filters, register and map selections |
 | `utils/filterAssets.ts` | Layer/status/voltage/search predicates, original-record deduplication and bounds |
 | `utils/substationPresentation.ts` | Polygon style state, parent-symbol filtering and canonical viewport counts |
+| `utils/planningMap.ts` | Drawable project data, route styling and project symbols |
 | `MapCanvas.vue` | MapLibre sources/layers, camera, selection and basemap lifecycle |
 | `MapLayersControl.vue` | Responsive sidebar, search results, layer toggles, filter groups and retries |
 | `MapBasemapPicker.vue` | Full-row basemap selection and native radio keyboard behavior |
-| `AssetTable.vue`, `InventorySummary.vue` | Twenty-row pagination and matching original-record counts |
+| `AssetTable.vue`, `InventorySummary.vue` | Ten-row pagination and matching original-record counts |
 | `ProjectRegister.vue`, `PlanFilterFields.vue` | Project register pagination, target-year, source and stage controls |
+| `ReportDialog.vue` | Native modal, keyboard focus and dismissal |
 | `AssetDetailsDrawer.vue` | Floating source-attribute card with independent scrolling |
 | `DataProvenanceDialog.vue`, `AppHeader.vue` | Native About dialog and branding |
 
@@ -33,7 +35,11 @@ The map loads the OSM baseline and the small planning catalog independently. Eac
 
 Below zoom 10, interior circles/diamonds represent substation/plant polygons. At local zoom, original fills and boundaries replace them. Original point candidates stay at source coordinates. Marker clicks resolve parent records, and viewport counts canonicalize IDs across tiled fragments and multiple layers. Filtering never counts representatives as additional assets.
 
-The navbar selects Map, Summary or RUPTL plans via URL hashes. The map stays mounted while reading a register so returning to it preserves the camera, layers and filters. Both registers retain their page and controls while inspecting a record on the map. The sidebar occupies its own column on desktop and opens over the map on smaller screens. Its scrollable contents support native checkboxes, disclosure controls, keyboard search and Escape. Panning, zooming and empty selections preserve layer choices.
+The navbar opens Summary and RUPTL plans in a shared native modal over the map. Existing URL hashes and browser Back/Forward select the corresponding report. The map continues rendering with the shared filters. Each register mounts on its first visit and retains its controls, table page and scroll position when reports close and reopen.
+
+The modal has a fixed heading and close button, plus an independently scrollable content panel. Compact spacing and ten rows per table page shorten the content. Pagination stays at the bottom of the visible table while scrolling. The modal fills the screen on phones. Native modal behavior makes the background inert. Tab and Shift+Tab wrap between enabled, visible controls. Escape, the close button or a press and release on the desktop backdrop closes it and restores focus to the trigger. Selecting a record closes the modal before the map detail card receives focus.
+
+The sidebar occupies its own column on desktop and opens over the map on smaller screens. Its header keeps Reset filters visible while the filter groups scroll. Its scrollable contents support native checkboxes, disclosure controls, keyboard search and Escape. Panning, zooming and empty selections preserve layer choices.
 
 The map fills the available viewport beneath the navbar. Reading a row or clicking a map feature opens its source details. The drawer shows other selected projects at the exact same coordinates when multiple point records overlap. A container query places the drawer at the bottom of narrow maps. Measured drawer bounds provide camera clearance. ResizeObserver handles sidebar changes and interrupted fits.
 

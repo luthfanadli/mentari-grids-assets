@@ -4,7 +4,7 @@ import type { AssetFeature } from '../types/assets'
 import { STATUS_LABELS, VOLTAGE_COLORS, formatNumber, formatVoltage } from '../utils/formatAssets'
 const props = defineProps<{ features: AssetFeature[]; selectedId: string | null; viewportCount: number | null }>()
 defineEmits<{ select: [feature: AssetFeature]; reset: [] }>()
-const page = ref(1), pageSize = 20
+const page = ref(1), pageSize = 10
 const pageCount = computed(() => Math.max(1, Math.ceil(props.features.length / pageSize)))
 const pageFeatures = computed(() => props.features.slice((page.value - 1) * pageSize, page.value * pageSize))
 watch(() => props.features, () => { page.value = 1 })

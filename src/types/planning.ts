@@ -8,7 +8,7 @@ export const planningLabels: Record<PlanningKind, string> = {
   generators: 'Generation projects',
 }
 
-export interface ProjectProperties {
+interface ProjectProperties {
   id: string
   name: string
   source: string

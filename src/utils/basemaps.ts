@@ -9,7 +9,7 @@ export const BASEMAP_LABELS: Record<BasemapId, string> = {
   custom: 'Custom basemap',
 }
 
-export const GOOGLE_SATELLITE_TILE_URL = 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+const GOOGLE_SATELLITE_TILE_URL = 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
 export const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
 const GEOGRAPHY_SOURCE = 'regional-context'
 
