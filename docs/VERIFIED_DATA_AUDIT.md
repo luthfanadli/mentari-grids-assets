@@ -1,6 +1,6 @@
 # Verified source audit
 
-These are feature counts from the supplied GeoPackage, not unique or operational PLN assets. The expected metrics are enforced by `scripts/expected-audit.json` and `scripts/expected-power-plant-audit.json`.
+The OSM tables count source features from the supplied GeoPackage. The planning audit counts project rows from three separate GeoJSONs. Reference metrics are recorded in `scripts/expected-audit.json`, `scripts/expected-power-plant-audit.json` and `scripts/expected-planning-audit.json`.
 
 | Source property | Value |
 | --- | --- |
@@ -53,6 +53,25 @@ All 643 footprints are published: 633 not construction-tagged, ten construction-
 
 The 420 nonnull output values retain unknown units; 30 start-date strings are not verified commissioning dates.
 
+## RUPTL and RUKN planning files
+
+The three supplied files match IPM's open planning downloads byte for byte. The committed planning audit records each input SHA-256 and the expected counts. The separate catalog lists all input and prepared file fingerprints. [IPM v2.0.0 data collection](https://github.com/sandro71626/ipm-model)
+
+| Source file | Source bytes | RUPTL records | RUKN records | Drawable projects |
+| --- | ---: | ---: | ---: | ---: |
+| `ruptl_transmission.geojson` | 4,979,759 | 1,251 | 7 | 1,248 |
+| `ruptl_substations.geojson` | 857,650 | 1,740 | 0 | 1,740 |
+| `ruptl_generators.geojson` | 494,548 | 1,058 | 1 | 1,059 |
+| **Total** | **6,331,957** | **4,049** | **8** | **4,047** |
+
+All 4,057 rows have a unique source ID within their file. The generation projects occupy 796 distinct coordinate pairs. Substation projects occupy 877 pairs and reference 870 distinct source site IDs. They comprise 457 new works, 1,095 extensions and 188 uprates. All point records credit manual mapping by IPM. IPM labels 512 generator and 404 substation locations with medium confidence.
+
+Raw transmission geometries comprise 1,239 LineStrings and 19 MultiLineStrings. Seven LineStrings collapse to a single coordinate. Three other LineStrings have distinct endpoints and a source route status of `none`. These ten rows retain their planning properties with null publication geometry. The private `data/qa/planning-qa.json` records their IDs and individual reasons. The 1,248 drawable routes comprise 1,077 tagged `drawn`, 142 `schematic` and 29 `assumed`.
+
+Eight records credit RUKN 2025–2060 and carry source stage `Study`. Source target years range from 2025 to 2045, including projections beyond 2034. One substation project has no target COD year. Source labels and scenario years describe published plans.
+
 ## Recheck
 
 Run the [documented preprocessing and Python tests](../README.md#regenerate-data). Public `qa-report.json` records actual metrics, exact audit differences, exclusions and structural validation. Full point evidence stays in private QA. Source/status, topology and completeness limitations are documented [separately](DATA_COVERAGE_AND_LIMITATIONS.md); structural QA does not validate official asset identity.
+
+Run `python scripts/prepare_planning.py --output data/interim/planning-preview` for a planning candidate release. Inspect `data/qa/planning-qa.json`, then regenerate the four planning files together and run `pnpm check:data`. Source-version mismatches report expected and actual values before any publication writes.

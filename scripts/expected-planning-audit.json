@@ -1,0 +1,26 @@
+{
+  "transmission": {
+    "source_bytes": 4979759,
+    "source_sha256": "857001a08038353d5b2abd8ab60df5f4909c862c2e15ee8b7688df1bc05d643f",
+    "count": 1258,
+    "mapped": 1248,
+    "geometry_issues": {"invalid_geometry": 7, "route_status_none": 3},
+    "source_counts": {"RUKN 2025-2060": 7, "RUPTL 2025-2034": 1251}
+  },
+  "substations": {
+    "source_bytes": 857650,
+    "source_sha256": "9e33f7c0cbe83be74b7b6a750b4f5b16464c559714e31e8b511ef0567d0f6f36",
+    "count": 1740,
+    "mapped": 1740,
+    "geometry_issues": {},
+    "source_counts": {"RUPTL 2025-2034": 1740}
+  },
+  "generators": {
+    "source_bytes": 494548,
+    "source_sha256": "9db8703cee4b9537f60819fbec738ee72499f0a3009f5f09e7d25d3ea0123721",
+    "count": 1059,
+    "mapped": 1059,
+    "geometry_issues": {},
+    "source_counts": {"RUKN 2025-2060": 1, "RUPTL 2025-2034": 1058}
+  }
+}

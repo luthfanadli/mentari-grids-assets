@@ -1,4 +1,5 @@
 import type { AssetCollection, DisplayPointCollection, InventorySummary } from '../types/assets'
+import { planningKinds, type PlanningKind, type PlanningCatalog, type ProjectCollection } from '../types/planning.ts'
 export function createAssetRepository(fetcher: typeof fetch = fetch, base = import.meta.env?.BASE_URL ?? '/') {
   const requests = new Map<string, Promise<unknown>>()
   function load<T>(filename: string, validate: (value: unknown) => boolean): Promise<T> {
@@ -25,7 +26,29 @@ export function createAssetRepository(fetcher: typeof fetch = fetch, base = impo
       f.type === 'Feature' && typeof f.properties?.feature_id === 'string' && typeof f.properties?.display_name === 'string' &&
       f.properties.source_status_verified === false && f.geometry && ['LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'Point'].includes(f.geometry.type))
   }
+  const loadPlanningCatalog = () => load<PlanningCatalog>('planning/catalog.json', value => {
+    const catalog = value as PlanningCatalog | null
+    return !!catalog?.datasets && planningKinds.every(kind => {
+      const dataset = catalog.datasets[kind]
+      return dataset && Number.isInteger(dataset.count) && Number.isInteger(dataset.mapped) &&
+        dataset.count >= dataset.mapped && dataset.mapped >= 0
+    }) && Array.isArray(catalog.filters?.sources) && Array.isArray(catalog.filters.statuses) && Array.isArray(catalog.filters.target_years)
+  })
   return {
+    loadPlanningCatalog,
+    loadProjects: async (kind: PlanningKind) => {
+      const catalog = await loadPlanningCatalog()
+      const expected = catalog.datasets[kind]
+      return load<ProjectCollection>(`planning/${kind}.geojson`, value => {
+        const collection = value as ProjectCollection | null
+        return collection?.type === 'FeatureCollection' && Array.isArray(collection.features) &&
+          collection.features.length === expected.count && collection.features.filter(f => f.geometry).length === expected.mapped &&
+          collection.features.every(f => f.type === 'Feature' && typeof f.properties?.id === 'string' &&
+            f.id === `planning:${kind}:${f.properties.id}` && typeof f.properties.name === 'string' &&
+            typeof f.properties.source === 'string' && (f.geometry === null ||
+              (kind === 'transmission' ? ['LineString', 'MultiLineString'].includes(f.geometry.type) : f.geometry.type === 'Point')))
+      })
+    },
     loadBase: async () => {
       const [lines, primary, powerPlants, summary, displayPoints] = await Promise.all([
         load<AssetCollection>('transmission-lines.geojson', validCollection), load<AssetCollection>('substations-primary.geojson', validCollection),

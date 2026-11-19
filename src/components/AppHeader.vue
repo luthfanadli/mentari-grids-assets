@@ -1,15 +1,23 @@
 <script setup lang="ts">
-defineEmits<{ about: [] }>()
+export type PageName = 'map' | 'summary' | 'plans'
+defineProps<{ page: PageName }>()
+defineEmits<{ navigate: [page: PageName]; about: [] }>()
+const tabs: { key: PageName; label: string }[] = [
+  { key: 'map', label: 'Map' }, { key: 'summary', label: 'Summary' }, { key: 'plans', label: 'RUPTL plans' },
+]
 </script>
+
 <template>
   <header class="app-header">
-    <a class="brand" href="#main" aria-label="MENTARI Grids inventory"><img class="brand-logo" src="/images/Mentari Logo_Tagline Revamp_Color.png" alt="MENTARI logo" width="1890" height="1063"/><span><strong>MENTARI <span>Grids</span></strong><small>TRANSMISSION ASSET INVENTORY</small></span></a>
-    <button class="nav-button" @click="$emit('about')">About the data <span aria-hidden="true">↗</span></button>
+    <a class="brand" href="#map" aria-label="MENTARI Grids map">
+      <img src="/images/Mentari Logo_Tagline Revamp_Color.png" alt="MENTARI logo" width="80" height="45"/>
+      <span class="brand-label"><strong>MENTARI <span>Grids</span></strong><small>Indonesia power atlas</small></span>
+    </a>
+    <nav class="primary-nav" aria-label="Main navigation">
+      <a v-for="tab in tabs" :key="tab.key" :href="'#' + tab.key" :aria-current="page === tab.key ? 'page' : undefined" @click.prevent="$emit('navigate', tab.key)">{{ tab.label }}</a>
+    </nav>
+    <button class="about-button" aria-haspopup="dialog" aria-label="About the data" @click="$emit('about')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg><span>About the data</span>
+    </button>
   </header>
 </template>
-
-<style scoped>
-.brand-logo { display: block; width: 92px; height: 54px; padding: 3px 6px; object-fit: contain; flex: none; background: #fff; border-radius: 6px }
-@media(max-width:720px) { .brand-logo { width: 62px; height: 38px } }
-@media(max-width:380px) { .app-header { padding-inline: 14px; gap: 8px } .brand { gap: 8px } .brand-logo { width: 56px; height: 36px } .brand strong { font-size: 17px } .brand small { font-size: 5.5px; letter-spacing: .8px } }
-</style>

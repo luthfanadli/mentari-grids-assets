@@ -1,9 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
@@ -13,12 +13,15 @@ test('publication bytes and checksums survive Git staging and Windows/Linux chec
   const repository = join(temporary, 'repository')
   mkdirSync(join(repository, 'public/data'), { recursive: true })
   mkdirSync(join(repository, 'scripts'))
-  const files = readdirSync(join(root, 'public/data')).map(name => `public/data/${name}`)
+  const files = readdirSync(join(root, 'public/data'), { recursive: true, encoding: 'utf8' })
+    .map(name => `public/data/${name.replaceAll('\\', '/')}`)
+    .filter(name => statSync(join(root, name)).isFile())
   const git = (...args: string[]) => execFileSync('git', args, {
     cwd: repository, stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024,
   })
   try {
-    for (const name of ['scripts/check_public_data.mjs', ...files]) {
+    for (const name of ['scripts/check_public_data.mjs', 'scripts/check_planning_data.mjs', 'scripts/expected-planning-audit.json', ...files]) {
+      mkdirSync(dirname(join(repository, name)), { recursive: true })
       copyFileSync(join(root, name), join(repository, name))
     }
     git('init', '--quiet')

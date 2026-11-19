@@ -17,7 +17,7 @@ The repository builds a static Vite app. Preprocessed data is committed; deploym
 
 ## Before deployment
 
-Run `pnpm test` and `pnpm build`. Commit the complete nine-file `public/data/` set with its catalog and `.gitattributes`. The build validates bytes, checksums, versions, counts and symbol-parent linkage before compilation.
+Run `pnpm test` and `pnpm build`. Include the nine OSM files, the four files in `public/data/planning/`, the local basemap asset and `.gitattributes`. The build validates both data publications and inventory symbol-parent linkage before compilation.
 
 Generated JSON/GeoJSON has canonical UTF-8/CRLF bytes. `public/data/** -text` prevents Git newline conversion. A one-byte size/checksum failure can indicate older LF-normalized data paired with a CRLF catalog: regenerate the complete dataset using the documented pipeline and retain the attributes rule. Do not bypass the guard. Node tests verify staging and Windows/Linux checkout byte preservation.
 
@@ -43,10 +43,10 @@ The same suite can target an authorized Vercel preview by changing the base URL.
 ## Preview checks
 
 - Default counts: 4,345 lines, 621 primary polygons, 633 plants, zero candidate records.
-- All nine data URLs return JSON/GeoJSON with catalog-matching bytes; the MapLibre worker and real overlays load.
+- Both catalogs and their data URLs return the expected bytes. Verify the planning register shows 4,057 records and that all three overlays together offer 4,047 mappable projects.
 - Optional candidates and construction/disused flags remain separate. Point voltage and plant output units remain unknown.
 - Search `-18678451` opens GITET Pedan with its original signed ID and geometry.
-- Layers, extent/basemap controls, details, About, mobile scrolling and retry/fallback states work. Source/license/provider credits stay visible.
+- Map fills the viewport below the navbar. Test the collapsible sidebar, Summary, RUPTL plans, map/details selection, attribution and mobile controls.
 - Refresh works; data revalidates. Raw GPKG, references, internal QA and secrets are absent from the build.
 
 The app fetches static data publicly even without download controls. External basemaps require provider availability and applicable usage terms; Google Satellite uses the supplied direct endpoint rather than a Map Tiles API session integration. Local tests do not verify a hosted account, domain, deployment protection or CDN settings.

@@ -1,6 +1,6 @@
 # Data filter specification
 
-Input: the supplied `data/raw/IDN.gpkg`. Source-version targets are recorded in [the audit](VERIFIED_DATA_AUDIT.md) and `scripts/expected-*.json`. Rules run in `scripts/prepare_data.py`; counts are validation targets, not selection predicates.
+The OSM inventory uses the supplied `data/raw/IDN.gpkg` and `scripts/prepare_data.py`. Three IPM GeoJSON inputs form the separate planning publication. Source-version targets are recorded in [the audit](VERIFIED_DATA_AUDIT.md) and `scripts/expected-*.json`.
 
 ## Spatial scope
 
@@ -48,6 +48,8 @@ Preserve energy-source, method, raw output, raw start-date, English-name, descri
 
 ## Geometry, IDs and counting
 
+For the OSM inventory:
+
 - Validate EPSG:4326, expected geometry families, required attributes, numeric values, flags, unique integral source IDs and valid nonempty geometry. Reject malformed inputs; quarantine conflicting flags.
 - Preserve signed source `id`, never GeoPackage `fid`. Original feature IDs are `<source_layer>:<source_id>`. Equal numeric IDs in different layers do not establish OSM identity.
 - Normalize polygon winding. Lines/substation polygons retain seven coordinate decimals without simplification or dissolve. Published original points and plant footprints retain full source precision.
@@ -55,9 +57,15 @@ Preserve energy-source, method, raw output, raw start-date, English-name, descri
 - Measure line geometry with WGS84 `pyproj.Geod`; label it mapped geometry length, not official route length or circuit-km.
 - Preserve missing values as null. No official region/system, planned infrastructure, capacity or operational status is inferred.
 
+## Planning projects
+
+`scripts/prepare_planning.py` preserves one record per supplied source project in the transmission, substation works and generation files. The source field identifies RUPTL or RUKN. A valid supplied project location or route is displayed at its original coordinates. A missing, invalid or explicitly unavailable route produces a register entry with null geometry. Null geometry contributes to register totals and is excluded from mapped and viewport counts.
+
+The three project layers load independently when enabled. Filter projects by source, supplied stage and supplied target year. Search uses source project names, IDs, site IDs, province, system, endpoints and technology where available. The grid voltage selector reads the explicit project `voltage_kv` for transmission and substation works. Generation projects are independent of the voltage selector. OSM status filters apply only to inventory records.
+
 ## Outputs and validation
 
-Publish the six GeoJSONs and three metadata files listed in [the dictionary](DATA_DICTIONARY.md), with attribution and ODbL notices. Deterministic ordering, UTF-8/CRLF serialization and checksums must remain stable across platforms. Check source SHA-256 before/after processing and report exact audit differences before writing publication files.
+The OSM inventory has six GeoJSON files and three metadata files with their source attribution and ODbL notices. The planning publication adds three GeoJSON files and a catalog with IPM attribution, CC BY-SA 4.0 and the notice for OSM-derived data. Both publications use deterministic ordering, UTF-8/CRLF serialization and checksums. Each pipeline checks the input SHA-256 before and after processing and reports audit differences before writing publication files. [Data dictionary](DATA_DICTIONARY.md)
 
 Private QA under `data/qa/` contains exclusions, status conflicts, source-point review and all matching evidence. Do not copy raw data, source references or full internal review tables into `public/`.
 

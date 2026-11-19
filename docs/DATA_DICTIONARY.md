@@ -1,8 +1,8 @@
 # Data dictionary
 
-Publication schema **3**, pipeline **1.2.0**. GeoJSON uses RFC 7946 longitude/latitude in EPSG:4326, collection attribution/license notices and original signed source IDs. Selection rules belong to [the filter specification](DATA_FILTER_SPEC.md).
+The OSM inventory uses publication schema **3**, pipeline **1.2.0**. The planning catalog uses schema **1**. Both publish GeoJSON longitude/latitude coordinates in WGS84 with source attribution. The [filter specification](DATA_FILTER_SPEC.md) documents selection.
 
-## Publication files
+## OSM publication files
 
 | File in `public/data/` | Records / role | Bytes |
 | --- | ---: | ---: |
@@ -17,6 +17,33 @@ Publication schema **3**, pipeline **1.2.0**. GeoJSON uses RFC 7946 longitude/la
 | `qa-report.json` | Aggregate structural/source QA | 12,790 |
 
 Six GeoJSONs total **8,887,904 bytes**; all nine files total **8,916,510 bytes**. There are **6,119 original records** across all flags. Symbols do not increase that count. The original line/primary/review geometry exports remain unchanged; points and plant footprints preserve full source coordinate precision.
+
+## Planning publication
+
+The records represent individual project entries from the three supplied Indonesia Power Map downloads. Their catalog and checksums are in `public/data/planning/`.
+
+| File | Project rows | Rows with map geometry | Bytes |
+| --- | ---: | ---: | ---: |
+| `transmission.geojson` | 1,258 | 1,248 | 5,033,703 |
+| `substations.geojson` | 1,740 | 1,740 | 931,310 |
+| `generators.geojson` | 1,059 | 1,059 | 538,556 |
+| `catalog.json` | | | 4,053 |
+| **Total** | **4,057** | **4,047** | **6,507,622** |
+
+The feature ID is `planning:<dataset>:<source ID>`. The dataset is the file basename without the extension. `properties.id` keeps the original identifier. Substation and generation projects use source points. Transmission projects use the supplied LineString or MultiLineString, or null for rows without a usable route. Properties preserve source values, their units, and missing fields. Distinct projects at the same coordinates retain their own IDs.
+
+| Fields | Meaning in the planning files |
+| --- | --- |
+| `source`, `status`, `province`, `system` | Source plan, project stage and geographic labels as supplied by IPM |
+| `target_cod_year`, `cod_re_base`, `cod_ared` | Target years, including the two plan scenarios when supplied. Actual commissioning requires separate evidence. |
+| `ruptl_page`, `ruptl_row` | Document references preserved as source text |
+| `scope`, `site_id`, `voltage_kv`, `voltage_label`, `capacity_mva` | Substation work, site reference, source kV and capacity where reported |
+| `type`, `technology`, `technology_label`, `capacity_mw`, `storage_mwh`, `developer` | Generation technology and reported project quantities or developer where supplied |
+| `from_substation`, `to_substation`, `voltage_kv`, `scope`, `line_type`, `conductor`, `hvdc`, `circuits`, `length_km`, `circuit_km` | Reported transmission attributes. Length figures come from the planning record. |
+| `location_source`, `location_confidence` | Point mapping credit and the publisher's assessment of point location |
+| `geometry_source`, `route_status` | Line mapping credit and source routing label (`drawn`, `assumed`, `schematic` or `none`) |
+
+The catalog gives each file's source URL, input and output hashes and sizes, project and drawable counts, status distributions and geometry issue counts. Its `filters` list the available sources, statuses and target years across all records, including whether a year is missing. The source attributes and mapping are credited to Sitompul, S. A. (2026), *Indonesia Power Map: Data Collection* v2.0.0, from PLN/ESDM plans. The planning adaptation uses CC BY-SA 4.0. OSM-derived material also carries ODbL attribution. [Publisher and license](https://github.com/sandro71626/ipm-model#lisensi)
 
 ## Original-record properties
 
@@ -66,7 +93,7 @@ Both feature ID and represented ID equal the parent polygon ID. Parent/symbol re
 
 ## Metadata and private QA
 
-- `summary.json`: source fingerprint/vintage, raw/per-subset counts, statuses, voltage distributions, missing values, fallback labels, review reasons, default selection, presentation/matching aggregates and GeoJSON byte sizes. Missing planned data has count null, not zero.
+- `summary.json`: OSM source fingerprint/vintage, raw/per-subset counts, statuses, voltage distributions, missing values, fallback labels, review reasons, default selection, presentation/matching aggregates and GeoJSON byte sizes. Its `planned_assets` field describes the GeoPackage alone. The separate planning catalog holds the project counts.
 - `data-catalog.json`: source/license links, CRS, method, matching/plant policies, field meanings, limitations and each GeoJSON's role/count/bytes/SHA-256.
 - `qa-report.json`: raw-layer inventory, geometry/attribute/ID checks, voltage inconsistencies, exclusions, audit actuals/differences, matching/plant QA and unchanged-source proof. PASS is structural/selection QA, not official asset validation.
 

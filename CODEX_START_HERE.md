@@ -19,6 +19,8 @@ Run `pnpm test`, `pnpm build` and relevant `pnpm test:e2e` scenarios. Update the
 4. Review QA and compare with `scripts/expected-audit.json` and `scripts/expected-power-plant-audit.json`. Mismatches report exact expected/actual values and stop before publication writes. `--allow-source-mismatch` is an explicit override after investigating a legitimate new source; it does not hide differences.
 5. Run the Python tests, regenerate all nine publication files together, then run frontend validation. Keep `public/data/** -text` in .gitattributes: generated UTF-8/CRLF bytes and catalog hashes must survive Git checkout unchanged.
 
+The IPM planning publication has its own four files, source audit fixture and QA report. With the three supplied `ruptl_*.geojson` files in `data/raw/`, stage with `python scripts/prepare_planning.py --output data/interim/planning-preview --qa-output data/qa`. Review `planning-qa.json`, compare the catalog and source hashes, then run `python scripts/prepare_planning.py` to replace the set in `public/data/planning/`. `pnpm check:data` validates both publications. Project targets, confidence, scenario years and source attribution belong to the project records.
+
 Internal QA includes exclusions, status conflicts, source points and complete point/polygon matching reports. It is not a static asset. Individual publication files are replaced atomically; the nine-file set must be reviewed and committed together.
 
 ## QGIS Python fallback on Windows

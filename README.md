@@ -1,6 +1,6 @@
-# MENTARI Grids — Transmission Asset Inventory
+# MENTARI Grids — Indonesia power atlas
 
-A Vue 3, Vite, TypeScript and MapLibre WebGIS for Deliverable 2. It displays preliminary OpenStreetMap records for Indonesia, with search, map/table selection and source attributes. Counts describe mapped records, not verified operational assets.
+A Vue 3, Vite, TypeScript and MapLibre WebGIS for Deliverable 2. Explore Indonesia’s mapped electricity network alongside the supplied IPM planning projects. The inventory and project register retain the source IDs, attributes and units of each publication.
 
 ## Run
 
@@ -11,18 +11,16 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open http://localhost:5174. Published data is included in `public/data/`; Python and the private GeoPackage are needed only to regenerate it. Optional public basemap configuration is in [.env.example](.env.example).
+Open http://localhost:5174. The repository includes the prepared map data. Python and the private inputs are needed for regeneration. Optional basemap configuration is in [.env.example](.env.example).
 
 ## Use the dashboard
 
-- **Layers** inside the map controls lines, primary substations, power plants and two default-off candidate layers. Voltage and OSM-status filters are folded inside it.
-- Layers stays open during panning and zooming. Close it with its button, Close, Escape or an action outside the map. Opening the basemap menu also closes it.
-- Search by name, reference, operator or source ID. Plant search also includes energy source and method. Reset restores defaults and clears search.
-- Below zoom 10, polygon records use interior symbols; zooming in shows original footprints. Selecting either opens the same source record. Pink outlined circles represent separate unvalidated source points.
-- Cards and the table count all matching original records. The viewport count deduplicates visible representations. Symbols never add records.
-- Basemaps: OpenStreetMap, Google Satellite, plain background and an optional configured MapLibre style. The extent button fits filtered records. Repeated basemap-tile failures show a short "Tiles unavailable" note only inside the Basemap menu; choose another basemap there.
-
-The layout fills the viewport with small responsive margins. Candidate data loads only when enabled; requests are cached and failures can be retried. **About the data** explains provenance and missing coverage.
+- **Map** fills the space below the navbar. The left sidebar is open on desktop. On a phone, use **Layers** to open it. Panning and zooming preserve the panel and your selections.
+- In the sidebar, toggle mapped assets and project layers by asset type. Open **Review candidates** for the two optional substation layers. Grid voltage applies to lines and substations. **OSM status** applies to the baseline, and **Plan filters** controls the plan source, stage and target COD year.
+- Search the enabled layers by name or source ID and select a result to inspect it. Plan search also accepts provinces, systems and source site IDs. Select an overlapping project point to browse the matching projects at those coordinates.
+- **Summary** opens filtered OSM record counts and the paginated asset table. It distinguishes the selected inventory from the records currently drawn in the viewport. Polygon symbols below zoom 10 and the original footprints at local zoom represent the same records.
+- **RUPTL plans** opens all three planning files, including RUKN studies and entries without a drawable route. Filter the register, use **Show results on map**, or select a row to inspect one project. The map sidebar can load any one planning layer independently.
+- The basemap picker offers OpenStreetMap, Google Satellite, plain background and an optional custom style. Natural Earth cartography provides regional context while OSM tiles load. Source attribution and the dated data comparison are available under **About the data**.
 
 ## Published scope
 
@@ -37,16 +35,17 @@ The layout fills the viewport with small responsive margins. Candidate data load
 
 Six GeoJSONs and three metadata files total **8,916,510 bytes**. The 1,070 substation symbols and embedded plant display coordinates are excluded from inventory totals. Power plants ignore voltage filters because no plant voltage field is supplied.
 
-"Not flagged in OSM" does not verify operation. Point-candidate voltages and plant output units are unknown. Planned RUPTL/RUKN projects, official region/system assignments, verified capacity and COD are unavailable. See [coverage and limitations](docs/DATA_COVERAGE_AND_LIMITATIONS.md).
+The separate planning publication adds **4,057 project records**, of which **4,047** have map geometry. Its three GeoJSONs and catalog total **6,507,622 bytes**. Planning overlays start off. The combined data publications occupy **15,424,132 bytes**. See [the comparison with Indonesia Power Map](docs/DATA_COVERAGE_AND_LIMITATIONS.md#comparison-with-indonesia-power-map) for differences in baseline units, coverage and source dates.
 
 ## Regenerate data
 
-Place the supplied, unchanged `IDN.gpkg` in `data/raw/`, then:
+Place the supplied `IDN.gpkg`, `ruptl_transmission.geojson`, `ruptl_substations.geojson` and `ruptl_generators.geojson` in `data/raw/`. After reviewing a staging run as described in [the maintenance guide](CODEX_START_HERE.md), use:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r scripts/requirements.txt
 .\.venv\Scripts\python.exe scripts/prepare_data.py
+.\.venv\Scripts\python.exe scripts/prepare_planning.py
 .\.venv\Scripts\python.exe -m unittest discover -s scripts -p 'test_*.py' -v
 ```
 
@@ -82,6 +81,10 @@ These documents describe the current implementation. Superseded implementation r
 ## Attribution and assets
 
 Data: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), exported through [OpenInfraMap](https://openinframap.org/), distributed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/). Preserve attribution and license notices when redistributing. Static `/data/` URLs are public because the browser fetches them; the app has no download controls.
+
+Planning data credit Sitompul, S. A. (2026), *Indonesia Power Map: Data Collection* v2.0.0, under CC BY-SA 4.0, with ODbL for OSM-derived material. The prepared files add source-namespaced identifiers and mark unusable route geometries as absent. [Source and citation](https://github.com/sandro71626/ipm-model) · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
+The local outline and labels occupy 324,563 bytes outside the asset inventory. They use public-domain Natural Earth cartography. Input versions and reproduction steps are in [the basemap generator](scripts/prepare_basemap.py).
 
 The supplied MENTARI logo is unchanged. [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) is served locally with its [SIL OFL notice](public/fonts/PlusJakartaSans-OFL.txt), without runtime font-service requests. The Latin variable WOFF2 was obtained from [Google Fonts v12](https://fonts.gstatic.com/s/plusjakartasans/v12/LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yw.woff2); SHA-256: `153fc85b70298beeb1d61a5f723331649e7f23bb77302a66e61cb3e2fbdb5e79`.
 

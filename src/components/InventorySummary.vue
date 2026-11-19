@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { formatNumber } from '../utils/formatAssets'
-defineProps<{ counts: { lines: number; primary: number; review: number; points: number; plants: number }; loading: boolean }>()
+import type { InventorySummary } from '../types/assets'
+defineProps<{ counts: { lines: number; primary: number; review: number; points: number; plants: number }; summary: InventorySummary | null; loading: boolean }>()
+const metrics = [
+  { key: 'lines', dataset: 'lines', label: 'Line segments', test: 'line-count' },
+  { key: 'primary', dataset: 'primary', label: 'Primary substations', test: 'primary-count' },
+  { key: 'plants', dataset: 'power_plants', label: 'Plant footprints', test: 'plant-count' },
+  { key: 'review', dataset: 'review', label: 'Review polygons', test: 'review-count' },
+  { key: 'points', dataset: 'point_candidates', label: 'Point candidates', test: 'point-count' },
+] as const
 </script>
 <template>
-  <section class="summary-grid" aria-label="Selected record counts" aria-live="polite">
-    <article class="metric-card"><span class="metric-label"><span class="metric-icon">╱</span> Line segments</span><strong data-testid="line-count">{{ loading ? '—' : formatNumber(counts.lines) }}</strong><small>Selected mapped segments</small></article>
-    <article class="metric-card"><span class="metric-label"><span class="metric-icon">▧</span> Primary substations</span><strong data-testid="primary-count">{{ loading ? '—' : formatNumber(counts.primary) }}</strong><small>Selected transmission-tagged polygons</small></article>
-    <article class="metric-card plant-metric"><span class="metric-label"><span class="metric-icon">◆</span> Power plants</span><strong data-testid="plant-count">{{ loading ? '—' : formatNumber(counts.plants) }}</strong><small>Selected source footprints</small></article>
-    <article class="metric-card review-metric"><span class="metric-label"><span class="metric-icon">◇</span> Review polygons</span><strong data-testid="review-count">{{ loading ? '—' : formatNumber(counts.review) }}</strong><small>Unvalidated polygons · off by default</small></article>
-    <article class="metric-card point-metric"><span class="metric-label"><span class="metric-icon">◎</span> Point-only candidates</span><strong data-testid="point-count">{{ loading ? '—' : formatNumber(counts.points) }}</strong><small>Unvalidated source locations · off by default</small></article>
+  <section class="inventory-totals" aria-label="Selected OSM inventory records" aria-live="polite">
+    <div v-for="metric in metrics" :key="metric.key"><span>{{ metric.label }}</span><strong :data-testid="metric.test">{{ loading ? '…' : formatNumber(counts[metric.key]) }}</strong><small v-if="summary">of {{ formatNumber(summary.datasets[metric.dataset].count) }} published</small></div>
   </section>
 </template>

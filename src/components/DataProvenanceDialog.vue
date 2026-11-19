@@ -1,24 +1,37 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { InventorySummary } from '../types/assets'
+import type { PlanningCatalog } from '../types/planning'
 import { formatNumber } from '../utils/formatAssets'
-defineProps<{ summary: InventorySummary | null }>()
+const props = defineProps<{ summary: InventorySummary | null; catalog: PlanningCatalog | null }>()
+const planTotals = computed(() => {
+  if (!props.catalog) return null
+  const datasets = Object.values(props.catalog.datasets)
+  return {
+    records: datasets.reduce((total, dataset) => total + dataset.count, 0),
+    mapped: datasets.reduce((total, dataset) => total + dataset.mapped, 0),
+  }
+})
 const emit = defineEmits<{ close: [] }>()
-const dialog = ref<HTMLDialogElement | null>(null)
+const dialog = ref<HTMLDialogElement>()
 onMounted(() => dialog.value?.showModal())
-onBeforeUnmount(() => dialog.value?.close())
 </script>
 <template>
   <dialog ref="dialog" class="provenance-dialog" aria-labelledby="about-title" @close="emit('close')" @click="event => { if (event.target === dialog) dialog?.close() }">
-    <div class="drawer-heading"><span class="eyebrow">PROVENANCE & COVERAGE</span><button class="icon-button" aria-label="Close about data" @click="dialog?.close()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
-    <h2 id="about-title">A starting point for the grid inventory.</h2>
-    <p>This Deliverable 2 workspace presents a preliminary inventory from <a href="https://openinframap.org/" target="_blank" rel="noopener">OpenInfraMap</a> / <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
-    <div class="about-callout"><strong>Not flagged does not mean operational.</strong><p>Construction and disused flags reflect the source export. Primary substations have explicit transmission tags; candidate polygons need manual validation.</p></div>
-    <p v-if="summary">The published subsets contain {{ formatNumber(summary.datasets.lines.count) }} mapped line segments, {{ formatNumber(summary.datasets.primary.count) }} primary polygons and {{ formatNumber(summary.datasets.review.count) }} separate review candidates. Lines are selected by their numeric maximum voltage, in volts, at 70 / 150 / 275 / 500 kV.</p>
-    <p v-if="summary">Point matching compared all {{ formatNumber(summary.raw_counts.power_substation_point ?? 0) }} source points against all {{ formatNumber(summary.raw_counts.power_substation_polygon ?? 0) }} polygons: {{ summary.substation_point_matching.classifications.matched }} supported matches, {{ summary.substation_point_matching.classifications.uncertain }} uncertain records and {{ summary.substation_point_matching.classifications.distinct_point_only_candidate }} distinct candidates under the screening policy. {{ summary.datasets.point_candidates.count }} eligible point-only candidates are available separately, off by default; their voltage, function and physical identity are unverified. Intersection alone never establishes duplication.</p>
-    <p>At overview scales, representative symbols locate polygon records; at zoom 10 and above, the original footprints are shown. Symbols add no inventory records. Matched and uncertain source points are withheld from the separate point layer to avoid counting possible shared locations again.</p>
-    <p v-if="summary">Power plants add {{ formatNumber(summary.datasets.power_plants.count) }} original source footprints as generation context, separate from transmission assets. Diamonds represent the same footprints below zoom 10; local zoom shows original boundaries. Source energy/method/output/start-date tags are unverified. The export supplies no voltage or output unit; output is not assumed MW, and start dates are not verified COD.</p>
-    <h3>What is still missing</h3><p>Authoritative RUPTL 2025–2034 / RUKN 2025–2060 planned projects, official region and power-system grouping, verified HVDC and converter stations, COD, MVA, official circuit-km, thermal ratings and AIS/GIS classification. No planned spatial records have been created. All point-only candidate voltages remain unknown in this source.</p>
-    <p>Source data vintage: <strong>unknown</strong>. Counts represent mapped features; cross-layer duplicates, network topology and national completeness have not been verified.</p>
+    <div class="dialog-inner">
+      <div class="drawer-heading"><h2 id="about-title">About the data</h2><button class="icon-button" aria-label="Close about data" @click="dialog?.close()">×</button></div>
+      <h3>Mapped inventory</h3>
+      <p>MENTARI Grids shows Indonesian transmission segments, substation polygons and power-plant footprints from an OpenInfraMap export. Its OSM snapshot date is unknown. The default map shows records without construction or disused flags. Operation remains unverified.</p>
+      <p v-if="summary">{{ formatNumber(summary.datasets.primary.count) }} substation polygons carry a transmission tag and a maximum voltage of 70, 150, 275 or 500 kV. The review layer contains {{ summary.datasets.review.count }} additional polygons. {{ summary.datasets.point_candidates.count }} source points have unknown voltage and can be inspected separately.</p>
+      <p>At national scale, one symbol represents each selected footprint. Zoom in to see its boundary. Plant output units and official OSM asset identities remain unverified.</p>
+      <p>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> · <a href="https://openinframap.org/">OpenInfraMap</a> · <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a></p>
+      <h3>Planning projects</h3>
+      <p>The three supplied Indonesia Power Map files cite RUPTL 2025–2034 and RUKN 2025–2060. Each row describes a project or work item. Locations and routes are mapped by IPM. The details show the reported stage, target year, location confidence or route status, and source page when supplied.</p>
+      <p v-if="planTotals">Map geometry is available for {{ formatNumber(planTotals.mapped) }} of {{ formatNumber(planTotals.records) }} projects. The register also lists transmission projects whose route has coincident vertices or is marked unavailable by the source.</p>
+      <p>Sitompul, S. A. · <a href="https://indonesiapowermap.com/#data">Indonesia Power Map</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. The dashboard adds map identifiers and withholds unusable route geometries.</p>
+      <h3>Comparison with Indonesia Power Map</h3>
+      <p>IPM’s 15 November 2026 release lists 1,947 existing transmission entries, 1,158 substations and 3,199 generation entries. MENTARI counts OSM segments and footprints. For planning, the three supplied files match the IPM downloads byte for byte.</p>
+      <p><a href="https://indonesiapowermap.com/#data">IPM open data</a> · <a href="https://indonesiapowermap.com/docs/publication_policy.md">IPM publication policy</a></p>
+    </div>
   </dialog>
 </template>

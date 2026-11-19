@@ -3,8 +3,7 @@ import type { AssetFeature, DisplayPointCollection, InventorySummary } from '../
 import { createAssetRepository } from '../services/assetData'
 import { defaultFilters, filterAssets, selectionCounts, uniqueInventoryFeatures } from '../utils/filterAssets'
 import { selectedDisplayPoints } from '../utils/substationPresentation'
-export function useAssetFilters() {
-  const repository = createAssetRepository()
+export function useAssetFilters(repository = createAssetRepository()) {
   const baseFeatures = shallowRef<AssetFeature[]>([]), reviewFeatures = shallowRef<AssetFeature[]>([])
   const pointFeatures = shallowRef<AssetFeature[]>([])
   const displayPoints = shallowRef<DisplayPointCollection>({ type: 'FeatureCollection', features: [] })

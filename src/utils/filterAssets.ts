@@ -1,4 +1,5 @@
-import type { AssetFeature, AssetFilters } from '../types/assets'
+import type { AssetFeature, AssetFilters, AssetGeometry } from '../types/assets'
+import type { BBox } from 'geojson'
 
 export const VOLTAGES = [500, 275, 150, 70] as const
 export function defaultFilters(): AssetFilters {
@@ -31,8 +32,7 @@ export function selectionCounts(features: AssetFeature[]) {
 export function uniqueInventoryFeatures(features: AssetFeature[]): AssetFeature[] {
   return [...new Map(features.filter(feature => feature.properties.counts_as_inventory !== false).map(feature => [feature.properties.feature_id, feature])).values()]
 }
-export function featureBounds(features: AssetFeature[]): [number, number, number, number] | null {
-  if (!features.length) return null
+export function featureBounds(features: ReadonlyArray<{ bbox?: BBox; geometry: AssetGeometry | null }>): [number, number, number, number] | null {
   let west = Infinity, south = Infinity, east = -Infinity, north = -Infinity
   const walk = (coords: unknown): void => {
     const values = coords as unknown[]
@@ -42,11 +42,12 @@ export function featureBounds(features: AssetFeature[]): [number, number, number
     } else values.forEach(walk)
   }
   for (const feature of features) {
+    if (!feature.geometry) continue
     const bounds = feature.bbox
     if (bounds?.length === 4) {
       west = Math.min(west, bounds[0]!); south = Math.min(south, bounds[1]!)
       east = Math.max(east, bounds[2]!); north = Math.max(north, bounds[3]!)
     } else walk(feature.geometry.coordinates)
   }
-  return [west, south, east, north]
+  return Number.isFinite(west) ? [west, south, east, north] : null
 }

@@ -2,6 +2,7 @@
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import type { Map as LibreMap, GeoJSONSource, ExpressionSpecification } from 'maplibre-gl'
 import type { AssetFeature, AssetCollection, DisplayPointCollection } from '../types/assets'
+import type { ProjectFeature } from '../types/planning'
 import { featureBounds } from '../utils/filterAssets'
 import { VOLTAGE_COLORS } from '../utils/formatAssets'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
@@ -9,8 +10,10 @@ import { FOOTPRINT_MIN_ZOOM, renderedRecordCount } from '../utils/substationPres
 import MapBasemapPicker from './MapBasemapPicker.vue'
 import { OSM_ATTRIBUTION, basemapStyle, isBasemapTileEvent } from '../utils/basemaps'
 import type { BasemapId } from '../utils/basemaps'
-const props = defineProps<{ features: AssetFeature[]; displayPoints: DisplayPointCollection; selectedId: string | null }>()
-const emit = defineEmits<{ select: [feature: AssetFeature]; viewport: [count: number | null] }>()
+import { addProjectLayers, projectHitLayers, projectMapData, projectSource } from '../utils/planningMap'
+type MapRecord = AssetFeature | ProjectFeature
+const props = defineProps<{ features: AssetFeature[]; projects: ProjectFeature[]; displayPoints: DisplayPointCollection; selectedId: string | null }>()
+const emit = defineEmits<{ select: [feature: MapRecord]; viewport: [inventory: number | null, projects: number | null] }>()
 const container = ref<HTMLElement | null>(null)
 const detailsPopup = ref<HTMLElement | null>(null)
 const ready = ref(false), mapError = ref(''), basemapError = ref(false), zoom = ref(4)
@@ -21,9 +24,13 @@ const renderedPlantSymbols = ref(0)
 let map: LibreMap | undefined, resize: ResizeObserver | undefined, disposed = false
 let viewportDirty = true
 let basemapTileFailures = 0
-let pendingFit: AssetFeature[] | undefined
+let pendingFit: MapRecord[] | undefined
 let measuredWidth = 0, measuredHeight = 0
-const clickable = ['plant-symbols', 'plant-fill', 'plant-outline', 'construction-plant-outline', 'point-candidates', 'primary-symbols', 'review-symbols', 'primary-fill', 'primary-outline', 'construction-polygon-outline', 'review-fill', 'review-outline', 'line-hit']
+const clickable = [...projectHitLayers, 'plant-symbols', 'plant-fill', 'plant-outline', 'construction-plant-outline', 'point-candidates', 'primary-symbols', 'review-symbols', 'primary-fill', 'primary-outline', 'construction-polygon-outline', 'review-fill', 'review-outline', 'line-hit']
+const inventorySources = ['inventory', 'substation-symbols', 'plant-symbols', projectSource]
+function findRecord(id?: string | null) {
+  return props.features.find(f => f.properties.feature_id === id) ?? props.projects.find(f => f.id === id)
+}
 const voltageColor: ExpressionSpecification = ['match', ['get', 'max_voltage_kv'], 500, VOLTAGE_COLORS[500]!, 275, VOLTAGE_COLORS[275]!, 150, VOLTAGE_COLORS[150]!, 70, VOLTAGE_COLORS[70]!, '#6c7883']
 const isLine: ExpressionSpecification = ['==', ['get', 'asset_type'], 'transmission_line']
 const isPolygon: ExpressionSpecification = ['==', ['get', 'asset_type'], 'substation_polygon']
@@ -68,10 +75,12 @@ function syncSelected() {
   }
   if (map?.getLayer('selection-symbol')) map.setFilter('selection-symbol', selected)
   if (map?.getLayer('selection-plant-symbol')) map.setFilter('selection-plant-symbol', selected)
+  if (map?.getLayer('project-highlight-line')) map.setFilter('project-highlight-line', ['all', ['==', ['geometry-type'], 'LineString'], selected])
+  if (map?.getLayer('project-highlight-point')) map.setFilter('project-highlight-point', ['all', ['==', ['geometry-type'], 'Point'], selected])
 }
 function addInventory() {
   if (!map || map.getSource('inventory')) return
-  map.addSource('inventory', { type: 'geojson', data: data(), attribution: OSM_ATTRIBUTION })
+  map.addSource('inventory', { type: 'geojson', data: data(), attribution: OSM_ATTRIBUTION + ' · <a href="https://openinframap.org/">OpenInfraMap</a> · <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL</a>' })
   map.addSource('substation-symbols', { type: 'geojson', data: symbolData() })
   map.addSource('plant-symbols', { type: 'geojson', data: plantSymbolData() })
   addPlantIcons()
@@ -112,20 +121,24 @@ function addInventory() {
     paint: { 'circle-radius': 10, 'circle-color': '#000', 'circle-opacity': 0, 'circle-stroke-width': 3, 'circle-stroke-color': '#f7bf27' } })
   map.addLayer({ id: 'selection-plant-symbol', type: 'circle', source: 'plant-symbols', maxzoom: FOOTPRINT_MIN_ZOOM,
     filter: ['==', ['get', 'feature_id'], ''], paint: { 'circle-radius': 10, 'circle-color': '#000', 'circle-opacity': 0, 'circle-stroke-width': 3, 'circle-stroke-color': '#f7bf27' } })
+  addProjectLayers(map, props.projects)
   syncSelected(); ready.value = true; viewportDirty = true
 }
 function updateViewport() {
   if (!map || !ready.value) return
   const selectedIds = new Set(props.features.map(feature => feature.properties.feature_id))
+  const projectIds = new Set(props.projects.map(feature => feature.id))
   const rendered = map.queryRenderedFeatures(undefined, { layers: clickable }).filter(feature =>
-    selectedIds.has(feature.properties.represented_feature_id ?? feature.properties.feature_id))
+    feature.source === projectSource ? projectIds.has(feature.properties.feature_id) :
+      selectedIds.has(feature.properties.represented_feature_id ?? feature.properties.feature_id))
   renderedSymbols.value = renderedRecordCount(rendered.filter(feature => feature.source === 'substation-symbols'))
   renderedPoints.value = renderedRecordCount(rendered.filter(feature => feature.properties.asset_type === 'substation_point'))
   renderedPlantSymbols.value = renderedRecordCount(rendered.filter(feature => feature.source === 'plant-symbols'))
   center.value = map.getCenter()
-  zoom.value = map.getZoom(); emit('viewport', renderedRecordCount(rendered))
+  zoom.value = map.getZoom()
+  emit('viewport', renderedRecordCount(rendered.filter(f => f.source !== projectSource)), renderedRecordCount(rendered.filter(f => f.source === projectSource)))
 }
-function fitFeatures(features: AssetFeature[]) {
+function fitFeatures(features: MapRecord[]) {
   const bounds = featureBounds(features)
   if (map && bounds) {
     const canvas = container.value?.getBoundingClientRect()
@@ -141,11 +154,12 @@ function fitFeatures(features: AssetFeature[]) {
 function resizeMap() {
   if (!map || !container.value) return
   const width = container.value.clientWidth, height = container.value.clientHeight
+  if (!width || !height) return
   // MapLibre may resize its canvas first through its own window listener.
   if (measuredWidth === width && measuredHeight === height) return
   measuredWidth = width; measuredHeight = height
   // Restart an active fit after resizing so its destination uses the new canvas center.
-  const selected = props.features.find(feature => feature.properties.feature_id === props.selectedId)
+  const selected = findRecord(props.selectedId)
   const interruptedFit = pendingFit ?? (selected ? [selected] : undefined)
   map.stop()
   map.resize()
@@ -162,12 +176,12 @@ function changeBasemap(next: BasemapId) {
   if (!map || disposed || basemap.value === next) return
   basemap.value = next
   resetBasemapStatus(); ready.value = false; viewportDirty = true
-  emit('viewport', null)
+  emit('viewport', null, null)
   map.setStyle(basemapStyle(next, customStyleUrl), { diff: false })
 }
 watch([() => props.features, () => props.displayPoints], () => {
   viewportDirty = true
-  emit('viewport', null)
+  emit('viewport', null, null)
   const source = map?.getSource('inventory') as GeoJSONSource | undefined
   source?.setData(data())
   const symbols = map?.getSource('substation-symbols') as GeoJSONSource | undefined
@@ -175,11 +189,17 @@ watch([() => props.features, () => props.displayPoints], () => {
   const plants = map?.getSource('plant-symbols') as GeoJSONSource | undefined
   plants?.setData(plantSymbolData())
 })
+watch(() => props.projects, projects => {
+  viewportDirty = true
+  emit('viewport', null, null)
+  const source = map?.getSource(projectSource) as GeoJSONSource | undefined
+  source?.setData(projectMapData(projects))
+})
 watch(() => props.selectedId, (selectedId, previousId) => {
   syncSelected()
   // Keep the selected geometry clear of the floating card; closing recenters it.
   resizeMap()
-  const selected = props.features.find(f => f.properties.feature_id === (selectedId ?? previousId))
+  const selected = findRecord(selectedId ?? previousId)
   if (selected) fitFeatures([selected])
 }, { flush: 'post' })
 onMounted(async () => {
@@ -188,23 +208,25 @@ onMounted(async () => {
     if (disposed || !container.value) return
     libre.setWorkerUrl(workerUrl)
     map = new libre.Map({ container: container.value, style: basemapStyle(basemap.value, customStyleUrl), bounds: [[94.5, -11.4], [141.7, 6.7]], fitBoundsOptions: { padding: 25 }, maxZoom: 19, minZoom: 2, renderWorldCopies: false, attributionControl: false, fadeDuration: 0 })
+    center.value = map.getCenter()
+    zoom.value = map.getZoom()
     mapAvailable.value = true
     map.addControl(new libre.NavigationControl({ showCompass: false }), 'top-right')
-    map.addControl(new libre.ScaleControl({ unit: 'metric' }), 'bottom-left')
-    map.addControl(new libre.AttributionControl({ compact: false }), 'bottom-right')
+    map.addControl(new libre.ScaleControl({ unit: 'metric', maxWidth: 80 }), 'bottom-left')
+    map.addControl(new libre.AttributionControl(), 'bottom-right')
     map.on('style.load', addInventory)
     map.on('idle', updateViewport)
     map.on('sourcedata', event => {
-      if (['inventory', 'substation-symbols', 'plant-symbols'].includes(event.sourceId)) viewportDirty = true
+      if (inventorySources.includes(event.sourceId)) viewportDirty = true
       if (isBasemapTileEvent(event) && event.tile.state === 'loaded' && map?.getSource(event.sourceId)) resetBasemapStatus()
     })
     // Inventory counts must not wait for slow or unavailable external raster tiles.
     map.on('render', () => {
-      if (viewportDirty && ready.value && map?.getSource('inventory') && map.getSource('substation-symbols') && map.getSource('plant-symbols') && map.isSourceLoaded('inventory') && map.isSourceLoaded('substation-symbols') && map.isSourceLoaded('plant-symbols') && !map.isMoving()) {
+      if (viewportDirty && ready.value && map && !map.isMoving() && inventorySources.every(id => map!.getSource(id) && map!.isSourceLoaded(id))) {
         updateViewport(); viewportDirty = false
       }
     })
-    map.on('movestart', () => { resetBasemapStatus(); viewportDirty = true; emit('viewport', null) })
+    map.on('movestart', () => { resetBasemapStatus(); viewportDirty = true; emit('viewport', null, null) })
     map.on('moveend', () => { pendingFit = undefined })
     map.on('error', event => {
       if (basemap.value === 'plain' || !isBasemapTileEvent(event) || !map?.getSource(event.sourceId)) return
@@ -213,30 +235,31 @@ onMounted(async () => {
     map.on('click', event => {
       if (!ready.value || !map) return
       const hits = map.queryRenderedFeatures([[event.point.x - 4, event.point.y - 4], [event.point.x + 4, event.point.y + 4]], { layers: clickable })
-      const hit = hits.find(feature => feature.source === 'substation-symbols' || feature.source === 'plant-symbols' || feature.properties.asset_type === 'substation_point') ?? hits[0]
-      const selected = props.features.find(f => f.properties.feature_id === (hit?.properties.represented_feature_id ?? hit?.properties.feature_id))
+      const hit = hits.find(feature => feature.geometry.type === 'Point') ?? hits[0]
+      const selected = findRecord(hit?.properties.represented_feature_id ?? hit?.properties.feature_id)
       if (selected) emit('select', selected)
     })
     map.on('mousemove', event => { if (ready.value && map) map.getCanvas().style.cursor = map.queryRenderedFeatures(event.point, { layers: clickable }).length ? 'pointer' : '' })
     resize = new ResizeObserver(resizeMap); resize.observe(container.value)
-  } catch (cause) { mapError.value = `Map unavailable. ${cause instanceof Error ? cause.message : 'WebGL could not start'}. You can still search and inspect records below.` }
+  } catch (cause) { mapError.value = `Map unavailable. ${cause instanceof Error ? cause.message : 'WebGL could not start'}. Open Summary or RUPTL plans to browse records.` }
 })
 onBeforeUnmount(() => { disposed = true; resize?.disconnect(); map?.remove() })
+defineExpose({ fitFeatures })
 </script>
 <template>
   <section class="map-card" aria-label="Spatial asset inventory">
     <div class="map-frame">
-    <div class="map-body"><div ref="container" class="map-container" role="region" aria-label="Interactive map of selected lines, substations, power plants and point-only candidates" data-testid="map" :data-ready="ready" :data-basemap="basemap" :data-substation-mode="zoom < FOOTPRINT_MIN_ZOOM ? 'representative-symbols' : 'footprints'" :data-rendered-symbols="renderedSymbols" :data-rendered-point-candidates="renderedPoints" :data-rendered-plant-symbols="renderedPlantSymbols" :data-zoom="zoom" :data-center-lng="center.lng" :data-center-lat="center.lat"></div>
+    <slot name="layers" :overview="zoom < FOOTPRINT_MIN_ZOOM"/>
+    <div class="map-body"><div ref="container" class="map-container" role="region" aria-label="Interactive map of Indonesia’s electricity network and planning projects" data-testid="map" :data-ready="ready" :data-basemap="basemap" :data-substation-mode="zoom < FOOTPRINT_MIN_ZOOM ? 'representative-symbols' : 'footprints'" :data-rendered-symbols="renderedSymbols" :data-rendered-point-candidates="renderedPoints" :data-rendered-plant-symbols="renderedPlantSymbols" :data-zoom="zoom" :data-center-lng="center.lng" :data-center-lat="center.lat"></div>
       <div class="map-actions" role="group" aria-label="Map tools">
-      <button class="map-tool-button" :disabled="!ready || !features.length" aria-label="Fit filtered records" title="Fit filtered records" @click="fitFeatures(features)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
+      <button class="map-tool-button" :disabled="!ready || !(features.length || projects.some(f => f.geometry))" aria-label="Fit filtered records" title="Fit filtered records" @click="fitFeatures([...features, ...projects])"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg></button>
       <span class="map-tools-divider" aria-hidden="true"></span>
       <MapBasemapPicker :selected="basemap" :custom-available="!!customStyleUrl" :disabled="!mapAvailable" :tile-error="basemapError" @change="changeBasemap"/>
       </div>
       <div v-if="mapError" class="map-failure" role="alert">{{ mapError }}</div><div v-else-if="!ready" class="map-loading" role="status">Loading map…</div>
-      <slot name="layers" :overview="zoom < FOOTPRINT_MIN_ZOOM"/>
-      <span v-if="ready" class="zoom-label">ZOOM {{ zoom.toFixed(1) }}</span>
-    </div>
+      <slot name="status"/>
       <div v-if="selectedId" ref="detailsPopup" class="map-details"><slot name="details"/></div>
+    </div>
     </div>
   </section>
 </template>

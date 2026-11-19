@@ -9,7 +9,7 @@ const directory = resolve(root, 'public/data')
 const read = name => JSON.parse(readFileSync(join(directory, name), 'utf8'))
 const summary = read('summary.json'), catalog = read('data-catalog.json'), qa = read('qa-report.json')
 const files = ['transmission-lines.geojson', 'substations-primary.geojson', 'substations-review.geojson', 'substations-point-candidates.geojson', 'substation-display-points.geojson', 'power-plants.geojson', 'summary.json', 'data-catalog.json', 'qa-report.json']
-assert.deepEqual(readdirSync(directory).sort(), [...files].sort(), 'Only the nine intended data exports may be published')
+assert.deepEqual(readdirSync(directory).sort(), [...files, 'planning'].sort(), 'Unexpected item in the data publication')
 assert.equal(summary.schema_version, 3)
 assert.equal(summary.data_version, catalog.data_version, 'Metadata versions differ')
 assert.equal(summary.data_version, qa.data_version, 'QA version differs')
@@ -95,3 +95,4 @@ function checkAssets(path) {
 checkAssets(resolve(root, 'public'))
 console.log(`Publication checks passed: ${ids.size.toLocaleString('en-GB')} inventory/review records; ${symbolIds.size} uncounted substation symbols; ${summary.datasets.power_plants.count} embedded plant display locations; nine files; matching versions, checksums and counts.`)
 console.log(`Published GeoJSON bytes: ${catalog.datasets.reduce((n, entry) => n + statSync(join(directory, entry.url.split('/').pop())).size, 0).toLocaleString('en-GB')}`)
+await import('./check_planning_data.mjs')

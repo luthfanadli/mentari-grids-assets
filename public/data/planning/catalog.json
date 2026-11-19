@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "attribution": "Sitompul, S. A. (2026). Indonesia Power Map: Data Collection (v2.0.0). Plan attributes from PLN/ESDM. Mapping by IPM.",
+  "source_url": "https://github.com/sandro71626/ipm-model",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "osm_notice": "© OpenStreetMap contributors. ODbL 1.0 applies to OSM-derived material.",
+  "osm_license": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "adaptation": "MENTARI Grids adds project feature IDs and withholds geometry for unusable routes. Valid source coordinates and planning attributes retain their supplied values.",
+  "coverage": "Project rows retain the supplied plan, status, target years, geographical labels, capacity units and geometry precision. Multiple rows can describe work at one site. Status and target years describe plans; actual commissioning requires separate evidence.",
+  "datasets": {
+    "transmission": {
+      "url": "/data/planning/transmission.geojson",
+      "input": "ruptl_transmission.geojson",
+      "input_url": "https://indonesiapowermap.com/data/open/geojson/ruptl_transmission.geojson",
+      "source_bytes": 4979759,
+      "source_sha256": "857001a08038353d5b2abd8ab60df5f4909c862c2e15ee8b7688df1bc05d643f",
+      "count": 1258,
+      "mapped": 1248,
+      "source_counts": {
+        "RUKN 2025-2060": 7,
+        "RUPTL 2025-2034": 1251
+      },
+      "geometry_issues": {
+        "invalid_geometry": 7,
+        "route_status_none": 3
+      },
+      "statuses": {
+        "Committed": 73,
+        "Construction": 101,
+        "Planned": 1077,
+        "Study": 7
+      },
+      "route_status": {
+        "assumed": 29,
+        "drawn": 1083,
+        "none": 3,
+        "schematic": 143
+      },
+      "bytes": 5033703,
+      "sha256": "5c2f12fff01390ffb52f80abb8af5bd4e269e5bb5e5cf6d7d939ff0624886d92"
+    },
+    "substations": {
+      "url": "/data/planning/substations.geojson",
+      "input": "ruptl_substations.geojson",
+      "input_url": "https://indonesiapowermap.com/data/open/geojson/ruptl_substations.geojson",
+      "source_bytes": 857650,
+      "source_sha256": "9e33f7c0cbe83be74b7b6a750b4f5b16464c559714e31e8b511ef0567d0f6f36",
+      "count": 1740,
+      "mapped": 1740,
+      "source_counts": {
+        "RUPTL 2025-2034": 1740
+      },
+      "geometry_issues": {},
+      "statuses": {
+        "Committed": 84,
+        "Construction": 148,
+        "Planned": 1508
+      },
+      "location_confidence": {
+        "high": 1336,
+        "medium": 404
+      },
+      "bytes": 931310,
+      "sha256": "6bd36c172269fa7bba910eb439cd53f81ee5fe5342b50eed8570a26d22520093"
+    },
+    "generators": {
+      "url": "/data/planning/generators.geojson",
+      "input": "ruptl_generators.geojson",
+      "input_url": "https://indonesiapowermap.com/data/open/geojson/ruptl_generators.geojson",
+      "source_bytes": 494548,
+      "source_sha256": "9db8703cee4b9537f60819fbec738ee72499f0a3009f5f09e7d25d3ea0123721",
+      "count": 1059,
+      "mapped": 1059,
+      "source_counts": {
+        "RUKN 2025-2060": 1,
+        "RUPTL 2025-2034": 1058
+      },
+      "geometry_issues": {},
+      "statuses": {
+        "Committed": 53,
+        "Construction": 115,
+        "Planned": 865,
+        "Proposed": 25,
+        "Study": 1
+      },
+      "location_confidence": {
+        "high": 547,
+        "medium": 512
+      },
+      "bytes": 538556,
+      "sha256": "0384c2ebb1f76542e1c1824c9d5670b5a37944174d55cd199fff2994e625dca2"
+    }
+  },
+  "filters": {
+    "sources": [
+      "RUKN 2025-2060",
+      "RUPTL 2025-2034"
+    ],
+    "statuses": [
+      "Committed",
+      "Construction",
+      "Planned",
+      "Proposed",
+      "Study"
+    ],
+    "target_years": [
+      2025,
+      2026,
+      2027,
+      2028,
+      2029,
+      2030,
+      2031,
+      2032,
+      2033,
+      2034,
+      2035,
+      2038,
+      2039,
+      2040,
+      2041,
+      2045
+    ],
+    "unknown_year": true
+  }
+}

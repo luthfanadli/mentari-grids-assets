@@ -1,26 +1,41 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import type { AssetFeature } from '../types/assets'
+import type { ProjectFeature } from '../types/planning'
+import { isProject } from '../utils/planning'
+import ProjectDetails from './ProjectDetails.vue'
 import { STATUS_LABELS, REVIEW_LABELS, formatValue, formatVoltage } from '../utils/formatAssets'
-const props = defineProps<{ feature: AssetFeature }>()
-const emit = defineEmits<{ close: [] }>()
+const props = defineProps<{ feature: AssetFeature | ProjectFeature; colocated: ProjectFeature[] }>()
+const emit = defineEmits<{ close: []; select: [record: ProjectFeature] }>()
 const closeButton = ref<HTMLButtonElement | null>(null)
 const content = ref<HTMLElement | null>(null)
 const previousFocus = document.activeElement as HTMLElement | null
-const p = computed(() => props.feature.properties)
+const project = computed(() => isProject(props.feature) ? props.feature : null)
+const asset = computed(() => isProject(props.feature) ? null : props.feature)
+const p = computed(() => asset.value?.properties)
 watch(() => props.feature, async () => {
   await nextTick()
   if (content.value) content.value.scrollTop = 0
   closeButton.value?.focus()
 }, { immediate: true })
-function onEscape(event: KeyboardEvent) { if (event.key === 'Escape') emit('close') }
+function onEscape(event: KeyboardEvent) {
+  if (event.key === 'Escape' && !event.defaultPrevented && !document.querySelector('dialog[open]') && !content.value?.closest('[inert]')) emit('close')
+}
 onMounted(() => document.addEventListener('keydown', onEscape))
-onBeforeUnmount(() => { document.removeEventListener('keydown', onEscape); previousFocus?.focus() })
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onEscape)
+  if (!closeButton.value?.closest('.details-drawer')?.contains(document.activeElement)) return
+  const target = previousFocus?.isConnected && previousFocus.getClientRects().length && !previousFocus.closest('[inert]')
+    ? previousFocus : document.querySelector<HTMLElement>('.map-workspace:not([inert]) .maplibregl-canvas')
+  target?.focus({ preventScroll: true })
+})
 </script>
 <template>
   <aside class="details-drawer" role="region" aria-labelledby="detail-title" data-testid="asset-details">
-    <div class="drawer-heading"><span class="eyebrow">ASSET DETAILS</span><button ref="closeButton" class="icon-button" aria-label="Close feature details" @click="$emit('close')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <div class="drawer-heading"><span>{{ project ? 'Project details' : 'Asset details' }}</span><button ref="closeButton" class="icon-button" aria-label="Close feature details" @click="$emit('close')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
     <div ref="content" class="details-content" role="region" aria-label="Asset attributes" tabindex="0">
+    <ProjectDetails v-if="project" :feature="project" :colocated="colocated" @select="record => emit('select', record)"/>
+    <template v-else-if="asset && p">
     <span class="asset-kind">{{ p.asset_type === 'power_plant' ? 'Power plant footprint' : p.asset_type === 'substation_point' ? 'Unvalidated point-only candidate' : p.review_reason ? 'Review polygon candidate' : p.asset_type === 'transmission_line' ? 'Transmission line segment' : 'Primary substation polygon' }}</span>
     <h2 id="detail-title">{{ p.display_name }}</h2><p v-if="p.display_name_is_fallback" class="filter-note">Interface fallback label. No source name is available.</p>
     <div class="detail-badges"><span v-if="p.asset_type !== 'power_plant'" class="badge">{{ formatVoltage(p.max_voltage_kv) }}</span><span v-else class="badge">{{ p.plant_source || 'Energy source unavailable' }}</span><span class="badge muted-badge">Unverified operation</span></div>
@@ -29,7 +44,7 @@ onBeforeUnmount(() => { document.removeEventListener('keydown', onEscape); previ
     <dl class="detail-fields">
       <div><dt>Original name</dt><dd>{{ formatValue(p.name) }}</dd></div><div><dt>Reference</dt><dd>{{ formatValue(p.ref) }}</dd></div>
       <div><dt>OSM source ID</dt><dd class="mono">{{ p.source_id }}</dd></div><div><dt>Source layer</dt><dd class="mono">{{ p.source_layer }}</dd></div>
-      <div><dt>Original geometry</dt><dd>{{ feature.geometry.type }}{{ p.asset_type === 'substation_point' ? ' · original source location' : '' }}</dd></div>
+      <div><dt>Original geometry</dt><dd>{{ asset.geometry.type }}{{ p.asset_type === 'substation_point' ? ' · original source location' : '' }}</dd></div>
       <div><dt>Operator</dt><dd>{{ formatValue(p.operator) }}</dd></div>
       <template v-if="p.asset_type === 'power_plant'">
         <div><dt>Energy source tag</dt><dd>{{ formatValue(p.plant_source) }}</dd></div>
@@ -55,6 +70,7 @@ onBeforeUnmount(() => { document.removeEventListener('keydown', onEscape); previ
       <div v-if="p.asset_type === 'transmission_line'"><dt>Mapped geometry length</dt><dd>{{ p.mapped_geometry_length_km === null ? 'Not available' : p.mapped_geometry_length_km.toFixed(2) + ' km' }}<small>WGS84 geodesic measurement; not official circuit-km.</small></dd></div>
       <div><dt>Official region / power system</dt><dd>Not available</dd></div><div><dt>Verified COD / capacity / AIS–GIS</dt><dd>Not available</dd></div>
     </dl>
+    </template>
     </div>
   </aside>
 </template>
