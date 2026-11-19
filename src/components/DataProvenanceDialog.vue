@@ -26,7 +26,7 @@ onMounted(() => dialog.value?.showModal())
       <p>At national scale, one symbol represents each selected footprint. Zoom in to see its boundary. Plant output units and official OSM asset identities remain unverified.</p>
       <p>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> · <a href="https://openinframap.org/">OpenInfraMap</a> · <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a></p>
       <h3>Planning projects</h3>
-      <p>The three supplied Indonesia Power Map files cite RUPTL 2025–2034 and RUKN 2025–2060. Each row describes a project or work item. Locations and routes are mapped by IPM. The details show the reported stage, target year, location confidence or route status, and source page when supplied.</p>
+      <p>The three supplied Indonesia Power Map files cite RUPTL 2025–2034 and RUKN 2025–2060. Each row describes a project entry. Several projects can share a site. Locations and routes are mapped by IPM. The details show the reported stage, target year, location confidence or route status, and source page when supplied.</p>
       <p v-if="planTotals">Map geometry is available for {{ formatNumber(planTotals.mapped) }} of {{ formatNumber(planTotals.records) }} projects. The register also lists transmission projects whose route has coincident vertices or is marked unavailable by the source.</p>
       <p><a href="https://indonesiapowermap.com/#data">Indonesia Power Map</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. The dashboard adds map identifiers and withholds unusable route geometries.</p>
       <h3>Comparison with Indonesia Power Map</h3>

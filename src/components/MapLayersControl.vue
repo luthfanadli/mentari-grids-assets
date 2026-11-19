@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { AssetFeature, AssetFilters, InventorySummary, OsmStatus } from '../types/assets'
-import type { PlanningCatalog, PlanningKind, PlanFilters, ProjectFeature } from '../types/planning'
+import { planningLabels, type PlanningCatalog, type PlanningKind, type PlanFilters, type ProjectFeature } from '../types/planning'
 import { VOLTAGES } from '../utils/filterAssets'
 import { STATUS_LABELS, VOLTAGE_COLORS, formatNumber } from '../utils/formatAssets'
 import { polygonStyleState } from '../utils/substationPresentation'
@@ -22,9 +22,9 @@ const emit = defineEmits<{
   select: [record: AssetFeature | ProjectFeature]; summary: []; plans: []
 }>()
 const sections = [
-  { title: 'Transmission', kind: 'transmission', key: 'lines', dataset: 'lines', label: 'Mapped lines', plan: 'Line projects' },
-  { title: 'Substations', kind: 'substations', key: 'primary', dataset: 'primary', label: 'Primary substations', plan: 'Substation projects' },
-  { title: 'Generation', kind: 'generators', key: 'powerPlants', dataset: 'power_plants', label: 'Power-plant footprints', plan: 'Generation projects' },
+  { title: 'Transmission', kind: 'transmission', key: 'lines', dataset: 'lines', label: 'Mapped lines' },
+  { title: 'Substations', kind: 'substations', key: 'primary', dataset: 'primary', label: 'Primary substations' },
+  { title: 'Generation', kind: 'generators', key: 'powerPlants', dataset: 'power_plants', label: 'Power-plant footprints' },
 ] as const
 const statuses: OsmStatus[] = ['not_flagged_in_osm', 'tagged_construction', 'tagged_disused']
 const desktop = window.matchMedia('(min-width: 761px)')
@@ -96,7 +96,7 @@ onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.r
               <span>{{ section.label }}</span><small aria-hidden="true">{{ summary ? formatNumber(summary.datasets[section.dataset].count) : '…' }}</small>
             </label>
             <label class="layer-row"><input v-model="planningLayers" type="checkbox" :value="section.kind"/>
-              <span class="layer-key planned" :class="section.kind" aria-hidden="true"></span><span>{{ section.plan }}</span><small aria-hidden="true">{{ catalog ? formatNumber(catalog.datasets[section.kind].count) : '…' }}</small>
+              <span class="layer-key planned" :class="section.kind" aria-hidden="true"></span><span>{{ planningLabels[section.kind] }}</span><small aria-hidden="true">{{ catalog ? formatNumber(catalog.datasets[section.kind].count) : '…' }}</small>
             </label>
             <p v-if="planningLayers.includes(section.kind) && planLoading[section.kind]" class="layers-note" role="status">Loading projects…</p>
             <p v-if="planningLayers.includes(section.kind) && planErrors[section.kind]" class="layers-error" role="alert">{{ planErrors[section.kind] }} <button class="text-button" @click="emit('retryProject', section.kind)">Retry projects</button></p>
@@ -121,10 +121,10 @@ onBeforeUnmount(() => { desktop.removeEventListener('change', adapt); document.r
         <details class="asset-group"><summary>OSM status<i class="chevron" aria-hidden="true"></i></summary>
           <div class="group-rows"><label v-for="status in statuses" :key="status" class="layer-row"><input v-model="filters.statuses" type="checkbox" :value="status"/><i class="status-key" :class="status" aria-hidden="true"></i>{{ STATUS_LABELS[status] }}</label><p class="layers-note">Operation is unverified.</p></div>
         </details>
-        <details class="asset-group"><summary>Plan filters<i class="chevron" aria-hidden="true"></i></summary>
+        <details v-if="planningLayers.length" class="asset-group"><summary>Project filters<i class="chevron" aria-hidden="true"></i></summary>
           <PlanFilterFields v-if="catalog" v-model="planFilters" :options="catalog.filters"/>
           <p v-else-if="catalogError" class="layers-error" role="alert">{{ catalogError }} <button class="text-button" @click="emit('retryCatalog')">Retry catalogue</button></p>
-          <p v-else class="layers-note">Loading plan filters…</p>
+          <p v-else class="layers-note">Loading project filters…</p>
         </details>
       </div>
       <div class="layers-footer"><span v-if="busy" role="status">Loading layers…</span><span v-else>{{ formatNumber(features.length) }} OSM · {{ formatNumber(mappedProjectCount) }} mapped {{ mappedProjectCount === 1 ? 'project' : 'projects' }}</span></div>

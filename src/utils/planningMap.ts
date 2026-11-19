@@ -36,9 +36,9 @@ export function addProjectLayers(map: LibreMap, projects: ProjectFeature[]) {
   context.strokeStyle = planColor
   context.lineWidth = 4
   context.strokeRect(4, 4, 20, 20)
-  map.addImage('substation-work', context.getImageData(0, 0, 28, 28), { pixelRatio: 2 })
+  map.addImage('substation-project', context.getImageData(0, 0, 28, 28), { pixelRatio: 2 })
   map.addLayer({ id: 'planning-substations', type: 'symbol', source: projectSource, filter: ['==', ['get', 'kind'], 'substations'],
-    layout: { 'icon-image': 'substation-work', 'icon-size': 0.9, 'icon-allow-overlap': true, 'icon-ignore-placement': true } })
+    layout: { 'icon-image': 'substation-project', 'icon-size': 0.9, 'icon-allow-overlap': true, 'icon-ignore-placement': true } })
   map.addLayer({ id: 'planning-generators', type: 'circle', source: projectSource, filter: ['==', ['get', 'kind'], 'generators'],
     paint: { 'circle-radius': 4.8, 'circle-color': '#fff9ed', 'circle-stroke-color': planColor, 'circle-stroke-width': 2 } })
   map.addLayer({ id: 'project-highlight-line', type: 'line', source: projectSource, filter: ['==', ['get', 'feature_id'], ''],

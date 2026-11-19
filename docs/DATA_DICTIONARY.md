@@ -30,7 +30,7 @@ The records represent individual project entries from the three supplied Indones
 | `catalog.json` | | | 4,053 |
 | **Total** | **4,057** | **4,047** | **6,507,622** |
 
-The map labels `Substation projects` and `Generation projects` refer to `substations.geojson` and `generators.geojson`. Substation projects include the source scopes `New`, `Extension` and `Uprate`. Generation projects include generation, hybrid generation/storage and dedicated storage entries.
+The map labels `Transmission projects`, `Substation projects` and `Generation projects` refer to `transmission.geojson`, `substations.geojson` and `generators.geojson`, respectively. Substation projects include the source scopes `New`, `Extension` and `Uprate`. Generation projects include generation, hybrid generation/storage and dedicated storage entries.
 
 The feature ID is `planning:<dataset>:<source ID>`. The dataset is the file basename without the extension. `properties.id` keeps the original identifier. Substation and generation projects use source points. Transmission projects use the supplied LineString or MultiLineString, or null for rows without a usable route. Properties preserve source values, their units, and missing fields. Distinct projects at the same coordinates retain their own IDs.
 
@@ -39,7 +39,7 @@ The feature ID is `planning:<dataset>:<source ID>`. The dataset is the file base
 | `source`, `status`, `province`, `system` | Source plan, project stage and geographic labels as supplied by IPM |
 | `target_cod_year`, `cod_re_base`, `cod_ared` | Target years, including the two plan scenarios when supplied. Actual commissioning requires separate evidence. |
 | `ruptl_page`, `ruptl_row` | Document references preserved as source text |
-| `scope`, `site_id`, `voltage_kv`, `voltage_label`, `capacity_mva` | Substation work, site reference, source kV and capacity where reported |
+| `scope`, `site_id`, `voltage_kv`, `voltage_label`, `capacity_mva` | Substation project scope, site reference, source kV and capacity where reported |
 | `type`, `technology`, `technology_label`, `capacity_mw`, `storage_mwh`, `developer` | Generation technology and reported project quantities or developer where supplied |
 | `from_substation`, `to_substation`, `voltage_kv`, `scope`, `line_type`, `conductor`, `hvdc`, `circuits`, `length_km`, `circuit_km` | Reported transmission attributes. Length figures come from the planning record. |
 | `location_source`, `location_confidence` | Point mapping credit and the publisher's assessment of point location |

@@ -16,7 +16,8 @@ Audit fixtures detect source changes and report exact differences before publica
 | --- | --- |
 | `services/assetData.ts` | Validated fetches; cache in-flight/successful requests; evict failures for retry |
 | `composables/useAssetFilters.ts` | Shared filters, loading/errors, lazy candidates, computed selection and counts |
-| `composables/usePlanning.ts`, `utils/planning.ts` | Independent project layer loads, plan filters, register and map selections |
+| `composables/usePlanning.ts`, `utils/planning.ts` | Independent project layer loads, project filters, register and map selections |
+| `types/planning.ts` | Project types and shared layer labels for the sidebar, register and details |
 | `utils/filterAssets.ts` | Layer/status/voltage/search predicates, original-record deduplication and bounds |
 | `utils/substationPresentation.ts` | Polygon style state, parent-symbol filtering and canonical viewport counts |
 | `utils/planningMap.ts` | Drawable project data, route styling and project symbols |
@@ -39,7 +40,7 @@ The navbar opens Summary and RUPTL plans in a shared native modal over the map. 
 
 The modal has a fixed heading and close button, plus an independently scrollable content panel. Compact spacing and ten rows per table page shorten the content. Pagination stays at the bottom of the visible table while scrolling. The modal fills the screen on phones. Native modal behavior makes the background inert. Tab and Shift+Tab wrap between enabled, visible controls. Escape, the close button or a press and release on the desktop backdrop closes it and restores focus to the trigger. Selecting a record closes the modal before the map detail card receives focus.
 
-The sidebar occupies its own column on desktop and opens over the map on smaller screens. Its header keeps Reset filters visible while the filter groups scroll. Its scrollable contents support native checkboxes, disclosure controls, keyboard search and Escape. Panning, zooming and empty selections preserve layer choices.
+The sidebar occupies its own column on desktop and opens over the map on smaller screens. Its header keeps Reset filters visible while the filter groups scroll. Its scrollable contents support native checkboxes, disclosure controls, keyboard search and Escape. The **Project filters** section appears as a collapsed disclosure when any project layer is enabled. Disabling all project layers removes that disclosure while retaining the shared filter values in `usePlanning`. Panning, zooming and empty selections preserve layer choices.
 
 The map fills the available viewport beneath the navbar. Reading a row or clicking a map feature opens its source details. The drawer shows other selected projects at the exact same coordinates when multiple point records overlap. A container query places the drawer at the bottom of narrow maps. Measured drawer bounds provide camera clearance. ResizeObserver handles sidebar changes and interrupted fits.
 

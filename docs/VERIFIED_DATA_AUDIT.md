@@ -64,7 +64,7 @@ The three supplied files match IPM's open planning downloads byte for byte. The 
 | `ruptl_generators.geojson` | 494,548 | 1,058 | 1 | 1,059 |
 | **Total** | **6,331,957** | **4,049** | **8** | **4,047** |
 
-All 4,057 rows have a unique source ID within their file. The generation projects occupy 796 distinct coordinate pairs. Substation projects occupy 877 pairs and reference 870 distinct source site IDs. They comprise 457 new works, 1,095 extensions and 188 uprates. All point records credit manual mapping by IPM. IPM labels 512 generator and 404 substation locations with medium confidence.
+All 4,057 rows have a unique source ID within their file. The generation projects occupy 796 distinct coordinate pairs. Substation projects occupy 877 pairs and reference 870 distinct source site IDs. Their source `scope` values are `New` (457), `Extension` (1,095) and `Uprate` (188). All point records credit manual mapping by IPM. IPM labels 512 generator and 404 substation locations with medium confidence.
 
 Raw transmission geometries comprise 1,239 LineStrings and 19 MultiLineStrings. Seven LineStrings collapse to a single coordinate. Three other LineStrings have distinct endpoints and a source route status of `none`. These ten rows retain their planning properties with null publication geometry. The private `data/qa/planning-qa.json` records their IDs and individual reasons. The 1,248 drawable routes comprise 1,077 tagged `drawn`, 142 `schematic` and 29 `assumed`.
 

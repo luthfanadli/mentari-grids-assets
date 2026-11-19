@@ -52,7 +52,7 @@ IPM combines PLN/ESDM planning material, OSM and its own mapping. Its release co
 
 The reference map’s older **About** text, dated 22 September 2026, quotes 4,053 lines, about 990 substations (931 with coordinates), and 593 plants. The November downloads linked from that same page yield the comparison above. [Reference map and About](https://indonesiapowermap.com/web/preview_indonesia)
 
-Of the 4,057 planning records, 4,049 cite RUPTL and eight cite RUKN (seven transmission studies and one generation study). Substation projects comprise 457 new works, 1,095 extensions and 188 uprates. IPM attributes all supplied point locations and line geometries to its manual mapping. Some locations or routes are indicative. In particular, line records carry `drawn`, `schematic`, `assumed` or `none` route status. A map symbol or line cannot verify exact siting, electrical connectivity or an operating date.
+Of the 4,057 planning records, 4,049 cite RUPTL and eight cite RUKN (seven transmission studies and one generation study). Substation projects have the source `scope` values `New` (457), `Extension` (1,095) and `Uprate` (188). IPM attributes all supplied point locations and line geometries to its manual mapping. Some locations or routes are indicative. In particular, line records carry `drawn`, `schematic`, `assumed` or `none` route status. A map symbol or line cannot verify exact siting, electrical connectivity or an operating date.
 
 ## Remaining Deliverable 2 gaps
 

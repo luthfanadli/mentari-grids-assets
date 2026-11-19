@@ -46,7 +46,7 @@ function reset() { kind.value = ''; listOnly.value = false; emit('reset') }
     </div>
     <p v-for="item in kinds.filter(k => errors[k])" :key="item" class="load-error" role="alert">{{ errors[item] }} <button class="text-button" @click="emit('retry', item)">Retry {{ planningLabels[item].toLowerCase() }}</button></p>
     <section class="asset-table-card" aria-labelledby="plan-records-heading" :aria-busy="busy">
-      <div class="results-heading"><div><h2 id="plan-records-heading">Project register <span>{{ formatNumber(records.length) }}</span></h2><p>Each row is one project entry. Several works can share a site.</p></div>
+      <div class="results-heading"><div><h2 id="plan-records-heading">Project register <span>{{ formatNumber(records.length) }}</span></h2><p>Each row is one project entry. Several projects can share a site.</p></div>
         <span class="viewport-count">{{ formatNumber(selectedCount) }} selected for map<span v-if="viewportCount !== null"> · {{ formatNumber(viewportCount) }} in viewport</span></span>
       </div>
       <p v-if="busy" class="empty-state" role="status">Loading project records…</p>

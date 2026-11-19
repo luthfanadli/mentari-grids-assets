@@ -63,6 +63,8 @@ For the OSM inventory:
 
 The three project layers load independently when enabled. Filter projects by source, supplied stage and supplied target year. Search uses source project names, IDs, site IDs, province, system, endpoints and technology where available. The grid voltage selector reads the explicit project `voltage_kv` for transmission and substation projects. Generation projects are independent of the voltage selector. OSM status filters apply only to inventory records.
 
+The sidebar's **Project filters** section is available only while at least one project layer is enabled and starts collapsed when it appears. The source, stage and target-year values are shared with the **RUPTL plans** register and persist when all project layers are disabled. Section visibility depends on enabled layers, including layers with no matches or a loading error, so filters can still be adjusted for empty results.
+
 ## Outputs and validation
 
 The OSM inventory has six GeoJSON files and three metadata files with their source attribution and ODbL notices. The planning publication adds three GeoJSON files and a catalog with IPM attribution, CC BY-SA 4.0 and the notice for OSM-derived data. Both publications use deterministic ordering, UTF-8/CRLF serialization and checksums. Each pipeline checks the input SHA-256 before and after processing and reports audit differences before writing publication files. [Data dictionary](DATA_DICTIONARY.md)
