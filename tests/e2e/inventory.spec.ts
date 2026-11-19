@@ -330,7 +330,7 @@ test('planning register distinguishes all records, mapped routes, sources and co
   await expect(heading).toHaveText('Project register 3')
   await page.getByRole('button', { name: 'Show results on map' }).click()
   await expect(rail(page).locator('.layers-footer')).toContainText('3 mapped projects')
-  await expect(rail(page).getByRole('checkbox', { name: 'Substation works' })).toBeChecked()
+  await expect(rail(page).getByRole('checkbox', { name: 'Substation projects' })).toBeChecked()
   await nav(page, 'RUPTL plans')
   await register.getByRole('button', { name: 'Reset filters' }).click()
   await register.getByRole('combobox', { name: 'Project type', exact: true }).selectOption('substations')

@@ -43,7 +43,7 @@ The sidebar occupies its own column on desktop and opens over the map on smaller
 
 The map fills the available viewport beneath the navbar. Reading a row or clicking a map feature opens its source details. The drawer shows other selected projects at the exact same coordinates when multiple point records overlap. A container query places the drawer at the bottom of narrow maps. Measured drawer bounds provide camera clearance. ResizeObserver handles sidebar changes and interrupted fits.
 
-Project rendering uses amber dashed lines for routes, hollow squares for substation works and hollow circles for generation. The WebGL source carries only drawable geometry and stable feature identifiers. Full project attributes and entries without geometry are available in the register. Selected and viewport counts are calculated separately for OSM and plans.
+Project rendering uses amber dashed lines for routes, hollow squares for substation projects and hollow circles for generation. The WebGL source carries only drawable geometry and stable feature identifiers. Full project attributes and entries without geometry are available in the register. Selected and viewport counts are calculated separately for OSM and plans.
 
 ## Basemaps and failures
 

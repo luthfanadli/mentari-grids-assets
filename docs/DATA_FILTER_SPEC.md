@@ -59,9 +59,9 @@ For the OSM inventory:
 
 ## Planning projects
 
-`scripts/prepare_planning.py` preserves one record per supplied source project in the transmission, substation works and generation files. The source field identifies RUPTL or RUKN. A valid supplied project location or route is displayed at its original coordinates. A missing, invalid or explicitly unavailable route produces a register entry with null geometry. Null geometry contributes to register totals and is excluded from mapped and viewport counts.
+`scripts/prepare_planning.py` preserves one record per supplied source project in the transmission, substation and generation files. The source field identifies RUPTL or RUKN. A valid supplied project location or route is displayed at its original coordinates. A missing, invalid or explicitly unavailable route produces a register entry with null geometry. Null geometry contributes to register totals and is excluded from mapped and viewport counts.
 
-The three project layers load independently when enabled. Filter projects by source, supplied stage and supplied target year. Search uses source project names, IDs, site IDs, province, system, endpoints and technology where available. The grid voltage selector reads the explicit project `voltage_kv` for transmission and substation works. Generation projects are independent of the voltage selector. OSM status filters apply only to inventory records.
+The three project layers load independently when enabled. Filter projects by source, supplied stage and supplied target year. Search uses source project names, IDs, site IDs, province, system, endpoints and technology where available. The grid voltage selector reads the explicit project `voltage_kv` for transmission and substation projects. Generation projects are independent of the voltage selector. OSM status filters apply only to inventory records.
 
 ## Outputs and validation
 

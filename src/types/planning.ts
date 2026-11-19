@@ -4,7 +4,7 @@ export const planningKinds = ['transmission', 'substations', 'generators'] as co
 export type PlanningKind = typeof planningKinds[number]
 export const planningLabels: Record<PlanningKind, string> = {
   transmission: 'Transmission projects',
-  substations: 'Substation works',
+  substations: 'Substation projects',
   generators: 'Generation projects',
 }
 

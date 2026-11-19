@@ -46,13 +46,13 @@ The table compares all baseline records in MENTARI with IPM’s **15 November 20
 | Baseline transmission | 4,374 OSM line segments selected by numeric maximum voltage of 70, 150, 275 or 500 kV | 1,947 transmission sections with endpoint, route length and circuit fields |
 | Baseline substations | 622 primary polygons, 448 review polygons and 32 point candidates | 1,158 substation and switchyard entries with source IDs and capacity fields |
 | Baseline generation | 643 plant footprints, with no source unit for output | 3,199 generation entries, including captive plants, rooftop aggregates and electricity imports |
-| Planning inputs | 1,258 transmission entries, 1,740 substation works and 1,059 generation entries | Same three input files and counts |
+| Planning inputs | 1,258 transmission entries, 1,740 substation projects and 1,059 generation entries | Same three input files and counts |
 
 IPM combines PLN/ESDM planning material, OSM and its own mapping. Its release covers 38 provinces and reports across eight regions. The three planning files contain 34 distinct province labels and seven `system` values, with `NUSA_TENGGARA` covering both NTB and NTT. MENTARI retains the labels supplied for each project. The baseline GeoPackage supplies no official regional/system membership. Differences between baseline totals cannot quantify missing assets without matching and validating the underlying records. IPM counts rooftop aggregates and imports in its tables, although its map omits those points. [IPM data dictionary](https://indonesiapowermap.com/data/open/README.md) · [IPM publication policy](https://indonesiapowermap.com/docs/publication_policy.md)
 
 The reference map’s older **About** text, dated 22 September 2026, quotes 4,053 lines, about 990 substations (931 with coordinates), and 593 plants. The November downloads linked from that same page yield the comparison above. [Reference map and About](https://indonesiapowermap.com/web/preview_indonesia)
 
-Of the 4,057 planning records, 4,049 cite RUPTL and eight cite RUKN (seven transmission studies and one generation study). Substation works comprise 457 new works, 1,095 extensions and 188 uprates. IPM attributes all supplied point locations and line geometries to its manual mapping. Some locations or routes are indicative. In particular, line records carry `drawn`, `schematic`, `assumed` or `none` route status. A map symbol or line cannot verify exact siting, electrical connectivity or an operating date.
+Of the 4,057 planning records, 4,049 cite RUPTL and eight cite RUKN (seven transmission studies and one generation study). Substation projects comprise 457 new works, 1,095 extensions and 188 uprates. IPM attributes all supplied point locations and line geometries to its manual mapping. Some locations or routes are indicative. In particular, line records carry `drawn`, `schematic`, `assumed` or `none` route status. A map symbol or line cannot verify exact siting, electrical connectivity or an operating date.
 
 ## Remaining Deliverable 2 gaps
 

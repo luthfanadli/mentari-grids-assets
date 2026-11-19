@@ -23,7 +23,7 @@ const emit = defineEmits<{
 }>()
 const sections = [
   { title: 'Transmission', kind: 'transmission', key: 'lines', dataset: 'lines', label: 'Mapped lines', plan: 'Line projects' },
-  { title: 'Substations', kind: 'substations', key: 'primary', dataset: 'primary', label: 'Primary substations', plan: 'Substation works' },
+  { title: 'Substations', kind: 'substations', key: 'primary', dataset: 'primary', label: 'Primary substations', plan: 'Substation projects' },
   { title: 'Generation', kind: 'generators', key: 'powerPlants', dataset: 'power_plants', label: 'Power-plant footprints', plan: 'Generation projects' },
 ] as const
 const statuses: OsmStatus[] = ['not_flagged_in_osm', 'tagged_construction', 'tagged_disused']
