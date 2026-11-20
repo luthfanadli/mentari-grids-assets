@@ -7,7 +7,12 @@ onMounted(() => dialog.value?.showModal())
 <template>
   <dialog ref="dialog" class="provenance-dialog" aria-labelledby="about-title" @close="emit('close')" @click="event => { if (event.target === dialog) dialog?.close() }">
     <div class="dialog-inner">
-      <div class="drawer-heading"><h2 id="about-title">About the data</h2><button class="icon-button" aria-label="Close about data" @click="dialog?.close()">×</button></div>
+      <div class="drawer-heading">
+        <h2 id="about-title">About the data</h2>
+        <button type="button" class="icon-button" aria-label="Close about data" @click="dialog?.close()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
       <div class="about-body">
         <section aria-labelledby="about-assets">
           <h3 id="about-assets">Mapped assets</h3>
